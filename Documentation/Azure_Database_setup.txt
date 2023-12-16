@@ -1,0 +1,22 @@
+1) search for azure database for MYSQL servers
+2) click the blue button "Create azure database for mysql server"
+3) choose the flexible server option!
+
+Details i used: 
+subscriptions: Azure for students
+resource group: MP-Resource-Group (create new resource group with whatever u want.)
+server name: mpsqldatabase
+region: defaulted to East US 
+MYsql version: 8.0 
+workload type: for development or hobby projects
+enable high availability: Untick 
+authentication: mysql authentication only
+admin user: <Check whatsapp thanks>
+password: <check whatsapp thanks>
+
+Networking portion. 
+connectvitiy used: Public access (TEMP but should be configured to internal subnet ONLY in PROD!)
+
+rest ignore for now lol
+
+create and yippie!
