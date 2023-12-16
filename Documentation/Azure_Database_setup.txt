@@ -17,6 +17,8 @@ password: <check whatsapp thanks>
 Networking portion. 
 connectvitiy used: Public access (TEMP but should be configured to internal subnet ONLY in PROD!)
 
+
 rest ignore for now lol
 
 create and yippie!
+
