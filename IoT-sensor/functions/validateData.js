@@ -1,8 +1,9 @@
 var validator = require('validator');
 
 function isNumber(data) {
-    return !is
+    console.log("isNumber");
+
 
   }
   
-  module.exports = { isNumber} 
+  module.exports = { isNumber } 

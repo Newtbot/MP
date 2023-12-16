@@ -13,6 +13,8 @@
 2) validate the data
 */
 
+const { isNumber } = require("./functions/validateData");
+
 function generateRandomData() {
 	const psiData = getRandomValue(0, 500);
 	const humidityData = getRandomValue(0, 100);
@@ -36,7 +38,7 @@ function generateRandomData() {
 		windspeed: windspeedData.toFixed(0) + "km/h",
 		time: currentTime,
 	};
-
+    /*
 	console.log(json.psi);
 	console.log(json.humidity);
 	console.log(json.o3);
@@ -45,11 +47,17 @@ function generateRandomData() {
 	console.log(json.temperature);
 	console.log(json.windspeed);
 	console.log(json.time);
+    */
+    return json;
 }
 
 function getRandomValue(min, max) {
 	return Math.random() * (max - min) + min;
 }
 
-//every 5 minutes
-setInterval(generateRandomData, 300000);
+//5 minutes
+setInterval(() => {
+    var json = generateRandomData();
+    isNumber(json);
+}, 300000);
+
