@@ -1,7 +1,14 @@
 var validator = require('validator');
 
 function isNumber(data) {
-    console.log("isNumber");
+    if (validator.isNumeric(data))
+    {
+        console.log(data);
+    }
+    else
+    {
+        console.log("Invalid data");
+    }
 
 
   }

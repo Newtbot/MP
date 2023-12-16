@@ -10,7 +10,7 @@
 
 /*
 1) generate random data for each sensor
-2) validate the data
+3) send the coap request to the server
 */
 
 const { isNumber } = require("./functions/validateData");
@@ -38,16 +38,6 @@ function generateRandomData() {
 		windspeed: windspeedData.toFixed(0) + "km/h",
 		time: currentTime,
 	};
-    /*
-	console.log(json.psi);
-	console.log(json.humidity);
-	console.log(json.o3);
-	console.log(json.no2);
-	console.log(json.so2);
-	console.log(json.temperature);
-	console.log(json.windspeed);
-	console.log(json.time);
-    */
     return json;
 }
 
@@ -55,9 +45,16 @@ function getRandomValue(min, max) {
 	return Math.random() * (max - min) + min;
 }
 
+
 //5 minutes
 setInterval(() => {
     var json = generateRandomData();
-    isNumber(json);
+    console.log(json);
 }, 300000);
 
+/*
+setInterval(() => {
+    var json = generateRandomData();
+    console.log(json);
+}, 600);
+*/
