@@ -1,4 +1,4 @@
-<!-- views/home.ejs -->
+<!-- views/inusers.ejs -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
+  <title>In-House Users</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <style>
     body {
@@ -19,7 +19,7 @@
       width: 250px;
       position: fixed;
       background-color: #333;
-      padding-top: 60px; 
+      padding-top: 60px;
       transition: 0.5s;
     }
 
@@ -88,11 +88,15 @@
       transform: rotate(45deg) translate(-5px, -6px);
     }
 
+    /* Add additional styles specific to inusers.ejs below */
+    #userDataContainer {
+      margin-top: 20px;
+    }
+
     table {
       border-collapse: collapse;
-      width: 80%;
-      margin: 20px 0;
-      font-size: 16px;
+      width: 100%;
+      margin-top: 20px;
     }
 
     th, td {
@@ -112,6 +116,7 @@
     td {
       white-space: nowrap;
     }
+
   </style>
 </head>
 
@@ -124,37 +129,78 @@
       <span></span>
       <span></span>
     </div>
-    <a href="/inusers">In-House Users</a>
-    <a href="#">Users</a>
-    <a href="#">Data Analysis</a>
-    <a href="#">Logout</a>
+    <a href="#" id="userDataLink">User Data</a>
+    <a href="/inusers/edituserdata">Edit User Data</a>
   </div>
 
   <div id="content">
-    <h2>Welcome to the Home Page, <%= username %>!</h2>
-    <h3>Last 10 Logins:</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th>Last Login Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% loginLogs.forEach(log => { %>
-          <tr>
-            <td><%= log.username %></td>
-            <td><%= new Date(log.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) %></td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
+    <h2>Welcome to the In-House Users Page</h2>
 
+    <div id="userDataContainer">
+      <h3>All Users</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Last Login</th>
+            <th>Job Title</th>
+            <!-- Add more table headers as needed -->
+          </tr>
+        </thead>
+        <tbody>
+          <% if (allUsers && allUsers.length > 0) { %>
+            <% allUsers.forEach(user => { %>
+              <tr>
+                <td><%= user.name %></td>
+                <td><%= user.username %></td>
+                <td><%= user.email %></td>
+                <td><%= user.password %></td>
+                <td><%= new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) %></td>
+                <td><%= user.jobTitle %></td>
+                <!-- Add more table data cells as needed -->
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr>
+              <td colspan="6">No users available.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Additional content for In-House Users page goes here -->
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
       document.getElementById('sidebarCollapse').addEventListener('click', function () {
         document.getElementById('sidebar').style.width = (document.getElementById('sidebar').style.width === '250px') ? '0' : '250px';
       });
+
+      $(document).ready(function () {
+        function displayUserData() {
+          $.ajax({
+            url: '/inusers/userdata',
+            method: 'GET',
+            dataType: 'html',
+            success: function (data) {
+              $('#userDataContainer').html(data);
+            },
+            error: function (error) {
+              console.error('Error fetching user data:', error);
+              // Handle error as needed
+            }
+          });
+        }
+
+        // Call the function when the page loads
+        displayUserData();
+      });
     </script>
+
   </div>
 
 </body>
