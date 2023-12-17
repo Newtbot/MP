@@ -10,7 +10,8 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
-  <style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+ <style>
     body {
       margin: 0;
       font-family: 'Arial', sans-serif;
@@ -156,94 +157,92 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Data will be populated dynamically using JavaScript -->
+          <% if (allUsers && allUsers.length > 0) { %>
+            <% allUsers.forEach(user => { %>
+              <tr>
+                <td><%= user.name %></td>
+                <td><%= user.username %></td>
+                <td><%= user.email %></td>
+                <td><%= user.password %></td>
+                <td><%= new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) %></td>
+                <td><%= user.jobTitle %></td>
+                <!-- Add more table data cells as needed -->
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr>
+              <td colspan="6">No users available.</td>
+            </tr>
+          <% } %>
         </tbody>
       </table>
     </div>
 
     <!-- Additional content for In-House Users page goes here -->
+    <!-- Additional content for In-House Users page goes here -->
 
-    <script>
-      document.getElementById('sidebarCollapse').addEventListener('click', function () {
-        document.getElementById('sidebar').style.width = (document.getElementById('sidebar').style.width === '250px') ? '0' : '250px';
-      });
+<!-- Additional content for In-House Users page goes here -->
 
-      // Function to download data as Excel
-      function downloadExcel() {
-        // Assuming 'allUsers' is defined in the global scope
-        if (window.allUsers && window.allUsers.length > 0) {
-          const data = window.allUsers.map(user => [
-            user.name,
-            user.username,
-            user.email,
-            user.password,
-            new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }),
-            user.jobTitle
-            // Add more data fields as needed
-          ]);
+<!-- Additional content for In-House Users page goes here -->
 
-          const ws = XLSX.utils.aoa_to_sheet([['Name', 'Username', 'Email', 'Password', 'Last Login', 'Job Title'], ...data]);
-          const wb = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(wb, ws, 'All Users');
-          XLSX.writeFile(wb, 'user_data.xlsx');
-        } else {
-          console.error('No data available for download.');
-          // Handle the case where there is no data
-        }
-      }
+<script>
+  // Use the JSON data provided by the server
+  const allUsers = <%- JSON.stringify(allUsers) %>;
 
-      // Function to display user data
-      function displayUserData() {
-        $.ajax({
-          url: '/inusers/userdata',
-          method: 'GET',
-          dataType: 'json', // Assuming the response is JSON
-          success: function (data) {
-            window.allUsers = data; // Assuming the response contains user data
-            populateTable(data);
-          },
-          error: function (error) {
-            console.error('Error fetching user data:', error);
-            // Handle error as needed
-          }
-        });
-      }
 
-      // Function to populate the table with user data
-      function populateTable(users) {
-        const tbody = document.querySelector('tbody');
-        tbody.innerHTML = ''; // Clear existing data
+  // Attach click event to the download button
+  document.getElementById('downloadButton').addEventListener('click', function () {
+    console.log('Download button clicked');
+    downloadExcel(allUsers);
+  });
 
-        if (users && users.length > 0) {
-          users.forEach(user => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${user.name}</td>
-              <td>${user.username}</td>
-              <td>${user.email}</td>
-              <td>${user.password}</td>
-              <td>${new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' })}</td>
-              <td>${user.jobTitle}</td>
-              <!-- Add more table data cells as needed -->
-            `;
-            tbody.appendChild(row);
-          });
-        } else {
-          const row = document.createElement('tr');
-          row.innerHTML = `<td colspan="6">No users available.</td>`;
-          tbody.appendChild(row);
-        }
-      }
+  // Function to download data as Excel
+  function downloadExcel(allUsers) {
+  if (allUsers && allUsers.length > 0) {
+    const data = allUsers.map(user => [
+      user.name,
+      user.username,
+      user.email,
+      user.password,
+      new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }),
+      user.jobTitle
+    ]);
 
-      // Call the function when the page loads
-      displayUserData();
+    const ws = XLSX.utils.aoa_to_sheet([['Name', 'Username', 'Email', 'Password', 'Last Login', 'Job Title'], ...data]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'All Users');
 
-      // Attach click event to the download button
-      document.getElementById('downloadButton').addEventListener('click', function () {
-        downloadExcel();
-      });
-    </script>
+    // Use the correct MIME type for the blob
+    const blob = XLSX.write(wb, { bookType: 'xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
+    // Create a Blob containing the Excel file data
+    const blobData = new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+    // Create a Blob URL
+    const blobUrl = URL.createObjectURL(blobData);
+
+    // Create an anchor element and trigger the download
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = 'user_data.xlsx';
+    document.body.appendChild(a);
+    a.click();
+
+    // Clean up resources
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+  } else {
+    console.error('No data available for download.');
+  }
+}
+
+</script>
+
+
+
+
+
+    
   </div>
 
 </body>

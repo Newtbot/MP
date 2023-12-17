@@ -103,7 +103,6 @@ app.get('/home', isAuthenticated, (req, res) => {
     res.render('home', { username: req.session.username, loginLogs: loginResults });
   });
 });
-
 app.get('/inusers', isAuthenticated, (req, res) => {
   // Fetch all user data from the database
   const allUsersQuery = 'SELECT * FROM users';
@@ -115,10 +114,14 @@ app.get('/inusers', isAuthenticated, (req, res) => {
       return;
     }
 
-    // Render the inusers page with all user data
-    res.render('inusers', { allUsers: allUsers });
+    // Render the inusers page with JSON data
+    res.render('inusers', { allUsers });
   });
 });
+
+
+
+
 
 app.use(express.static('views'));
 
