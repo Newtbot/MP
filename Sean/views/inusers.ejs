@@ -8,6 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>In-House Users</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -131,11 +133,14 @@
     </div>
     <a href="#" id="userDataLink">User Data</a>
     <a href="/inusers/edituserdata">Edit User Data</a>
+    <a href="/home" id="homeLink">Home</a>
   </div>
 
   <div id="content">
     <h2>Welcome to the In-House Users Page</h2>
-
+    <div id="downloadButtonContainer">
+      <button id="downloadButton">Download as Excel</button>
+    </div>
     <div id="userDataContainer">
       <h3>All Users</h3>
       <table>
@@ -151,53 +156,91 @@
           </tr>
         </thead>
         <tbody>
-          <% if (allUsers && allUsers.length > 0) { %>
-            <% allUsers.forEach(user => { %>
-              <tr>
-                <td><%= user.name %></td>
-                <td><%= user.username %></td>
-                <td><%= user.email %></td>
-                <td><%= user.password %></td>
-                <td><%= new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) %></td>
-                <td><%= user.jobTitle %></td>
-                <!-- Add more table data cells as needed -->
-              </tr>
-            <% }); %>
-          <% } else { %>
-            <tr>
-              <td colspan="6">No users available.</td>
-            </tr>
-          <% } %>
+          <!-- Data will be populated dynamically using JavaScript -->
         </tbody>
       </table>
     </div>
 
     <!-- Additional content for In-House Users page goes here -->
 
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
       document.getElementById('sidebarCollapse').addEventListener('click', function () {
         document.getElementById('sidebar').style.width = (document.getElementById('sidebar').style.width === '250px') ? '0' : '250px';
       });
 
-      $(document).ready(function () {
-        function displayUserData() {
-          $.ajax({
-            url: '/inusers/userdata',
-            method: 'GET',
-            dataType: 'html',
-            success: function (data) {
-              $('#userDataContainer').html(data);
-            },
-            error: function (error) {
-              console.error('Error fetching user data:', error);
-              // Handle error as needed
-            }
-          });
-        }
+      // Function to download data as Excel
+      function downloadExcel() {
+        // Assuming 'allUsers' is defined in the global scope
+        if (window.allUsers && window.allUsers.length > 0) {
+          const data = window.allUsers.map(user => [
+            user.name,
+            user.username,
+            user.email,
+            user.password,
+            new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }),
+            user.jobTitle
+            // Add more data fields as needed
+          ]);
 
-        // Call the function when the page loads
-        displayUserData();
+          const ws = XLSX.utils.aoa_to_sheet([['Name', 'Username', 'Email', 'Password', 'Last Login', 'Job Title'], ...data]);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, 'All Users');
+          XLSX.writeFile(wb, 'user_data.xlsx');
+        } else {
+          console.error('No data available for download.');
+          // Handle the case where there is no data
+        }
+      }
+
+      // Function to display user data
+      function displayUserData() {
+        $.ajax({
+          url: '/inusers/userdata',
+          method: 'GET',
+          dataType: 'json', // Assuming the response is JSON
+          success: function (data) {
+            window.allUsers = data; // Assuming the response contains user data
+            populateTable(data);
+          },
+          error: function (error) {
+            console.error('Error fetching user data:', error);
+            // Handle error as needed
+          }
+        });
+      }
+
+      // Function to populate the table with user data
+      function populateTable(users) {
+        const tbody = document.querySelector('tbody');
+        tbody.innerHTML = ''; // Clear existing data
+
+        if (users && users.length > 0) {
+          users.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${user.name}</td>
+              <td>${user.username}</td>
+              <td>${user.email}</td>
+              <td>${user.password}</td>
+              <td>${new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' })}</td>
+              <td>${user.jobTitle}</td>
+              <!-- Add more table data cells as needed -->
+            `;
+            tbody.appendChild(row);
+          });
+        } else {
+          const row = document.createElement('tr');
+          row.innerHTML = `<td colspan="6">No users available.</td>`;
+          tbody.appendChild(row);
+        }
+      }
+
+      // Call the function when the page loads
+      displayUserData();
+
+      // Attach click event to the download button
+      document.getElementById('downloadButton').addEventListener('click', function () {
+        downloadExcel();
       });
     </script>
 
