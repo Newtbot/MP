@@ -7,7 +7,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 require('dotenv').config();
 
-// MySQL setup (replace with your MySQL connection details)
 const mysqlConfig = {
   host: process.env.host,
   user: process.env.user,
