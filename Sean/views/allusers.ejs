@@ -1,0 +1,30 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Users</title>
+  <!-- Add any additional styles or dependencies here -->
+</head>
+<body>
+  <h2>All Users</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Username</th>
+        <!-- Add additional columns as needed -->
+      </tr>
+    </thead>
+    <tbody>
+      <% for (let i = 0; i < users.length; i++) { %>
+        <tr>
+          <td><%= users[i].username %></td>
+          <!-- Add additional columns as needed -->
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</body>
+</html>
