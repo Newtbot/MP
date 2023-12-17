@@ -7,120 +7,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>In-House Users</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
- <style>
-    body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-    }
-
-    #sidebar {
-      height: 100%;
-      width: 250px;
-      position: fixed;
-      background-color: #333;
-      padding-top: 60px;
-      transition: 0.5s;
-    }
-
-    #sidebar img {
-      width: 100%;
-      margin-bottom: 20px;
-    }
-
-    #sidebar a {
-      padding: 10px 15px;
-      text-decoration: none;
-      font-size: 18px;
-      color: white;
-      display: block;
-      transition: 0.3s;
-    }
-
-    #sidebar a:hover {
-      background-color: #555;
-    }
-
-    #content {
-      margin-left: 250px;
-      padding: 16px;
-    }
-
-    @media screen and (max-width: 600px) {
-      #sidebar {
-        width: 0;
-        overflow-x: hidden;
-      }
-
-      #content {
-        margin-left: 0;
-      }
-    }
-
-    #sidebarCollapse {
-      width: 40px;
-      height: 40px;
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      cursor: pointer;
-      z-index: 1;
-    }
-
-    #sidebarCollapse span {
-      display: block;
-      background: white;
-      height: 5px;
-      width: 30px;
-      margin: 6px auto;
-      transition: 0.3s;
-    }
-
-    #sidebarCollapse:hover span:nth-child(1) {
-      transform: rotate(-45deg) translate(-5px, 6px);
-    }
-
-    #sidebarCollapse:hover span:nth-child(2) {
-      opacity: 0;
-    }
-
-    #sidebarCollapse:hover span:nth-child(3) {
-      transform: rotate(45deg) translate(-5px, -6px);
-    }
-
-    /* Add additional styles specific to inusers.ejs below */
-    #userDataContainer {
-      margin-top: 20px;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 20px;
-    }
-
-    th, td {
-      border: 1px solid #dddddd;
-      text-align: left;
-      padding: 12px;
-    }
-
-    th {
-      background-color: #f2f2f2;
-    }
-
-    tr:hover {
-      background-color: #f5f5f5;
-    }
-
-    td {
-      white-space: nowrap;
-    }
-
-  </style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/style.css">
+  
 </head>
 
 <body>
@@ -133,7 +22,8 @@
       <span></span>
     </div>
     <a href="#" id="userDataLink">User Data</a>
-    <a href="/inusers/edituserdata">Edit User Data</a>
+    <a href="#" id="addUserLink">Add User</a>
+    <a href="#" id="deleteUserLink">Delete User</a>
     <a href="/home" id="homeLink">Home</a>
   </div>
 
@@ -153,7 +43,6 @@
             <th>Password</th>
             <th>Last Login</th>
             <th>Job Title</th>
-            <!-- Add more table headers as needed -->
           </tr>
         </thead>
         <tbody>
@@ -166,7 +55,6 @@
                 <td><%= user.password %></td>
                 <td><%= new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) %></td>
                 <td><%= user.jobTitle %></td>
-                <!-- Add more table data cells as needed -->
               </tr>
             <% }); %>
           <% } else { %>
@@ -177,72 +65,136 @@
         </tbody>
       </table>
     </div>
+    <div class="container">
+      <div class="title">Registration</div>
+      <div class="content">
+        <form action="#">
+          <div class="user-details">
+            <div class="input-box">
+              <span class="details">Full Name</span>
+              <input type="text" placeholder="Enter your name" required>
+            </div>
+            <div class="input-box">
+              <span class="details">Username</span>
+              <input type="text" placeholder="Enter your username" required>
+            </div>
+            <div class="user-creation-container">
+            <div class="input-box">
+              <span class="details">Email</span>
+              <input type="text" placeholder="Enter your email" required>
+            </div>
+            <div class="input-box">
+              <span class="details">Phone Number</span>
+              <input type="text" placeholder="Enter your number" required>
+            </div>
+            <div class="input-box">
+              <span class="details">Password</span>
+              <input type="text" placeholder="Enter your password" required>
+            </div>
+            <div class="input-box">
+              <span class="details">Confirm Password</span>
+              <input type="text" placeholder="Confirm your password" required>
+            </div>
+          </div>
+          <div class="gender-details">
+            <input type="radio" name="gender" id="dot-1">
+            <input type="radio" name="gender" id="dot-2">
+            <input type="radio" name="gender" id="dot-3">
+            <span class="gender-title">Gender</span>
+            <div class="category">
+              <label for="dot-1">
+              <span class="dot one"></span>
+              <span class="gender">Male</span>
+            </label>
+            <label for="dot-2">
+              <span class="dot two"></span>
+              <span class="gender">Female</span>
+            </label>
+            <label for="dot-3">
+              <span class="dot three"></span>
+              <span class="gender">Prefer not to say</span>
+              </label>
+            </div>
+          </div>
+          <div class="button">
+            <input type="submit" value="Register">
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
-    <!-- Additional content for In-House Users page goes here -->
-    <!-- Additional content for In-House Users page goes here -->
+  <!-- Your existing script tags -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js"></script>
 
-<!-- Additional content for In-House Users page goes here -->
+  <script>
+    const allUsers = <%- JSON.stringify(allUsers) %>;
 
-<!-- Additional content for In-House Users page goes here -->
+    document.getElementById('downloadButton').addEventListener('click', function () {
+      console.log('Download button clicked');
+      downloadExcel(allUsers);
+    });
 
-<script>
-  // Use the JSON data provided by the server
-  const allUsers = <%- JSON.stringify(allUsers) %>;
+    document.getElementById('addUserLink').addEventListener('click', function () {
+      document.getElementById('downloadButtonContainer').style.display = 'none';
+      document.getElementById('userDataContainer').style.display = 'none';
+      document.getElementById('createUserForm').style.display = 'block';
+    });
 
+    document.getElementById('userDataLink').addEventListener('click', function () {
+      document.getElementById('downloadButtonContainer').style.display = 'block';
+      document.getElementById('userDataContainer').style.display = 'block';
+      document.getElementById('createUserForm').style.display = 'none';
+    });
 
-  // Attach click event to the download button
-  document.getElementById('downloadButton').addEventListener('click', function () {
-    console.log('Download button clicked');
-    downloadExcel(allUsers);
-  });
+    document.getElementById('userForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const formData = new FormData(this);
+      const newUser = {};
+      formData.forEach((value, key) => {
+        newUser[key] = value;
+      });
+      console.log('New User:', newUser);
+      // You can send the newUser data to your server here
+    });
 
-  // Function to download data as Excel
-  function downloadExcel(allUsers) {
-  if (allUsers && allUsers.length > 0) {
-    const data = allUsers.map(user => [
-      user.name,
-      user.username,
-      user.email,
-      user.password,
-      new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }),
-      user.jobTitle
-    ]);
+    function downloadExcel(allUsers) {
+      if (allUsers && allUsers.length > 0) {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('All Users');
+        const headers = ['Name', 'Username', 'Email', 'Password', 'Last Login', 'Job Title'];
+        worksheet.addRow(headers);
+        allUsers.forEach(user => {
+          const rowData = [
+            user.name || '',
+            user.username || '',
+            user.email || '',
+            user.password || '',
+            user.lastLogin ? new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) : '',
+            user.jobTitle || ''
+          ];
+          worksheet.addRow(rowData);
+        });
+        workbook.xlsx.writeBuffer().then(buffer => {
+          const currentDate = new Date();
+          const formattedDate = currentDate.toISOString().split('T')[0];
+          const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '-');
+          const fileName = `user_data_${formattedDate}_${formattedTime}.xlsx`;
+          const blob = new Blob([buffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          });
+          saveAs(blob, fileName);
+        });
+      } else {
+        console.error('No data available for download.');
+      }
+    }
+  </script>
 
-    const ws = XLSX.utils.aoa_to_sheet([['Name', 'Username', 'Email', 'Password', 'Last Login', 'Job Title'], ...data]);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'All Users');
-
-    // Use the correct MIME type for the blob
-    const blob = XLSX.write(wb, { bookType: 'xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
-    // Create a Blob containing the Excel file data
-    const blobData = new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
-    // Create a Blob URL
-    const blobUrl = URL.createObjectURL(blobData);
-
-    // Create an anchor element and trigger the download
-    const a = document.createElement('a');
-    a.href = blobUrl;
-    a.download = 'user_data.xlsx';
-    document.body.appendChild(a);
-    a.click();
-
-    // Clean up resources
-    document.body.removeChild(a);
-    URL.revokeObjectURL(blobUrl);
-  } else {
-    console.error('No data available for download.');
-  }
-}
-
-</script>
-
-
-
-
-
-    
   </div>
 
 </body>
