@@ -1,16 +1,16 @@
-require("dotenv").config({ path: "../../.env" }); 
+require("dotenv").config({ path: "../.env" });
 const Sequelize = require("sequelize");
 
 const sequelize = new Sequelize(
- "your_database_name",
- process.env.
- process.env.,
-{
-    host: '',
-    dialect: 'mysql'
-  }
-);
+ "adminusers",
+ process.env.DB_USER,
+ process.env.DB_PASS,
 
+ {
+    host: "mpsqldatabasean.mysql.database.azure.com",
+    dialect: 'mysql'
+ }
+);
 
 sequelize.authenticate().then(() => {
    console.log('Connection has been established successfully.');
