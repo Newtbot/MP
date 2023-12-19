@@ -1,0 +1,101 @@
+/* user-creation.css */
+
+.user-creation-container {
+    margin-top: 20px;
+}
+
+.user-creation-container form {
+    max-width: 400px;
+    margin: auto;
+}
+
+.user-creation-container .user-details .input-box {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.user-creation-container .user-details .input-box input,
+.user-creation-container .user-details .input-box select {
+    height: 45px;
+    width: 100%;
+    outline: none;
+    font-size: 16px;
+    border-radius: 5px;
+    padding-left: 15px;
+    border: 1px solid #ccc;
+    border-bottom-width: 2px;
+    transition: all 0.3s ease;
+}
+
+.user-creation-container .user-details .input-box input:focus,
+.user-creation-container .user-details .input-box input:valid,
+.user-creation-container .user-details .input-box select:focus {
+    border-color: #9b59b6;
+}
+
+.user-creation-container form .category {
+    display: flex;
+    width: 100%;
+    margin: 14px 0;
+    justify-content: space-between;
+}
+
+.user-creation-container form .category select {
+    height: 45px;
+    width: 100%; /* Adjusted width to match other input boxes */
+    outline: none;
+    font-size: 16px;
+    border-radius: 5px;
+    padding-left: 15px;
+    border: 1px solid #ccc;
+    transition: all 0.3s ease;
+}
+
+.user-creation-container form .button {
+    height: 45px;
+    margin: 35px 0;
+}
+
+.user-creation-container form .button input {
+    height: 100%;
+    width: 100%;
+    border-radius: 5px;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+}
+
+.user-creation-container form .button input:hover {
+    background: linear-gradient(-135deg, #71b7e6, #9b59b6);
+}
+
+@media (max-width: 584px) {
+    .user-creation-container .user-details .input-box {
+        margin-bottom: 15px;
+        width: 100%;
+    }
+
+    .user-creation-container form .category {
+        width: 100%;
+    }
+
+    .user-creation-container .content form .user-details {
+        max-height: 300px;
+        overflow-y: scroll;
+    }
+
+    .user-creation-container .user-details::-webkit-scrollbar {
+        width: 5px;
+    }
+}
+
+@media (max-width: 459px) {
+    .user-creation-container .container .content .category {
+        flex-direction: column;
+    }
+}

@@ -2,6 +2,8 @@ const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +18,13 @@ const mysqlConfig = {
 };
 
 const mysqlConnection = mysql.createConnection(mysqlConfig);
+mysqlConnection.connect((err) => {
+  if (err) {
+    console.error('Error connecting to MySQL:', err);
+    return;
+  }
+  console.log('Connected to MySQL');
+});
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({ secret: 'your_session_secret', resave: false, saveUninitialized: true }));
@@ -119,6 +128,64 @@ app.get('/inusers', isAuthenticated, (req, res) => {
   });
 });
 
+app.post('/createUser', async (req, res) => {
+  try {
+    const { name, username, email, password, jobTitle } = req.body;
+
+    // Hash the password using bcrypt
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Start a transaction
+    mysqlConnection.beginTransaction((transactionErr) => {
+      if (transactionErr) {
+        console.error('Error starting transaction:', transactionErr);
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+      }
+
+      // Define the insert query
+      const insertUserQuery = 'INSERT INTO users (name, username, email, password, lastLogin, jobTitle) VALUES (?, ?, ?, ?, NULL, ?)';
+
+      // Log the query and its parameters
+      console.log('Insert Query:', insertUserQuery);
+      console.log('Query Parameters:', [name, username, email, hashedPassword, jobTitle]);
+
+      // Execute the query with user data
+      mysqlConnection.query(insertUserQuery, [name, username, email, hashedPassword, jobTitle], (queryErr, results) => {
+        if (queryErr) {
+          console.error('Error executing query:', queryErr);
+
+          // Rollback the transaction in case of an error
+          mysqlConnection.rollback((rollbackErr) => {
+            if (rollbackErr) {
+              console.error('Error rolling back transaction:', rollbackErr);
+            }
+            res.status(500).json({ error: 'Internal Server Error' });
+          });
+          return;
+        }
+
+        // Commit the transaction
+        mysqlConnection.commit((commitErr) => {
+          if (commitErr) {
+            console.error('Error committing transaction:', commitErr);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+          }
+
+          // Log the results of the query
+          console.log('Query Results:', results);
+
+          // Respond with a success message
+          res.status(201).json({ message: 'User created successfully' });
+        });
+      });
+    });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 
