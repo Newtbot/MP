@@ -1,6 +1,6 @@
 'use strict';
 const { Sequelize, DataTypes } = require('sequelize');
-const { sequelize } = require("../mySQL.js")
+const { sequelize } = require("../mySql.js");
 
 const userModel = sequelize.define('users', {
     // Model attributes are defined here

@@ -1,6 +1,6 @@
 'use strict';
 const { Sequelize, DataTypes } = require('sequelize');
-const { sequelize } = require("../mySQL.js")
+const { sequelize } = require("../nySql.js")
 
 const adminUserModel = sequelize.define('adminusers', {
     // Model attributes are defined here
