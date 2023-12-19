@@ -12,8 +12,9 @@ async function getallData() {
     return allData;
     }
     catch(error) {
-        console.error('Error:', error);
+        console.error(error);
         return null;
+
     }
 }
 
@@ -27,8 +28,9 @@ router.get('/', async (req, res) => {
       res.send(data);   
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error(error);
     res.status(500).send('Internal Server Error');
+    
   }
 });
 

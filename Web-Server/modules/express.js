@@ -6,13 +6,13 @@
 */
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = 80;
 
 const testRoute = require("../routes/test.js")
-const testRoute1 = require("../routes/latest-Data.js")
+const latestDataroute = require("../routes/latest-Data.js")
 
 app.use('/test', testRoute); 
-app.use('/api/latest-data', testRoute1);
+app.use('/api/latest-data', latestDataroute);
 
 
 app.listen(port, () => {

@@ -13,7 +13,7 @@ async function getLatestData() {
     return latestData;
   }
   catch (error) {
-    console.error('Error:', error);
+    console.error(error);
     return null;
   }
 }
@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
       res.status(200).send(data);
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error(error);
     res.status(500).send('Internal Server Error');
   }
 });
