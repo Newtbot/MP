@@ -3,7 +3,8 @@ const session = require('express-session');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
-
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -28,6 +29,17 @@ mysqlConnection.connect((err) => {
   console.log('Connected to MySQL');
 });
 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587, // use the appropriate port for your SMTP server
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.euser,
+    pass: process.env.epass
+  },
+});
+console.log(process.env.euser);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({ secret: 'your_session_secret', resave: false, saveUninitialized: true }));
 app.set('view engine', 'ejs');
@@ -256,8 +268,117 @@ app.post('/createUser', (req, res) => {
   }
 });
 
+app.get('/forgot-password', (req, res) => {
+  res.render('forgot-password'); // Assuming you have an EJS template for this
+});
 
+app.get('/forgot-password', (req, res) => {
+  res.render('forgot-password', { error: null, success: null });
+});
 
+// Handle the submission of the forgot password form
+app.post('/forgot-password', (req, res) => {
+  const { usernameOrEmail } = req.body;
+
+  // Perform the logic for sending the reset password email
+  // This is a simplified example, you should implement your own logic here
+
+  // Check if the username or email exists in the database
+  const checkUserQuery = 'SELECT * FROM users WHERE username = ? OR email = ?';
+  mysqlConnection.query(checkUserQuery, [usernameOrEmail, usernameOrEmail], (checkError, checkResults) => {
+    if (checkError) {
+      console.error('Error checking user:', checkError);
+      const error = 'An error occurred during the password reset process.';
+      res.render('forgot-password', { error, success: null });
+    } else if (checkResults.length === 0) {
+      const error = 'Username or email not found.';
+      res.render('forgot-password', { error, success: null });
+    } else {
+      // Assuming the user exists, generate a reset token and send an email
+      const user = checkResults[0];
+      const resetToken = crypto.randomBytes(20).toString('hex');
+      const resetTokenExpiry = new Date(Date.now() + 3600000); // Token expires in 1 hour
+
+      // Update user with reset token and expiry
+      const updateQuery = 'UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?';
+      mysqlConnection.query(updateQuery, [resetToken, resetTokenExpiry, user.id], (updateError) => {
+        if (updateError) {
+          console.error('Error updating reset token:', updateError);
+          const error = 'An error occurred during the password reset process.';
+          res.render('forgot-password', { error, success: null });
+        } else {
+          // Send email with reset link
+          const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
+          const mailOptions = {
+            to: user.email,
+            subject: 'Password Reset',
+            text: `Click on the following link to reset your password: ${resetLink}`,
+          };
+
+          transporter.sendMail(mailOptions, (emailError, info) => {
+            if (emailError) {
+              console.error('Error sending email:', emailError);
+              const error = 'An error occurred during the password reset process.';
+              res.render('forgot-password', { error, success: null });
+            } else {
+              console.log('Email sent: ' + info.response);
+              const success = 'Password reset email sent successfully. Check your inbox.';
+              res.render('forgot-password', { error: null, success });
+            }
+          });
+        }
+      });
+    }
+  });
+});
+// Handle Reset Password request
+app.post('/reset-password/:token', async (req, res) => {
+  const { token } = req.params;
+  const { password, confirmPassword } = req.body;
+
+  // Find user with matching reset token and not expired
+  const selectQuery = 'SELECT * FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()';
+  mysqlConnection.query(selectQuery, [token], async (selectErr, selectResults) => {
+    if (selectErr) {
+      console.error('Error querying reset token:', selectErr);
+      return res.status(500).json({ error: 'Error querying reset token' });
+    }
+
+    if (selectResults.length === 0) {
+      return res.status(400).json({ error: 'Invalid or expired reset token' });
+    }
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      return res.render('reset-password', { token, error: 'Passwords do not match' });
+    }
+
+    // Check if the new password meets complexity requirements
+    if (!isStrongPassword(password)) {
+      return res.render('reset-password', { token, error: 'Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Update user's password and clear reset token
+    const updateQuery = 'UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE reset_token = ?';
+    mysqlConnection.query(updateQuery, [hashedPassword, token], (updateErr) => {
+      if (updateErr) {
+        console.error('Error updating password:', updateErr);
+        res.status(500).json({ error: 'Error updating password' });
+      } else {
+        res.render('reset-password', { error: null, success: 'Password changed successfully', token });
+      }
+    });
+  });
+});
+
+app.get('/reset-password/:token', (req, res) => {
+  const { token } = req.params;
+  const error = req.query.error || null; // Get error from query parameter
+  res.render('reset-password', { token, error: null, success: null });
+});
 
 app.use(express.static('views'));
 
