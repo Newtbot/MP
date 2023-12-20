@@ -39,7 +39,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.epass
   },
 });
-console.log(process.env.euser);
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({ secret: 'your_session_secret', resave: false, saveUninitialized: true }));
 app.set('view engine', 'ejs');
@@ -332,6 +332,7 @@ app.post('/forgot-password', (req, res) => {
   });
 });
 // Handle Reset Password request
+// Handle Reset Password request
 app.post('/reset-password/:token', async (req, res) => {
   const { token } = req.params;
   const { password, confirmPassword } = req.body;
@@ -345,17 +346,20 @@ app.post('/reset-password/:token', async (req, res) => {
     }
 
     if (selectResults.length === 0) {
-      return res.status(400).json({ error: 'Invalid or expired reset token' });
+      // Pass the error to the template when rendering the reset-password page
+      return res.render('reset-password', { token, resetError: 'Invalid or expired reset token' });
     }
 
     // Check if passwords match
     if (password !== confirmPassword) {
-      return res.render('reset-password', { token, error: 'Passwords do not match' });
+      // Pass the error to the template when rendering the reset-password page
+      return res.render('reset-password', { token, resetError: 'Passwords do not match' });
     }
 
     // Check if the new password meets complexity requirements
     if (!isStrongPassword(password)) {
-      return res.render('reset-password', { token, error: 'Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.' });
+      // Pass the error to the template when rendering the reset-password page
+      return res.render('reset-password', { token, resetError: 'Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.' });
     }
 
     // Hash the new password
@@ -366,18 +370,24 @@ app.post('/reset-password/:token', async (req, res) => {
     mysqlConnection.query(updateQuery, [hashedPassword, token], (updateErr) => {
       if (updateErr) {
         console.error('Error updating password:', updateErr);
-        res.status(500).json({ error: 'Error updating password' });
+        // Pass the error to the template when rendering the reset-password page
+        res.render('reset-password', { token, resetError: 'Error updating password' });
       } else {
-        res.render('reset-password', { error: null, success: 'Password changed successfully', token });
+        // Pass the success message to the template when rendering the reset-password page
+        res.render('reset-password', { token, resetError: null, success: 'Password changed successfully' });
       }
     });
   });
 });
 
+
+
 app.get('/reset-password/:token', (req, res) => {
   const { token } = req.params;
   const error = req.query.error || null; // Get error from query parameter
-  res.render('reset-password', { token, error: null, success: null });
+// Assuming you have this line in your server code where you render the reset-password view
+res.render('reset-password', { token, passwordValidationError: null, resetError: null, success: null });
+
 });
 
 app.use(express.static('views'));
