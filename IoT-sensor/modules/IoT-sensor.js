@@ -13,7 +13,7 @@
 3) send the coap request to the server
 */
 
-const { isNumber } = require("./functions/validateData");
+const { isNumber } = require("../functions/validateData");
 
 let region = ["central", "north-east", "north", "east", "west"];
 
@@ -51,7 +51,7 @@ function getRandomValue(min, max) {
 	return Math.random() * (max - min) + min;
 }
 
-function iot_sensor_data() {
+async function iot_sensor_data() {
 	//5 minutes
 	setInterval(() => {
 		var json = generateRandomData();
