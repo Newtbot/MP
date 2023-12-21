@@ -1,0 +1,12 @@
+{
+  psi: '34',
+  humidity: '11%',
+  o3: '326ppm',
+  no2: '445ppm',
+  so2: '511ppm',
+  co: '16ppm',
+  temperature: '25°C',
+  windspeed: '2km/h',
+  time: '2023-12-21 14:24:44',
+  region: 'east'
+}

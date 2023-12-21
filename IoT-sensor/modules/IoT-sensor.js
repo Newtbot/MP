@@ -13,7 +13,7 @@
 3) send the coap request to the server
 */
 
-const { isNumber } = require("../functions/validateData");
+const { isNumber } = require("../../Web-Server/functions/validateData");
 
 let region = ["central", "north-east", "north", "east", "west"];
 
