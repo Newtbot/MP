@@ -332,7 +332,6 @@ app.post('/forgot-password', (req, res) => {
   });
 });
 // Handle Reset Password request
-// Handle Reset Password request
 app.post('/reset-password/:token', async (req, res) => {
   const { token } = req.params;
   const { password, confirmPassword } = req.body;
@@ -373,13 +372,16 @@ app.post('/reset-password/:token', async (req, res) => {
         // Pass the error to the template when rendering the reset-password page
         res.render('reset-password', { token, resetError: 'Error updating password' });
       } else {
-        // Pass the success message to the template when rendering the reset-password page
-        res.render('reset-password', { token, resetError: null, success: 'Password changed successfully' });
+        // Redirect to the success page upon successful password reset
+        res.redirect('/success');
       }
     });
   });
 });
 
+app.get('/success', (req, res) => {
+  res.render('success');
+});
 
 
 app.get('/reset-password/:token', (req, res) => {
@@ -389,7 +391,64 @@ app.get('/reset-password/:token', (req, res) => {
 res.render('reset-password', { token, passwordValidationError: null, resetError: null, success: null });
 
 });
+app.post('/reset-password', async (req, res) => {
+  const { username, password, confirmPassword } = req.body;
 
+  // Check if passwords match
+  if (password !== confirmPassword) {
+    return res.status(400).json({ error: 'Passwords do not match' });
+  }
+
+  // Check if the new password meets complexity requirements
+  if (!isStrongPassword(password)) {
+    return res.status(400).json({
+      error: 'Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.'
+    });
+  }
+
+  // Hash the new password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Check if the user exists in the database before updating the password
+  const userExists = await checkIfUserExists(username);
+
+  if (!userExists) {
+    return res.status(404).json({ error: 'User does not exist' });
+  }
+
+  // Update user's password based on the username
+  const updateQuery = 'UPDATE users SET password = ? WHERE username = ?';
+  mysqlConnection.query(updateQuery, [hashedPassword, username], (updateErr, updateResults) => {
+    if (updateErr) {
+      console.error('Error updating password:', updateErr);
+      return res.status(500).json({ error: 'Error updating password' });
+    }
+
+    // Check if the update affected any rows
+    if (updateResults.affectedRows > 0) {
+      // Password update successful
+      return res.status(200).json({ success: 'Password updated successfully' });
+    } else {
+      return res.status(404).json({ error: 'User not found or password not updated. No rows affected.' });
+    }
+  });
+});
+async function checkIfUserExists(username) {
+  // Example: Check if the user exists in your database
+  // You should replace this with your actual database query
+  // This is just a placeholder, and you need to implement it based on your database structure and connection
+
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT * FROM users WHERE username = ?';
+    mysqlConnection.query(query, [username], (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(results.length > 0);
+      }
+    });
+  });
+}
 app.use(express.static('views'));
 
 app.listen(PORT, () => {

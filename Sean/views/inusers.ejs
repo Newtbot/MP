@@ -27,6 +27,7 @@
     <a href="#" id="userDataLink">User Data</a>
     <a href="#" id="addUserLink">Add User</a>
     <a href="#" id="deleteUserLink">Delete User</a>
+    <a href="#" id="resetPasswordLink">Reset Password</a>
     <a href="/home" id="homeLink">Home</a>
   </div>
 
@@ -106,8 +107,36 @@
           </div>
         </form>
       </div>
+      div id="createUserForm" class="user-creation-container" style="display: none;">
+      <!-- ... existing user creation form ... -->
     </div>
-  </div>
+    <div id="resetPasswordFormContainer" style="display: none;">
+      <div id="resetPasswordForm" class="user-creation-container">
+        <div class="title">Reset Password</div>
+        <div class="content">
+          <form id="resetPasswordForm">
+            <div class="user-details">
+              <div class="input-box">
+                <span class="details">Username</span>
+                <input type="text" name="username" id="resetUsername" placeholder="Enter username" required>
+              </div>
+              <div class="input-box">
+                <span class="details">New Password</span>
+                <input type="password" name="password" id="resetPassword" placeholder="Enter new password" required>
+              </div>
+              <div class="input-box">
+                <span class="details">Confirm Password</span>
+                <input type="password" name="confirmPassword" id="resetConfirmPassword" placeholder="Confirm new password" required>
+              </div>
+            </div>
+            <div class="button">
+              <input type="submit" value="Reset Password">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
 
   <!-- Your existing script tags -->
   
@@ -120,109 +149,32 @@
   <script>
      const allUsers = <%- JSON.stringify(allUsers) %>;
 
-document.getElementById('downloadButton').addEventListener('click', function () {
-  console.log('Download button clicked');
-  downloadExcel(allUsers);
-});
-
-document.getElementById('addUserLink').addEventListener('click', function () {
-  document.getElementById('downloadButtonContainer').style.display = 'none';
-  document.getElementById('userDataContainer').style.display = 'none';
-  document.getElementById('createUserForm').style.display = 'block';
-});
-
-document.getElementById('userDataLink').addEventListener('click', function () {
-  document.getElementById('downloadButtonContainer').style.display = 'block';
-  document.getElementById('userDataContainer').style.display = 'block';
-  document.getElementById('createUserForm').style.display = 'none';
-});
-
-document.getElementById('userForm').addEventListener('submit', function (event) {
-    event.preventDefault();
-
-    // Use FormData directly
-    const formData = new FormData(document.getElementById('userForm'));
-
-    // Check password complexity
-    const password = formData.get('password');
-    const confirmPassword = formData.get('confirmPassword');
-
-    if (!isStrongPassword(password)) {
-      alert('Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.');
-      return;
-    }
-
-    // Check if passwords match
-    if (password !== confirmPassword) {
-      alert('Passwords do not match. Please enter the same password in both fields.');
-      return;
-    }
-
-    // Make a fetch request
-    fetch('/createUser', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: formData.get('name'),
-        username: formData.get('username'),
-        email: formData.get('email'),
-        password: password, // Use the validated password
-        jobTitle: formData.get('jobTitle'),
-      }),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log('Success:', data);
-
-        // Show an alert with the received data
-        alert(`User Registered!`);
-
-        // Optionally, you can clear the form or take other actions after registration
-        document.getElementById('userForm').reset();
-      })
-      .catch(error => {
-        console.error('Fetch Error:', error);
-      });
+$(document).ready(function () {
+  $('#resetPasswordLink').on('click', function () {
+    $('#resetPasswordFormContainer').show();
+    $('#createUserForm').hide();
+    $('#userDataContainer').hide();
+    $('#downloadButtonContainer').hide();
   });
 
-  // Function to validate password complexity
-  function isStrongPassword(password) {
-    // Password must be at least 10 characters long
-    if (password.length < 10) {
-      return false;
-    }
+  $('#addUserLink').on('click', function () {
+    $('#resetPasswordFormContainer').hide();
+    $('#createUserForm').show();
+    $('#userDataContainer').hide();
+    $('#downloadButtonContainer').hide();
+  });
 
-    // Password must contain at least one uppercase letter
-    if (!/[A-Z]/.test(password)) {
-      return false;
-    }
-
-    // Password must contain at least one lowercase letter
-    if (!/[a-z]/.test(password)) {
-      return false;
-    }
-
-    // Password must contain at least one digit
-    if (!/\d/.test(password)) {
-      return false;
-    }
-
-    // Password must contain at least one symbol
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      return false;
-    }
-
-    return true;
-  }
-
-
+  $('#userDataLink').on('click', function () {
+    $('#resetPasswordFormContainer').hide();
+    $('#createUserForm').hide();
+    $('#userDataContainer').show();
+    $('#downloadButtonContainer').show();
+  });
+});
+$('#downloadButton').on('click', function () {
+    // Call the downloadExcel function with the allUsers data
+    downloadExcel(allUsers);
+  });
     function downloadExcel(allUsers) {
       if (allUsers && allUsers.length > 0) {
         const workbook = new ExcelJS.Workbook();
@@ -254,7 +206,101 @@ document.getElementById('userForm').addEventListener('submit', function (event) 
         console.error('No data available for download.');
       }
     }
-   
+ 
+  function isStrongPassword(password) {
+    // Password must be at least 10 characters long
+    if (password.length < 10) {
+      return false;
+    }
+
+    // Password must contain at least one uppercase letter
+    if (!/[A-Z]/.test(password)) {
+      return false;
+    }
+
+    // Password must contain at least one lowercase letter
+    if (!/[a-z]/.test(password)) {
+      return false;
+    }
+
+    // Password must contain at least one digit
+    if (!/\d/.test(password)) {
+      return false;
+    }
+
+    // Password must contain at least one symbol
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  $('#resetPasswordForm').on('submit', function (e) {
+    e.preventDefault();
+
+    // Get values from the form
+    const username = $('#resetUsername').val();
+    const password = $('#resetPassword').val();
+    const confirmPassword = $('#resetConfirmPassword').val();
+
+    console.log('Username:', username);
+    console.log('New Password:', password);
+
+    // Validate passwords
+    if (password !== confirmPassword) {
+        alert('Passwords do not match. Please enter the same password in both fields.');
+        return;
+    }
+
+    // Check if the new password meets complexity requirements
+    if (!isStrongPassword(password)) {
+        alert('Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.');
+        return;
+    }
+
+    // Make a fetch request
+    fetch('/reset-password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password,
+            confirmPassword: confirmPassword,
+        }),
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+
+            // Show an alert with the received data
+            alert(data.success || data.error || 'Password change status unknown');
+
+            // Optionally, you can clear the form or take other actions after the password change
+            $('#resetUsername').val('');
+            $('#resetPassword').val('');
+            $('#resetConfirmPassword').val('');
+
+            // You might want to hide the reset password form after submission
+            $('#resetPasswordFormContainer').hide();
+        })
+        .catch(error => {
+            // Handle 404 error separately to show an alert
+            if (error.message.includes('HTTP error! Status: 404')) {
+                alert('User not found. Please enter a valid username.');
+            } else {
+                console.error('Fetch Error:', error);
+            }
+        });
+});
+  
   </script>
 
   </div>
