@@ -1,0 +1,14 @@
+#mosquitto conf file docs
+https://mosquitto.org/man/mosquitto-conf-5.html
+
+#conf file 
+allow_anonymous false #must have user
+connection_messages true #log client connect and disconnect
+password_file /etc/mosquitto/passwd #speicyf path to password file
+max_connections 5 #demo purpose
+listener 8883 #port for tls
+certfile /etc/letsencrypt/live/mqtt.teeseng.uk/cert.pem
+cafile /etc/letsencrypt/live/mqtt.teeseng.uk/chain.pem
+keyfile /etc/letsencrypt/live/mqtt.teeseng.uk/privkey.pem
+
+
