@@ -1,0 +1,10 @@
+#primaryily used to generate cert for mqtt broker usage. (standalone mode!)
+https://tecadmin.net/how-to-generate-lets-encrypt-ssl-using-certbot/
+
+
+
+#to get cert file locally.
+128  sudo cp -r /etc/letsencrypt ~/letsencrypt-copy
+129  sudo chown -R ubuntu:ubuntu ~/letsencrypt-copy
+130  sudo chown -R mpuser:mpuser ~/letsencrypt-copy
+

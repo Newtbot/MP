@@ -1,0 +1,18 @@
+1) clcik create 
+2) select the azure virtual machine option
+
+Details i used: 
+subscriptions: Azure for students
+resource group: MP-Resource-Group (create new resource group with whatever u want.)
+server name: <whatever u want>
+region: defaulted to East US 
+image: ubuntu (standardize for all my vm)
+vm architecture: x64
+size: B1S
+username and password: Up to u lol
+inbound port: 22 only 
+
+3) disk default config
+4) network config. configure as needed do not enable ports or service u do not need! (public ip if needed!)
+5) management default config
+6) blah skip to review and create and recheck details and create vm
