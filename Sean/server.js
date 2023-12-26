@@ -207,57 +207,80 @@ app.post('/createUser', (req, res) => {
       return res.status(400).json({ error: 'Password does not meet complexity requirements' });
     }
 
-    // Hash the password before storing it in the database
-    bcrypt.hash(password, 10, (hashError, hashedPassword) => {
-      if (hashError) {
-        console.error('Error hashing password:', hashError);
-        res.status(500).json({ error: 'Internal Server Error' });
-        return;
+    // Check if the username is already taken
+    const checkUsernameQuery = 'SELECT * FROM users WHERE username = ?';
+    mysqlConnection.query(checkUsernameQuery, [username], (usernameQueryErr, usernameResults) => {
+      if (usernameQueryErr) {
+        console.error('Error checking username:', usernameQueryErr);
+        return res.status(500).json({ error: 'Internal Server Error' });
       }
 
-      // Start a transaction
-      mysqlConnection.beginTransaction((transactionErr) => {
-        if (transactionErr) {
-          console.error('Error starting transaction:', transactionErr);
-          res.status(500).json({ error: 'Internal Server Error' });
-          return;
+      if (usernameResults.length > 0) {
+        return res.status(400).json({ error: 'Username is already taken', message: 'Username is already taken. Please choose a different username.' });
+      }
+
+      // Check if the email is already taken
+      const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
+      mysqlConnection.query(checkEmailQuery, [email], (emailQueryErr, emailResults) => {
+        if (emailQueryErr) {
+          console.error('Error checking email:', emailQueryErr);
+          return res.status(500).json({ error: 'Internal Server Error' });
         }
 
-        // Define the insert query
-        const insertUserQuery = 'INSERT INTO users (name, username, email, password, lastLogin, jobTitle) VALUES (?, ?, ?, ?, NULL, ?)';
+        if (emailResults.length > 0) {
+          return res.status(400).json({ error: 'Email is already in use', message: 'Email is already in use. Please choose another email.' });
+        }
 
-        // Log the query and its parameters
-        console.log('Insert Query:', insertUserQuery);
-        console.log('Query Parameters:', [name, username, email, hashedPassword, jobTitle]);
-
-        // Execute the query with user data
-        mysqlConnection.query(insertUserQuery, [name, username, email, hashedPassword, jobTitle], (queryErr, results) => {
-          if (queryErr) {
-            console.error('Error executing query:', queryErr);
-
-            // Rollback the transaction in case of an error
-            mysqlConnection.rollback((rollbackErr) => {
-              if (rollbackErr) {
-                console.error('Error rolling back transaction:', rollbackErr);
-              }
-              res.status(500).json({ error: 'Internal Server Error' });
-            });
-            return;
+        // Hash the password before storing it in the database
+        bcrypt.hash(password, 10, (hashError, hashedPassword) => {
+          if (hashError) {
+            console.error('Error hashing password:', hashError);
+            return res.status(500).json({ error: 'Internal Server Error' });
           }
 
-          // Commit the transaction
-          mysqlConnection.commit((commitErr) => {
-            if (commitErr) {
-              console.error('Error committing transaction:', commitErr);
-              res.status(500).json({ error: 'Internal Server Error' });
-              return;
+          // Start a transaction
+          mysqlConnection.beginTransaction((transactionErr) => {
+            if (transactionErr) {
+              console.error('Error starting transaction:', transactionErr);
+              return res.status(500).json({ error: 'Internal Server Error' });
             }
 
-            // Log the results of the query
-            console.log('Query Results:', results);
+            // Define the insert query
+            const insertUserQuery = 'INSERT INTO users (name, username, email, password, lastLogin, jobTitle) VALUES (?, ?, ?, ?, NULL, ?)';
 
-            // Respond with a success message
-            res.status(201).json({ message: 'User created successfully' });
+            // Log the query and its parameters
+            console.log('Insert Query:', insertUserQuery);
+            console.log('Query Parameters:', [name, username, email, hashedPassword, jobTitle]);
+
+            // Execute the query with user data
+            mysqlConnection.query(insertUserQuery, [name, username, email, hashedPassword, jobTitle], (queryErr, results) => {
+              if (queryErr) {
+                console.error('Error executing query:', queryErr);
+
+                // Rollback the transaction in case of an error
+                mysqlConnection.rollback((rollbackErr) => {
+                  if (rollbackErr) {
+                    console.error('Error rolling back transaction:', rollbackErr);
+                  }
+                  return res.status(500).json({ error: 'Internal Server Error' });
+                });
+                return;
+              }
+
+              // Commit the transaction
+              mysqlConnection.commit((commitErr) => {
+                if (commitErr) {
+                  console.error('Error committing transaction:', commitErr);
+                  return res.status(500).json({ error: 'Internal Server Error' });
+                }
+
+                // Log the results of the query
+                console.log('Query Results:', results);
+
+                // Respond with a success message
+                res.status(201).json({ message: 'User created successfully' });
+              });
+            });
           });
         });
       });
@@ -267,6 +290,82 @@ app.post('/createUser', (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+
+app.post('/check-username-email', (req, res) => {
+  try {
+    const { username, email } = req.body;
+
+    // Check if the username is already taken
+    const checkUsernameQuery = 'SELECT * FROM users WHERE username = ?';
+    mysqlConnection.query(checkUsernameQuery, [username], (usernameQueryErr, usernameResults) => {
+      if (usernameQueryErr) {
+        console.error('Error checking username:', usernameQueryErr);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      // Check if the email is already taken
+      const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
+      mysqlConnection.query(checkEmailQuery, [email], (emailQueryErr, emailResults) => {
+        if (emailQueryErr) {
+          console.error('Error checking email:', emailQueryErr);
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        if (usernameResults.length === 0 && emailResults.length === 0) {
+          // Both username and email are available
+          return res.status(200).json({ available: true });
+        } else {
+          // Either username or email is already taken
+          return res.status(400).json({ error: 'Username or email already taken' });
+        }
+      });
+    });
+  } catch (error) {
+    console.error('Error checking username and email:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+app.post('/check-username', (req, res) => {
+  const { username } = req.body;
+
+  const checkUsernameQuery = 'SELECT * FROM users WHERE username = ?';
+  mysqlConnection.query(checkUsernameQuery, [username], (error, results) => {
+    if (error) {
+      console.error('Error checking username:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      const isAvailable = results.length === 0;
+      res.json({ available: isAvailable });
+    }
+  });
+});
+
+// Assuming you have an instance of express named 'app'
+app.post('/check-email', (req, res) => {
+  const { email } = req.body;
+
+  // Check if the email is already taken in the database
+  const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
+  mysqlConnection.query(checkEmailQuery, [email], (error, results) => {
+    if (error) {
+      console.error('Error checking email:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+      return;
+    }
+
+    // If results.length is greater than 0, it means the email is already taken
+    const isEmailAvailable = results.length === 0;
+
+    // Return a JSON response indicating whether the email is available or not
+    res.json({ available: isEmailAvailable });
+  });
+});
+
+
 
 app.get('/forgot-password', (req, res) => {
   res.render('forgot-password'); // Assuming you have an EJS template for this
@@ -449,6 +548,9 @@ async function checkIfUserExists(username) {
     });
   });
 }
+
+
+
 app.use(express.static('views'));
 
 app.listen(PORT, () => {

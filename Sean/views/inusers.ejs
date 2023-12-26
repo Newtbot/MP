@@ -145,7 +145,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-     const allUsers = <%- JSON.stringify(allUsers) %>;
+   const allUsers = <%- JSON.stringify(allUsers) %>;
 
 $(document).ready(function () {
   $('#resetPasswordLink').on('click', function () {
@@ -169,136 +169,236 @@ $(document).ready(function () {
     $('#downloadButtonContainer').show();
   });
 });
+
 $('#downloadButton').on('click', function () {
-    // Call the downloadExcel function with the allUsers data
-    downloadExcel(allUsers);
-  });
-    function downloadExcel(allUsers) {
-      if (allUsers && allUsers.length > 0) {
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('All Users');
-        const headers = ['Name', 'Username', 'Email', 'Password', 'Last Login', 'Job Title'];
-        worksheet.addRow(headers);
-        allUsers.forEach(user => {
-          const rowData = [
-            user.name || '',
-            user.username || '',
-            user.email || '',
-            user.password || '',
-            user.lastLogin ? new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) : '',
-            user.jobTitle || ''
-          ];
-          worksheet.addRow(rowData);
-        });
-        workbook.xlsx.writeBuffer().then(buffer => {
-          const currentDate = new Date();
-          const formattedDate = currentDate.toISOString().split('T')[0];
-          const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '-');
-          const fileName = `user_data_${formattedDate}_${formattedTime}.xlsx`;
-          const blob = new Blob([buffer], {
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-          });
-          saveAs(blob, fileName);
-        });
-      } else {
-        console.error('No data available for download.');
-      }
-    }
- 
-  function isStrongPassword(password) {
-    // Password must be at least 10 characters long
-    if (password.length < 10) {
-      return false;
-    }
+  // Call the downloadExcel function with the allUsers data
+  downloadExcel(allUsers);
+});
 
-    // Password must contain at least one uppercase letter
-    if (!/[A-Z]/.test(password)) {
-      return false;
-    }
+function downloadExcel(allUsers) {
+  if (allUsers && allUsers.length > 0) {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('All Users');
+    const headers = ['Name', 'Username', 'Email', 'Password', 'Last Login', 'Job Title'];
+    worksheet.addRow(headers);
+    allUsers.forEach(user => {
+      const rowData = [
+        user.name || '',
+        user.username || '',
+        user.email || '',
+        user.password || '',
+        user.lastLogin ? new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) : '',
+        user.jobTitle || ''
+      ];
+      worksheet.addRow(rowData);
+    });
+    workbook.xlsx.writeBuffer().then(buffer => {
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString().split('T')[0];
+      const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '-');
+      const fileName = `user_data_${formattedDate}_${formattedTime}.xlsx`;
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+      saveAs(blob, fileName);
+    });
+  } else {
+    console.error('No data available for download.');
+  }
+}
 
-    // Password must contain at least one lowercase letter
-    if (!/[a-z]/.test(password)) {
-      return false;
-    }
-
-    // Password must contain at least one digit
-    if (!/\d/.test(password)) {
-      return false;
-    }
-
-    // Password must contain at least one symbol
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      return false;
-    }
-
-    return true;
+function isStrongPassword(password) {
+  // Password must be at least 10 characters long
+  if (password.length < 10) {
+    return false;
   }
 
-  $('#resetPasswordForm').on('submit', function (e) {
-    e.preventDefault();
+  // Password must contain at least one uppercase letter
+  if (!/[A-Z]/.test(password)) {
+    return false;
+  }
 
-    // Get values from the form
-    const username = $('#resetUsername').val();
-    const password = $('#resetPassword').val();
-    const confirmPassword = $('#resetConfirmPassword').val();
+  // Password must contain at least one lowercase letter
+  if (!/[a-z]/.test(password)) {
+    return false;
+  }
 
-    console.log('Username:', username);
-    console.log('New Password:', password);
+  // Password must contain at least one digit
+  if (!/\d/.test(password)) {
+    return false;
+  }
 
-    // Validate passwords
-    if (password !== confirmPassword) {
+  // Password must contain at least one symbol
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    return false;
+  }
+
+  return true;
+}
+
+
+
+function resetFormFields() {
+        $('#name').val('');
+        $('#username').val('');
+        $('#email').val('');
+        $('#password').val('');
+        $('#confirmPassword').val('');
+        $('#jobTitle').val('');
+      }
+
+
+      $('#userForm').on('submit', function (e) {
+      e.preventDefault();
+
+      const name = $('#name').val();
+      const username = $('#username').val();
+      const email = $('#email').val();
+      const password = $('#password').val();
+      const confirmPassword = $('#confirmPassword').val();
+      const jobTitle = $('#jobTitle').val();
+
+      if (password !== confirmPassword) {
         alert('Passwords do not match. Please enter the same password in both fields.');
         return;
-    }
+      }
 
-    // Check if the new password meets complexity requirements
-    if (!isStrongPassword(password)) {
+      if (!isStrongPassword(password)) {
         alert('Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.');
         return;
-    }
+      }
 
-    // Make a fetch request
-    fetch('/reset-password', {
+      fetch('/createUser', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            username: username,
-            password: password,
-            confirmPassword: confirmPassword,
+          name: name,
+          username: username,
+          email: email,
+          password: password,
+          jobTitle: jobTitle,
         }),
-    })
+      })
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+          if (response.status === 201) {
+            // Status 201 indicates successful creation
             return response.json();
+          } else {
+            return response.json().then(data => {
+              throw new Error(data.error || `HTTP error! Status: ${response.status}`);
+            });
+          }
         })
         .then(data => {
-            console.log('Success:', data);
-
-            // Show an alert with the received data
-            alert(data.success || data.error || 'Password change status unknown');
-
-            // Optionally, you can clear the form or take other actions after the password change
-            $('#resetUsername').val('');
-            $('#resetPassword').val('');
-            $('#resetConfirmPassword').val('');
-
-            // You might want to hide the reset password form after submission
-            $('#resetPasswordFormContainer').hide();
+          console.log('User registration success:', data);
+          alert('User registered successfully!');
+          resetFormFields();
         })
         .catch(error => {
-            // Handle 404 error separately to show an alert
-            if (error.message.includes('HTTP error! Status: 404')) {
-                alert('User not found. Please enter a valid username.');
-            } else {
-                console.error('Fetch Error:', error);
-            }
+          console.error('User registration error:', error);
+          handleRegistrationError(error);
         });
+    });
+
+function handleRegistrationError(error) {
+  console.error('Registration error:', error); // Log the full error object for debugging
+
+  let errorMessage;
+
+  if (typeof error === 'string') {
+    errorMessage = error;
+  } else if (error instanceof Error) {
+    errorMessage = error.message;
+  } else if (error.response && error.response.data && error.response.data.error) {
+    errorMessage = error.response.data.error;
+  } else {
+    errorMessage = 'Unknown error';
+  }
+
+  if (errorMessage.includes('Username is already taken')) {
+    alert('Username is already taken. Please choose a different username.');
+  } else if (errorMessage.includes('Email is already in use')) {
+    alert('Email is already in use. Please choose a different email.');
+  } else if (errorMessage.includes('Password does not meet complexity requirements')) {
+    alert('Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.');
+  } else if (errorMessage.includes('User registration failed')) {
+    alert('User registration failed. Please try again.');
+  } else {
+    alert(`Unknown error: ${errorMessage}`);
+  }
+}
+
+
+
+$('#resetPasswordForm').on('submit', function (e) {
+  e.preventDefault();
+
+  // Get values from the form
+  const username = $('#resetUsername').val();
+  const password = $('#resetPassword').val();
+  const confirmPassword = $('#resetConfirmPassword').val();
+
+  console.log('Username:', username);
+  console.log('New Password:', password);
+
+  // Validate passwords
+  if (password !== confirmPassword) {
+    alert('Error: Passwords do not match. Please enter the same password in both fields.');
+    return;
+  }
+
+  // Check if the new password meets complexity requirements
+  if (!isStrongPassword(password)) {
+    alert('Error: Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.');
+    return;
+  }
+
+  // Make a fetch request
+  fetch('/reset-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+        confirmPassword: confirmPassword,
+      }),
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.text().then(errorText => {
+          throw new Error(`HTTP error! Status: ${response.status}, Error: ${errorText}`);
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Success:', data);
+
+      // Show an alert with the received data
+      alert(data.success || data.error || 'Password change status unknown');
+
+      // Optionally, you can clear the form or take other actions after the password change
+      $('#resetUsername').val('');
+      $('#resetPassword').val('');
+      $('#resetConfirmPassword').val('');
+
+      // You might want to hide the reset password form after submission
+      $('#resetPasswordFormContainer').hide();
+    })
+    .catch(error => {
+      // Handle 404 error separately to show an alert
+      if (error.message.includes('HTTP error! Status: 404')) {
+        alert('Error: User not found. Please enter a valid username.');
+      } else {
+        console.error('Fetch Error:', error);
+      }
+    });
 });
-  
+
   </script>
 
   </div>
