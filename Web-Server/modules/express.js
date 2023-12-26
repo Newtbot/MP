@@ -4,8 +4,8 @@
 */
 const express = require("express");
 const helmet = require('helmet')
-app.use(helmet())
 const app = express();
+app.use(helmet())
 const port = 80;
 
 //disable x-powered-by header for security reasons

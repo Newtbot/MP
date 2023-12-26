@@ -23,3 +23,4 @@ log_type all
 log_facility 5
 log_dest file /var/log/mosquitto/mosquitto.log
 
+https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-the-mosquitto-mqtt-messaging-broker-on-ubuntu-18-04

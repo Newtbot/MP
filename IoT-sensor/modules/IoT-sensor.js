@@ -51,15 +51,9 @@ function getRandomValue(min, max) {
 	return Math.random() * (max - min) + min;
 }
 
-async function iot_sensor_data() {
-	//5 minutes
-	setInterval(() => {
-		var json = generateRandomData();
-		console.log(json);
-	}, 600); //every 1 second
+function iot_sensor_data() {
+	return generateRandomData();
 }
 
-iot_sensor_data()
-
-module.exports = { iot_sensor_data } 
+module.exports = { iot_sensor_data };
 

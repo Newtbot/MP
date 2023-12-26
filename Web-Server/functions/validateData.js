@@ -1,16 +1,25 @@
-var validator = require('validator');
+// Regular expressions for data validation
+const psiPattern = /^\d+$/;
+const humidityPattern = /^\d+%$/;
+const concentrationPattern = /^\d+ppm$/;
+const temperaturePattern = /^-?\d+°C$/;
+const windspeedPattern = /^\d+km\/h$/;
+const timePattern = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+const regionPattern = /^[a-zA-Z-]+$/;
 
-function isNumber(data) {
-    if (validator.isNumeric(data))
-    {
-        console.log(data);
-    }
-    else
-    {
-        console.log("Invalid data");
-    }
+function validateData(data) {
+  return (
+    psiPattern.test(data.psi) &&
+    humidityPattern.test(data.humidity) &&
+    concentrationPattern.test(data.o3) &&
+    concentrationPattern.test(data.no2) &&
+    concentrationPattern.test(data.so2) &&
+    concentrationPattern.test(data.co) &&
+    temperaturePattern.test(data.temperature) &&
+    windspeedPattern.test(data.windspeed) &&
+    timePattern.test(data.time) &&
+    regionPattern.test(data.region)
+  );
+}
 
-
-  }
-  
-  module.exports = { isNumber } 
+module.exports = { validateData };
