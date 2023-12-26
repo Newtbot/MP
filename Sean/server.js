@@ -57,6 +57,32 @@ app.get('/login', (req, res) => {
   res.render('login', { error: null });
 });
 
+const logActivity = async (username, success) => {
+  try {
+    const activity = success ? 'successful login' : 'unsuccessful login due to invalid password or username';
+    const logSql = 'INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)';
+    const logParams = [username, activity];
+
+    const connection = mysql.createConnection(mysqlConfig);
+    connection.connect();
+
+    connection.query(logSql, logParams, (error, results) => {
+      if (error) {
+        console.error('Error logging activity:', error);
+        // Handle error (you may want to log it or take other appropriate actions)
+      } else {
+        console.log('Activity logged successfully');
+      }
+
+      connection.end(); // Close the connection after logging activity
+    });
+  } catch (error) {
+    console.error('Error in logActivity function:', error);
+    // Handle error (you may want to log it or take other appropriate actions)
+  }
+};
+
+
 app.post('/login', async (req, res) => {
   try {
     let { username, password } = req.body;
@@ -65,9 +91,7 @@ app.post('/login', async (req, res) => {
     const loginSql = 'SELECT * FROM users WHERE username = ?';
     const updateLastLoginSql = 'UPDATE users SET lastLogin = CURRENT_TIMESTAMP WHERE username = ?';
 
-    // Check credentials and retrieve user information
     const connection = mysql.createConnection(mysqlConfig);
-
     connection.connect();
 
     console.log('Login Query:', loginSql);
@@ -83,48 +107,46 @@ app.post('/login', async (req, res) => {
         return;
       }
 
-      if (results.length === 0) {
+      const isLoginSuccessful = results.length > 0 && (await bcrypt.compare(password, results[0].password));
+
+      // Log login attempt
+      await logActivity(username, isLoginSuccessful);
+
+      if (isLoginSuccessful) {
+        const user = results[0];
+
+        // Update lastLogin field for the user
+        connection.query(updateLastLoginSql, [username], (updateError, updateResults) => {
+          if (updateError) {
+            console.error('Error updating lastLogin:', updateError);
+            res.status(500).send('Internal Server Error');
+            connection.end(); // Close the connection in case of an error
+            return;
+          }
+
+          // Check if the update affected any rows
+          if (updateResults.affectedRows > 0) {
+            // Set session data for authentication
+            req.session.regenerate(err => {
+              if (err) {
+                console.error('Error regenerating session:', err);
+              }
+              console.log('Session regenerated successfully');
+              req.session.authenticated = true;
+              req.session.username = username;
+              res.redirect('/home');
+              connection.end();
+            });
+          } else {
+            // Pass the error to the template
+            res.render('login', { error: 'Error updating lastLogin. No rows affected.' });
+            connection.end(); // Close the connection when not needed anymore
+          }
+        });
+      } else {
         // Pass the error to the template
         res.render('login', { error: 'Invalid username or password' });
         connection.end(); // Close the connection when not needed anymore
-      } else {
-        const user = results[0];
-        const passwordMatch = await bcrypt.compare(password, user.password);
-
-        if (passwordMatch) {
-          // Update lastLogin field for the user
-          connection.query(updateLastLoginSql, [username], (updateError, updateResults) => {
-            if (updateError) {
-              console.error('Error updating lastLogin:', updateError);
-              res.status(500).send('Internal Server Error');
-              connection.end(); // Close the connection in case of an error
-              return;
-            }
-
-            // Check if the update affected any rows
-            if (updateResults.affectedRows > 0) {
-              // Set session data for authentication
-              req.session.regenerate(err => {
-                if (err) {
-                  console.error('Error regenerating session:', err);
-                }
-                console.log('Session regenerated successfully');
-                req.session.authenticated = true;
-                req.session.username = username;
-                res.redirect('/home');
-                connection.end();
-              });
-            } else {
-              // Pass the error to the template
-              res.render('login', { error: 'Error updating lastLogin. No rows affected.' });
-              connection.end(); // Close the connection when not needed anymore
-            }
-          });
-        } else {
-          // Pass the error to the template
-          res.render('login', { error: 'Invalid username or password' });
-          connection.end(); // Close the connection when not needed anymore
-        }
       }
     });
   } catch (error) {
@@ -132,6 +154,7 @@ app.post('/login', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 
