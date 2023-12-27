@@ -12,12 +12,21 @@ const port = 80;
 app.disable('x-powered-by')
 
 
+//middleware logic
+//app.use('/api/v1', require('../middleware/ApiKey.js'));
+//app.use('/api/v1', require('../middleware/ApiLogger.js'));
+
+//route logic 
+app.use('/api/', require('../routes/api_route.js'));
+
+
+/*
 const testRoute = require("../routes/test.js")
 const latestDataroute = require("../routes/latest-Data.js")
 
 app.use('/test', testRoute); 
 app.use('/api/latest-data', latestDataroute);
-
+*/
 
 app.listen(port, () => {
 	console.log(`app listening on port ${port}`);

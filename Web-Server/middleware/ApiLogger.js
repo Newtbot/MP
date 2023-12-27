@@ -19,4 +19,4 @@ const APIlogger = (req, res, next) => {
 
 
 
-module.exports = { }
+module.exports = { APIlogger }

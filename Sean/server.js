@@ -20,8 +20,8 @@ const mysqlConfig = {
   timezone: 'Z', // Set the timezone to UTC
 };
 
-const mysqlConnection = mysql.createConnection(mysqlConfig);
-mysqlConnection.connect((err) => {
+  const connection = mysql.createConnection(mysqlConfig);
+  connection.connect((err) => {
   if (err) {
     console.error('Error connecting to MySQL:', err);
     return;
@@ -63,8 +63,8 @@ const logActivity = async (username, success) => {
     const logSql = 'INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)';
     const logParams = [username, activity];
 
-    const connection = mysql.createConnection(mysqlConfig);
-    connection.connect();
+    //const connection = mysql.createConnection(mysqlConfig);
+    //connection.connect();
 
     connection.query(logSql, logParams, (error, results) => {
       if (error) {
@@ -74,7 +74,7 @@ const logActivity = async (username, success) => {
         console.log('Activity logged successfully');
       }
 
-      connection.end(); // Close the connection after logging activity
+      //connection.end(); // Close the connection after logging activity
     });
   } catch (error) {
     console.error('Error in logActivity function:', error);
@@ -91,8 +91,8 @@ app.post('/login', async (req, res) => {
     const loginSql = 'SELECT * FROM users WHERE username = ?';
     const updateLastLoginSql = 'UPDATE users SET lastLogin = CURRENT_TIMESTAMP WHERE username = ?';
 
-    const connection = mysql.createConnection(mysqlConfig);
-    connection.connect();
+    //const connection = mysql.createConnection(mysqlConfig);
+    //connection.connect();
 
     console.log('Login Query:', loginSql);
     console.log('Query Parameters:', [username]);
@@ -103,7 +103,7 @@ app.post('/login', async (req, res) => {
       if (error) {
         console.error('Error executing login query:', error);
         res.status(500).send('Internal Server Error');
-        connection.end(); // Close the connection in case of an error
+        //connection.end(); // Close the connection in case of an error
         return;
       }
 
@@ -120,7 +120,7 @@ app.post('/login', async (req, res) => {
           if (updateError) {
             console.error('Error updating lastLogin:', updateError);
             res.status(500).send('Internal Server Error');
-            connection.end(); // Close the connection in case of an error
+            //connection.end(); // Close the connection in case of an error
             return;
           }
 
@@ -135,18 +135,18 @@ app.post('/login', async (req, res) => {
               req.session.authenticated = true;
               req.session.username = username;
               res.redirect('/home');
-              connection.end();
+              //connection.end();
             });
           } else {
             // Pass the error to the template
             res.render('login', { error: 'Error updating lastLogin. No rows affected.' });
-            connection.end(); // Close the connection when not needed anymore
+            //connection.end(); // Close the connection when not needed anymore
           }
         });
       } else {
         // Pass the error to the template
         res.render('login', { error: 'Invalid username or password' });
-        connection.end(); // Close the connection when not needed anymore
+        //connection.end(); // Close the connection when not needed anymore
       }
     });
   } catch (error) {
@@ -163,7 +163,7 @@ app.get('/home', isAuthenticated, (req, res) => {
   // Retrieve the overall last 10 logins for all users
   const loginsQuery = 'SELECT username, lastLogin FROM users ORDER BY lastLogin DESC LIMIT 10';
 
-  mysqlConnection.query(loginsQuery, (error, loginResults) => {
+  connection.query(loginsQuery, (error, loginResults) => {
     if (error) {
       console.error('Error executing login logs query:', error);
       res.status(500).send('Internal Server Error');
@@ -181,7 +181,7 @@ app.get('/inusers', isAuthenticated, (req, res) => {
   // Fetch all user data from the database
   const allUsersQuery = 'SELECT * FROM users';
 
-  mysqlConnection.query(allUsersQuery, (error, allUsers) => {
+  connection.query(allUsersQuery, (error, allUsers) => {
     if (error) {
       console.error('Error fetching all users:', error);
       res.status(500).send('Internal Server Error');
@@ -261,7 +261,7 @@ app.post('/createUser', async (req, res) => {
 
     // Check if the username is already taken
     const checkUsernameQuery = 'SELECT * FROM users WHERE username = ?';
-    mysqlConnection.query(checkUsernameQuery, [username], (usernameQueryErr, usernameResults) => {
+    connection.query(checkUsernameQuery, [username], (usernameQueryErr, usernameResults) => {
       if (usernameQueryErr) {
         console.error('Error checking username:', usernameQueryErr);
         return res.status(500).json({ error: 'Internal Server Error' });
@@ -275,7 +275,7 @@ app.post('/createUser', async (req, res) => {
 
       // Check if the email is already taken
       const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
-      mysqlConnection.query(checkEmailQuery, [email], (emailQueryErr, emailResults) => {
+      connection.query(checkEmailQuery, [email], (emailQueryErr, emailResults) => {
         if (emailQueryErr) {
           console.error('Error checking email:', emailQueryErr);
           return res.status(500).json({ error: 'Internal Server Error' });
@@ -295,7 +295,7 @@ app.post('/createUser', async (req, res) => {
           }
 
           // Start a transaction
-          mysqlConnection.beginTransaction((transactionErr) => {
+          connection.beginTransaction((transactionErr) => {
             if (transactionErr) {
               console.error('Error starting transaction:', transactionErr);
               return res.status(500).json({ error: 'Internal Server Error' });
@@ -309,12 +309,12 @@ app.post('/createUser', async (req, res) => {
             console.log('Query Parameters:', [name, username, email, hashedPassword, jobTitle]);
 
             // Execute the query with user data
-            mysqlConnection.query(insertUserQuery, [name, username, email, hashedPassword, jobTitle], (queryErr, results) => {
+            connection.query(insertUserQuery, [name, username, email, hashedPassword, jobTitle], (queryErr, results) => {
               if (queryErr) {
                 console.error('Error executing query:', queryErr);
 
                 // Rollback the transaction in case of an error
-                mysqlConnection.rollback((rollbackErr) => {
+                connection.rollback((rollbackErr) => {
                   if (rollbackErr) {
                     console.error('Error rolling back transaction:', rollbackErr);
                   }
@@ -326,7 +326,7 @@ app.post('/createUser', async (req, res) => {
               }
 
               // Commit the transaction
-              mysqlConnection.commit((commitErr) => {
+              connection.commit((commitErr) => {
                 if (commitErr) {
                   console.error('Error committing transaction:', commitErr);
                   // Log unsuccessful user creation due to an error
@@ -375,7 +375,7 @@ app.post('/forgot-password', (req, res) => {
 
   // Check if the username or email exists in the database
   const checkUserQuery = 'SELECT * FROM users WHERE username = ? OR email = ?';
-  mysqlConnection.query(checkUserQuery, [usernameOrEmail, usernameOrEmail], (checkError, checkResults) => {
+  connection.query(checkUserQuery, [usernameOrEmail, usernameOrEmail], (checkError, checkResults) => {
     if (checkError) {
       console.error('Error checking user:', checkError);
       const error = 'An error occurred during the password reset process.';
@@ -391,7 +391,7 @@ app.post('/forgot-password', (req, res) => {
 
       // Update user with reset token and expiry
       const updateQuery = 'UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?';
-      mysqlConnection.query(updateQuery, [resetToken, resetTokenExpiry, user.id], (updateError) => {
+      connection.query(updateQuery, [resetToken, resetTokenExpiry, user.id], (updateError) => {
         if (updateError) {
           console.error('Error updating reset token:', updateError);
           const error = 'An error occurred during the password reset process.';
@@ -444,7 +444,7 @@ app.post('/reset-password/:token', async (req, res) => {
 
   // Find user with matching reset token and not expired
   const selectQuery = 'SELECT * FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()';
-  mysqlConnection.query(selectQuery, [token], async (selectErr, selectResults) => {
+  connection.query(selectQuery, [token], async (selectErr, selectResults) => {
     if (selectErr) {
       console.error('Error querying reset token:', selectErr);
       return res.status(500).json({ error: 'Error querying reset token' });
@@ -472,7 +472,7 @@ app.post('/reset-password/:token', async (req, res) => {
 
     // Update user's password and clear reset token
     const updateQuery = 'UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE reset_token = ?';
-    mysqlConnection.query(updateQuery, [hashedPassword, token], (updateErr) => {
+    connection.query(updateQuery, [hashedPassword, token], (updateErr) => {
       if (updateErr) {
         console.error('Error updating password:', updateErr);
         // Pass the error to the template when rendering the reset-password page
@@ -524,7 +524,7 @@ app.post('/reset-password', async (req, res) => {
 
   // Update user's password based on the username
   const updateQuery = 'UPDATE users SET password = ? WHERE username = ?';
-  mysqlConnection.query(updateQuery, [hashedPassword, username], (updateErr, updateResults) => {
+  connection.query(updateQuery, [hashedPassword, username], (updateErr, updateResults) => {
     if (updateErr) {
       console.error('Error updating password:', updateErr);
       return res.status(500).json({ error: 'Error updating password' });
@@ -546,7 +546,7 @@ async function checkIfUserExists(username) {
 
   return new Promise((resolve, reject) => {
     const query = 'SELECT * FROM users WHERE username = ?';
-    mysqlConnection.query(query, [username], (err, results) => {
+    connection.query(query, [username], (err, results) => {
       if (err) {
         reject(err);
       } else {

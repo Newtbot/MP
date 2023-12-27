@@ -20,7 +20,7 @@ let region = ["central", "north-east", "north", "east", "west"];
 function generateRandomData() {
 	const psiData = getRandomValue(0, 500);
 	const humidityData = getRandomValue(0, 100);
-	const o3Data = getRandomValue(0, 600); //max 600
+	const o3Data = getRandomValue(0, 600); //max 600 
 	const no2Data = getRandomValue(0, 1000); //max 1000
 	const so2Data = getRandomValue(0, 1000); //max 1000
 	const coData = getRandomValue(0 , 100); 
