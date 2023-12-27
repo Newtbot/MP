@@ -10,10 +10,8 @@
 
 /*
 1) generate random data for each sensor
-3) send the coap request to the server
+2) pass to mqtt broker
 */
-
-const { isNumber } = require("../../Web-Server/functions/validateData");
 
 let region = ["central", "north-east", "north", "east", "west"];
 
