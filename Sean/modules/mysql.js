@@ -1,3 +1,5 @@
+const mysql = require("mysql");
+
 const mysqlConfig = {
 	host: process.env.host,
 	user: process.env.user,

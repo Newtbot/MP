@@ -6,16 +6,14 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
-const transporter = require("../modules/nodeMailer");
-const { mysqlConfig , connection } = require("../modules/mysql"); 
+const transporter = require("./modules/nodeMailer");
+const { mysqlConfig , connection } = require("./modules/mysql"); 
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 const PORT = process.env.PORT || 3000;
 require("dotenv").config();
-
-
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
@@ -48,8 +46,6 @@ const logActivity = async (username, success) => {
 		const logSql =
 			"INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)";
 		const logParams = [username, activity];
-
-
 
 		connection.query(logSql, logParams, (error, results) => {
 			if (error) {
