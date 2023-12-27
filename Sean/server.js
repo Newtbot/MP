@@ -221,9 +221,38 @@ function isStrongPassword(password) {
   return true;
 } 
 
-app.post('/createUser', (req, res) => {
+const logUserCreationActivity = async (creatorUsername, success, message) => {
+  try {
+    const activity = success ? 'successful user creation' : `unsuccessful user creation: ${message}`;
+    const logSql = 'INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)';
+    const logParams = [creatorUsername, activity];
+
+    const connection = mysql.createConnection(mysqlConfig);
+
+    connection.connect();
+
+    connection.query(logSql, logParams, (error, results) => {
+      if (error) {
+        console.error('Error logging user creation activity:', error);
+        // Handle error (you may want to log it or take other appropriate actions)
+      } else {
+        console.log('User creation activity logged successfully');
+      }
+
+      connection.end(); // Close the connection after logging activity
+    });
+  } catch (error) {
+    console.error('Error in logUserCreationActivity function:', error);
+    // Handle error (you may want to log it or take other appropriate actions)
+  }
+};
+
+app.post('/createUser', async (req, res) => {
   try {
     const { name, username, email, password, jobTitle } = req.body;
+
+    // Extract the username of the user creating a new user
+    const creatorUsername = req.session.username; // Adjust this based on how you store the creator's username in your session
 
     // Validate password complexity
     if (!isStrongPassword(password)) {
@@ -239,6 +268,8 @@ app.post('/createUser', (req, res) => {
       }
 
       if (usernameResults.length > 0) {
+        // Log unsuccessful user creation due to username taken
+        logUserCreationActivity(creatorUsername, false, 'username taken');
         return res.status(400).json({ error: 'Username is already taken', message: 'Username is already taken. Please choose a different username.' });
       }
 
@@ -251,6 +282,8 @@ app.post('/createUser', (req, res) => {
         }
 
         if (emailResults.length > 0) {
+          // Log unsuccessful user creation due to email taken
+          logUserCreationActivity(creatorUsername, false, 'email taken');
           return res.status(400).json({ error: 'Email is already in use', message: 'Email is already in use. Please choose another email.' });
         }
 
@@ -285,6 +318,8 @@ app.post('/createUser', (req, res) => {
                   if (rollbackErr) {
                     console.error('Error rolling back transaction:', rollbackErr);
                   }
+                  // Log unsuccessful user creation due to an error
+                  logUserCreationActivity(creatorUsername, false, 'internal error');
                   return res.status(500).json({ error: 'Internal Server Error' });
                 });
                 return;
@@ -294,8 +329,13 @@ app.post('/createUser', (req, res) => {
               mysqlConnection.commit((commitErr) => {
                 if (commitErr) {
                   console.error('Error committing transaction:', commitErr);
+                  // Log unsuccessful user creation due to an error
+                  logUserCreationActivity(creatorUsername, false, 'internal error');
                   return res.status(500).json({ error: 'Internal Server Error' });
                 }
+
+                // Log successful user creation
+                logUserCreationActivity(creatorUsername, true, 'user created successfully');
 
                 // Log the results of the query
                 console.log('Query Results:', results);
@@ -310,82 +350,10 @@ app.post('/createUser', (req, res) => {
     });
   } catch (error) {
     console.error('Error creating user:', error);
+    // Log unsuccessful user creation due to an error
+    logUserCreationActivity(req.session.username, false, 'internal error'); // Adjust this based on how you store the creator's username in your session
     res.status(500).json({ error: 'Internal Server Error' });
   }
-});
-
-
-
-app.post('/check-username-email', (req, res) => {
-  try {
-    const { username, email } = req.body;
-
-    // Check if the username is already taken
-    const checkUsernameQuery = 'SELECT * FROM users WHERE username = ?';
-    mysqlConnection.query(checkUsernameQuery, [username], (usernameQueryErr, usernameResults) => {
-      if (usernameQueryErr) {
-        console.error('Error checking username:', usernameQueryErr);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      }
-
-      // Check if the email is already taken
-      const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
-      mysqlConnection.query(checkEmailQuery, [email], (emailQueryErr, emailResults) => {
-        if (emailQueryErr) {
-          console.error('Error checking email:', emailQueryErr);
-          return res.status(500).json({ error: 'Internal Server Error' });
-        }
-
-        if (usernameResults.length === 0 && emailResults.length === 0) {
-          // Both username and email are available
-          return res.status(200).json({ available: true });
-        } else {
-          // Either username or email is already taken
-          return res.status(400).json({ error: 'Username or email already taken' });
-        }
-      });
-    });
-  } catch (error) {
-    console.error('Error checking username and email:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-
-app.post('/check-username', (req, res) => {
-  const { username } = req.body;
-
-  const checkUsernameQuery = 'SELECT * FROM users WHERE username = ?';
-  mysqlConnection.query(checkUsernameQuery, [username], (error, results) => {
-    if (error) {
-      console.error('Error checking username:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    } else {
-      const isAvailable = results.length === 0;
-      res.json({ available: isAvailable });
-    }
-  });
-});
-
-// Assuming you have an instance of express named 'app'
-app.post('/check-email', (req, res) => {
-  const { email } = req.body;
-
-  // Check if the email is already taken in the database
-  const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
-  mysqlConnection.query(checkEmailQuery, [email], (error, results) => {
-    if (error) {
-      console.error('Error checking email:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-      return;
-    }
-
-    // If results.length is greater than 0, it means the email is already taken
-    const isEmailAvailable = results.length === 0;
-
-    // Return a JSON response indicating whether the email is available or not
-    res.json({ available: isEmailAvailable });
-  });
 });
 
 
@@ -403,7 +371,7 @@ app.post('/forgot-password', (req, res) => {
   const { usernameOrEmail } = req.body;
 
   // Perform the logic for sending the reset password email
-  // This is a simplified example, you should implement your own logic here
+  // This is a simplified example; you should implement your own logic here
 
   // Check if the username or email exists in the database
   const checkUserQuery = 'SELECT * FROM users WHERE username = ? OR email = ?';
@@ -446,6 +414,9 @@ app.post('/forgot-password', (req, res) => {
               console.log('Email sent: ' + info.response);
               const success = 'Password reset email sent successfully. Check your inbox.';
               res.render('forgot-password', { error: null, success });
+
+              // Log the successful sending of the reset link in the database
+              logPasswordResetActivity(user.username, 'link sent successfully');
             }
           });
         }
@@ -453,6 +424,19 @@ app.post('/forgot-password', (req, res) => {
     }
   });
 });
+
+// Function to log the password reset activity in the database
+function logPasswordResetActivity(username, activity) {
+  const logSql = 'INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)';
+  mysqlConnection.query(logSql, [username, activity], (error) => {
+    if (error) {
+      console.error('Error logging password reset activity:', error);
+    } else {
+      console.log('Password reset activity logged successfully');
+    }
+  });
+}
+
 // Handle Reset Password request
 app.post('/reset-password/:token', async (req, res) => {
   const { token } = req.params;
