@@ -622,7 +622,7 @@ app.post("/reset-password", async (req, res) => {
 				return res
 					.status(404)
 					.json({
-						error: "User not found or password not updated. No rows affected.",
+						error: "User not found or password not updated.",
 					});
 			}
 		}
