@@ -211,8 +211,6 @@ const logUserCreationActivity = async (creatorUsername, success, message) => {
 			"INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)";
 		const logParams = [creatorUsername, activity];
 
-		connection.connect();
-
 		connection.query(logSql, logParams, (error, results) => {
 			if (error) {
 				console.error("Error logging user creation activity:", error);
@@ -221,7 +219,6 @@ const logUserCreationActivity = async (creatorUsername, success, message) => {
 				console.log("User creation activity logged successfully");
 			}
 
-			connection.end(); // Close the connection after logging activity
 		});
 	} catch (error) {
 		console.error("Error in logUserCreationActivity function:", error);
