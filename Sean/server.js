@@ -211,8 +211,6 @@ const logUserCreationActivity = async (creatorUsername, success, message) => {
 			"INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)";
 		const logParams = [creatorUsername, activity];
 
-		const connection = mysql.createConnection(mysqlConfig);
-
 		connection.connect();
 
 		connection.query(logSql, logParams, (error, results) => {
