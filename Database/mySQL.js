@@ -15,8 +15,8 @@ const sequelize = new Sequelize(
       ssl: {
          ca: fs.readFileSync(path.resolve(__dirname, '../cert/DigiCertGlobalRootCA.crt.pem')),
       }
-    }
- }
+    },
+   }
 );
 
 sequelize.authenticate().then(() => {
@@ -26,3 +26,4 @@ sequelize.authenticate().then(() => {
 });
 
 module.exports = { sequelize };
+

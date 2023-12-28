@@ -17,32 +17,6 @@ const options = {
 
 const client = mqtt.connect(brokerUrl, options);
 
+module.exports = client;
 
-// Event handlers
-client.on('connect', () => {
-  console.log('Connected to MQTT broker');
-  client.subscribe('iot-data'); 
-});
-
-client.on('message', (topic, message) => {
-  //console.log(`Received message on topic ${topic}: ${message}`);
-  let data = JSON.parse(message);
-  if (validateData(data)) {
-    //upload to db logic here
-  }
-  else {
-    console.log("Data is invalid");
-  }
-});
-
-client.on('error', (err) => {
-  console.error('Error:', err);
-  client.end(); 
-});
-
-client.on('end', () => {
-  console.log('Disconnected from MQTT broker');
-  client.reconnect = true;
-}
-);
 

@@ -1,12 +1,12 @@
 "use strict";
 const { Sequelize, DataTypes } = require("sequelize");
-const { sequelize } = require("../mySql.js");
+const { sequelize } = require("../mySQL");
 
 const IoTModel = sequelize.define("iot-data",{
 		// Model attributes are defined here
 		id: {
 			type: DataTypes.INTEGER,
-			allowNull: false,
+			allowNull: true,
 			primaryKey: true,
 		},
 		psiData: {
@@ -65,6 +65,7 @@ const IoTModel = sequelize.define("iot-data",{
         },
         updatedAt: {
             type: DataTypes.DATE,
+			//appointmentStart: { type: "DATETIME" }       // Do this instead
             allowNull: true,
         },
 	},
@@ -72,5 +73,7 @@ const IoTModel = sequelize.define("iot-data",{
 		timestamps: true,
 	}
 );
+
+
 
 module.exports = { IoTModel };

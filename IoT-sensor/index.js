@@ -30,5 +30,5 @@ client.on("error", (err) => {
 });
 
 //every 15 minutes
-//setInterval(publishData, 900000);
-setInterval(publishData, 600);
+setInterval(publishData, 900000);
+//setInterval(publishData, 600);

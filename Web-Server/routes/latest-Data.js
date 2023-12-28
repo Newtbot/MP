@@ -3,12 +3,13 @@ const { IoTModel } = require("../../Database/model/IoTModel.js");
 const express = require('express');
 const router = express.Router();
 
-// Logic for model and API
+// Logic for model and API by 1 
 async function getLatestData() {
   try {
     sequelize.sync();
     const latestData = await IoTModel.findAll({
-      order: [['createdAt', 'DESC']],
+      limit: 1,
+      order: [['createdAt', 'DESC']]
     });
     return latestData;
   }
