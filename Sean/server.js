@@ -460,10 +460,7 @@ app.post("/forgot-password", (req, res) => {
 									res.render("forgot-password", { error: null, success });
 
 									// Log the successful sending of the reset link in the database
-									logPasswordResetActivity(
-										user.username,
-										"link sent successfully"
-									);
+									logPasswordResetActivity(user.username,"link sent successfully");
 								}
 							});
 						}
@@ -478,7 +475,7 @@ app.post("/forgot-password", (req, res) => {
 function logPasswordResetActivity(username, activity) {
 	const logSql =
 		"INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)";
-	mysqlConnection.query(logSql, [username, activity], (error) => {
+		connection.query(logSql, [username, activity], (error) => {
 		if (error) {
 			console.error("Error logging password reset activity:", error);
 		} else {
