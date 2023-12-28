@@ -1,5 +1,8 @@
 const mysql = require("mysql2");
-
+const path = require("path");
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') })
+const fs = require('fs');
+/*
 const mysqlConfig = {
 	host: process.env.host,
 	user: process.env.user,
@@ -16,6 +19,17 @@ connection.connect((err) => {
 	}
 	console.log("Connected to MySQL");
 });
+*/
 
+const connection = mysql.createConnection({
+	host: process.env.host,
+	user: process.env.DB_USER,
+	password: process.env.DB_PASS,
+	database: "eco_saver",
+	ssl: {
+		ca: fs.readFileSync(path.resolve(__dirname, '../../cert/DigiCertGlobalRootCA.crt.pem')),
+	}
+  });
 
-module.exports = { connection , mysqlConfig };
+  
+module.exports = { connection };
