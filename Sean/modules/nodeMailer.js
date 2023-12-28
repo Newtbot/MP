@@ -1,5 +1,9 @@
 const nodemailer = require("nodemailer");
-const transporter = nodemailer.createTransport({
+const dotenv = require("dotenv");
+const path = require('path')
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') })
+
+let transporter = nodemailer.createTransport({
     service: 'gmail',
     host: 'smtp.gmail.com',
     port: 587, // use the appropriate port for your SMTP server
@@ -9,6 +13,4 @@ const transporter = nodemailer.createTransport({
       pass: process.env.epass
     },
   });
-
-
-module.exports = { transporter } ; 
+module.exports = { transporter };

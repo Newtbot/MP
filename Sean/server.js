@@ -6,8 +6,8 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
-const transporter = require("./modules/nodeMailer");
-const { mysqlConfig , connection } = require("./modules/mysql"); 
+const { transporter } = require("./modules/nodeMailer");
+const { connection } = require("./modules/mysql"); 
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -447,7 +447,6 @@ app.post("/forgot-password", (req, res) => {
 								subject: "Password Reset",
 								text: `Click on the following link to reset your password: ${resetLink}`,
 							};
-
 							transporter.sendMail(mailOptions, (emailError, info) => {
 								if (emailError) {
 									console.error("Error sending email:", emailError);
