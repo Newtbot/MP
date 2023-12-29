@@ -1,8 +1,11 @@
 const { sequelize }  = require("../../Database/mySql.js");
 const { IoTModel } = require("../../Database/model/IoTModel.js"); 
+const { getallData } = require("../functions/APIDatabase.js");
+
 const express = require('express');
 const router = express.Router();
 
+/*
 async function getallData() {
   try {
     sequelize.sync();
@@ -17,6 +20,7 @@ async function getallData() {
 
     }
 }
+*/
 
 router.get('/', async (req, res) => {
   try {

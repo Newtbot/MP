@@ -38,7 +38,7 @@ client.on('connect', () => {
   client.on('end', () => {
     console.log('Disconnected from MQTT broker');
     client.reconnect = true;
-  }
+    }
   );
   
   

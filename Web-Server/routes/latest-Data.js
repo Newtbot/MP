@@ -1,9 +1,11 @@
 const { sequelize }  = require("../../Database/mySql.js");
 const { IoTModel } = require("../../Database/model/IoTModel.js"); 
+const { getLatestData } = require("../functions/APIDatabase.js");
 const express = require('express');
 const router = express.Router();
 
 // Logic for model and API by 1 
+/*
 async function getLatestData() {
   try {
     sequelize.sync();
@@ -18,6 +20,7 @@ async function getLatestData() {
     return null;
   }
 }
+*/
 
 
 router.get('/', async (req, res) => {

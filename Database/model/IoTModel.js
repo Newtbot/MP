@@ -3,7 +3,6 @@ const { Sequelize, DataTypes } = require("sequelize");
 const { sequelize } = require("../mySQL");
 
 const IoTModel = sequelize.define("iot-data",{
-		// Model attributes are defined here
 		id: {
 			type: DataTypes.INTEGER,
 			allowNull: true,
@@ -65,7 +64,6 @@ const IoTModel = sequelize.define("iot-data",{
         },
         updatedAt: {
             type: DataTypes.DATE,
-			//appointmentStart: { type: "DATETIME" }       // Do this instead
             allowNull: true,
         },
 	},

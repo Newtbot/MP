@@ -21,15 +21,6 @@ app.use('/api/', APIlogger );
 //route logic 
 app.use('/api/', require('../routes/api_route.js'));
 
-
-/*
-const testRoute = require("../routes/test.js")
-const latestDataroute = require("../routes/latest-Data.js")
-
-app.use('/test', testRoute); 
-app.use('/api/latest-data', latestDataroute);
-*/
-
 app.listen(port, () => {
 	console.log(`app listening on port ${port}`);
 });

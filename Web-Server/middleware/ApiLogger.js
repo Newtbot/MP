@@ -1,19 +1,26 @@
-const { connect } = require("../routes/test");
-
+const { insertLogData } = require("../functions/Database.js");
 const APIlogger = (req, res, next) => {
-	/*  
-  console.log("API request received");
-    console.log(req.ip);
-    console.log(req.path);
-    console.log(req.method);
-    console.log(res.statusCode);
-    console.log(req.headers['user-agent']);
-    console.log(req.secure);
-    console.log(req.protocol);
-    console.log(req.get('host'));
-    console.log(new Date()); 
-    */
+
 	const log = {
+    ip: req.ip,
+    time: new Date().toUTCString(),
+    method: req.method,
+    //https://stackoverflow.com/questions/10183291/how-to-get-the-full-url-in-express
+    host: `${req.protocol}://${req.get("host")}${req.originalUrl}`, 
+    statusCode: res.statusCode,
+    Responsesize: res.get('Content-Length') ? res.get('Content-Length') : 0,
+    referrer: res.get('content-type') ? res.get('content-type') : "none",
+    userAgent: req.headers["user-agent"],
+	};
+	//upload to db logic here for api logs
+  insertLogData(log);
+	next();
+};
+
+module.exports = { APIlogger };
+
+
+/*
 		method: req.method,
 		statusCode: res.statusCode,
 		protocol: req.protocol,
@@ -22,14 +29,4 @@ const APIlogger = (req, res, next) => {
     ip: req.ip,
 		userAgent: req.headers["user-agent"],
 		host: `${req.protocol}://${req.get("host")}${req.originalUrl}`,
-	};
-  console.log(log);
-
-	//upload to db logic here for api logs
-
-	next();
-};
-
-module.exports = { APIlogger };
-
-
+*/

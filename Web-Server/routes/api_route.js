@@ -19,5 +19,6 @@ const router = require('express').Router();
 
 router.use('/test' , require('./test'));
 router.use('/latest-data', require('./latest-data'));
+router.use('/:month', require('./monthlyData'));
 
 module.exports = router;

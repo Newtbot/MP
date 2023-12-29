@@ -1,10 +1,11 @@
 const { sequelize }  = require("../../Database/mySql.js");
-const { IoTModel } = require("../../Database/model/IoTModel.js"); 
+const { IoTModel } = require("../../Database/model/IoTModel.js");
+const { api_log_Model } = require("../../Database/model/apiLog.js"); 
 
-async function insertData(data) {
-    console.log(data);
+function insertData(data) {
     try {
-        const latestData = await IoTModel.create({
+        //const latestData = await IoTModel.create({
+        IoTModel.create({
             psiData: data.psi,
             humidityData: data.humidity,
             o3Data: data.o3,
@@ -22,7 +23,27 @@ async function insertData(data) {
     }
 }
 
-module.exports = { insertData };
+function insertLogData(log){
+    try{
+        api_log_Model.create({
+            ip: log.ip,
+            time: log.time,
+            method: log.method,
+            host: log.host,
+            statusCode: log.statusCode,
+            Responsesize: log.Responsesize,
+            referrer: log.referrer,
+            userAgent: log.userAgent,
+        });    
+    }
+    catch
+    (error){
+        console.error(error);
+    }
+
+}
+
+module.exports = { insertData , insertLogData };
 
 
 
