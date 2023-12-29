@@ -17,6 +17,16 @@ module.exports = router;
 'use strict';
 const router = require('express').Router();
 
+//location route
+router.use('/location', require('./getLocation'));
+router.use('/add-location', require('./addLocation'));
+router.use('/update-location', require('./updateLocation'));
+router.use('/delete-location', require('./deleteLocation'));
+router.use('/', require('./getLocationId'));
+
+
+
+
 router.use('/test' , require('./test'));
 router.use('/latest-data', require('./latest-data'));
 router.use('/:month', require('./monthlyData'));
