@@ -140,7 +140,6 @@ app.get("/home", isAuthenticated, (req, res) => {
 	// Retrieve the overall last 10 logins for all users
 	const loginsQuery =
 		"SELECT username, lastLogin FROM users ORDER BY lastLogin DESC LIMIT 10";
-
 	connection.query(loginsQuery, (error, loginResults) => {
 		if (error) {
 			console.error("Error executing login logs query:", error);
@@ -531,17 +530,26 @@ app.post("/reset-password/:token", async (req, res) => {
 		// Update user's password and clear reset token
 		const updateQuery =
 			"UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE reset_token = ?";
-		connection.query(updateQuery, [hashedPassword, token], (updateErr) => {
-			if (updateErr) {
-				console.error("Error updating password:", updateErr);
-				// Pass the error to the template when rendering the reset-password page
-				res.render("reset-password", {
-					token,
-					resetError: "Error updating password",
-				});
-			} else {
-				// Redirect to the success page upon successful password reset
-				res.redirect("/success");
+			connection.query(updateQuery, [hashedPassword, token], async (updateErr, updateResults) => {
+				if (updateErr) {
+					console.error("Error updating password:", updateErr);
+					// Pass the error to the template when rendering the reset-password page
+					res.render("reset-password", {
+						token,
+						resetError: "Error updating password",
+					});
+				} else {
+					// Log password reset activity
+					const username = selectResults[0].username; // Assuming 'username' is the column name
+					const logQuery = "INSERT INTO user_logs (username, activity, timestamp) VALUES (?, 'Password Reseted successfully', NOW())";
+					connection.query(logQuery, [username], (logErr) => {
+						if (logErr) {
+							console.error("Error logging password reset:", logErr);
+							// You might want to handle the logging error here
+						}
+					});
+					// Redirect to the success page upon successful password reset
+					res.redirect("/success");
 			}
 		});
 	});
@@ -563,70 +571,159 @@ app.get("/reset-password/:token", (req, res) => {
 	});
 });
 app.post("/reset-password", async (req, res) => {
-	const { username, password, confirmPassword } = req.body;
+    const { username, password, confirmPassword } = req.body;
+	const creatorUsername = req.session.username;
 
-	// Check if passwords match
-	if (password !== confirmPassword) {
-		return res.status(400).json({ error: "Passwords do not match" });
-	}
+    // Check if passwords match
+    if (password !== confirmPassword) {
+        return res.status(400).json({ error: "Passwords do not match" });
+    }
 
-	// Check if the new password meets complexity requirements
-	if (!isStrongPassword(password)) {
-		return res.status(400).json({
-			error:
-				"Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.",
-		});
-	}
+    // Check if the new password meets complexity requirements
+    if (!isStrongPassword(password)) {
+        return res.status(400).json({
+            error:
+                "Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.",
+        });
+    }
 
-	// Hash the new password
-	const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-	// Check if the user exists in the database before updating the password
-	const userExists = await checkIfUserExists(username);
+    // Check if the user exists in the database before updating the password
+    const userExists = await checkIfUserExists(username);
 
-	if (!userExists) {
-		return res.status(404).json({ error: "User does not exist" });
-	}
+    if (!userExists) {
+        return res.status(404).json({ error: "User does not exist" });
+    }
 
-	// Update user's password based on the username
-	const updateQuery = "UPDATE users SET password = ? WHERE username = ?";
-	connection.query(
-		updateQuery,
-		[hashedPassword, username],
-		(updateErr, updateResults) => {
-			if (updateErr) {
-				console.error("Error updating password:", updateErr);
-				return res.status(500).json({ error: "Error updating password" });
-			}
+    // Update user's password based on the username
+    const updateQuery = "UPDATE users SET password = ? WHERE username = ?";
+    connection.query(updateQuery, [hashedPassword, username], async (updateErr, updateResults) => {
+        if (updateErr) {
+            console.error("Error updating password:", updateErr);
+            return res.status(500).json({ error: "Error updating password" });
+        }
 
-			// Check if the update affected any rows
-			if (updateResults.affectedRows > 0) {
-				// Password update successful
-				return res
-					.status(200)
-					.json({ success: "Password updated successfully" });
-			} else {
-				return res
-					.status(404)
-					.json({
-						error: "User not found or password not updated.",
-					});
-			}
-		}
-	);
+        // Check if the update affected any rows
+        if (updateResults.affectedRows > 0) {
+            // Log password reset activity
+            const logQuery = "INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, NOW())";
+            const logActivity = `Password has been reset for ${username}`;
+            connection.query(logQuery, [creatorUsername, logActivity], (logErr) => {
+                if (logErr) {
+                    console.error("Error logging password reset:", logErr);
+                    // You might want to handle the logging error here
+                }
+
+                // Password update successful
+                return res.status(200).json({ success: "Password updated successfully" });
+            });
+        } else {
+            return res.status(404).json({
+                error: "User not found or password not updated.",
+            });
+        }
+    });
 });
+
 async function checkIfUserExists(username) {
-	return new Promise((resolve, reject) => {
-		const query = "SELECT * FROM users WHERE username = ?";
-		connection.query(query, [username], (err, results) => {
-			if (err) {
-				reject(err);
-			} else {
-				resolve(results.length > 0);
-			}
-		});
-	});
+    return new Promise((resolve, reject) => {
+        const query = "SELECT * FROM users WHERE username = ?";
+        connection.query(query, [username], (err, results) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(results.length > 0);
+            }
+        });
+    });
 }
+app.get('/searchUser', (req, res) => {
+	const { username } = req.query;
+	const query = 'SELECT * FROM users WHERE username = ?';
+  
+	connection.query(query, [username], (err, results) => {
+	  if (err) {
+		console.error('MySQL query error:', err);
+		res.status(500).json({ success: false, error: 'Internal Server Error' });
+	  } else if (results.length === 0) {
+		// No user found with the given username
+		res.status(404).json({ success: false, error: 'User not found' });
+	  } else {
+		res.json(results);
+	  }
+	});
+  });
+
+app.get('/api/users', (req, res) => {
+	const query = 'SELECT * FROM users';
+  
+	connection.query(query, (err, results) => {
+	  if (err) {
+		console.error('MySQL query error:', err);
+		res.status(500).json({ success: false, error: 'Internal Server Error' });
+	  } else {
+		res.json(results);
+	  }
+	});
+  });
+  
+  // Route to search for a user by username
+  app.get('/api/searchUser', (req, res) => {
+	const { username } = req.query;
+	const query = 'SELECT * FROM users WHERE username = ?';
+  
+	connection.query(query, [username], (err, results) => {
+	  if (err) {
+		console.error('MySQL query error:', err);
+		res.status(500).json({ success: false, error: 'Internal Server Error' });
+	  } else {
+		res.json(results);
+	  }
+	});
+  });
+  
+  // Route to delete a user by username
+  
+  app.delete('/api/deleteUser/:username', async (req, res) => {
+	const { username } = req.params;
+	const query = 'DELETE FROM users WHERE username = ?';
+	const creatorUsername = req.session.username;
+	try {
+	  // Log deletion activity to USER_LOGS
+	  const deletionActivity = `User ${username} has been successfully deleted`;
+	  const logQuery = 'INSERT INTO USER_LOGS (USERNAME, ACTIVITY, TIMESTAMP) VALUES (?, ?, CURRENT_TIMESTAMP)';
+	  await executeQuery(logQuery, [creatorUsername, deletionActivity]);
+  
+	  // Perform user deletion
+	  const results = await executeQuery(query, [username]);
+  
+	  if (results.affectedRows === 0) {
+		res.status(404).json({ success: false, error: 'User not found' });
+	  } else {
+		res.json({ success: true, message: 'User deleted successfully' });
+	  }
+	} catch (error) {
+	  console.error('MySQL query error:', error);
+	  res.status(500).json({ success: false, error: 'Internal Server Error', details: error.message });
+	}
+  });
+  
+  async function executeQuery(sql, values) {
+	return new Promise((resolve, reject) => {
+	  connection.query(sql, values, (err, results) => {
+		if (err) {
+		  reject(err);
+		} else {
+		  resolve(results);
+		}
+	  });
+	});
+  }
+  
+  
+  
 
 app.use(express.static("views"));
 

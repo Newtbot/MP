@@ -44,7 +44,6 @@
             <th>Name</th>
             <th>Username</th>
             <th>Email</th>
-            <th>Password</th>
             <th>Last Login</th>
             <th>Job Title</th>
           </tr>
@@ -56,7 +55,6 @@
                 <td><%= user.name %></td>
                 <td><%= user.username %></td>
                 <td><%= user.email %></td>
-                <td><%= user.password %></td>
                 <td><%= new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) %></td>
                 <td><%= user.jobTitle %></td>                
               </tr>
@@ -134,7 +132,17 @@
         </div>
       </div>
     </div>
-    
+    <div id="deleteUserContainer" style="display: none;">
+      <h3>Delete User</h3>
+      <div class="search-container">
+        <input type="text" id="searchUserInput" placeholder="Search by username">
+        <button id="searchUserButton">Search</button>
+      </div>
+      <div id="searchResultsContainer" style="display: none;">
+        <h4>Search Results</h4>
+        <ul id="searchResultsList"></ul>
+      </div>
+    </div>
 
   <!-- Your existing script tags -->
   
@@ -153,6 +161,7 @@ $(document).ready(function () {
     $('#createUserForm').hide();
     $('#userDataContainer').hide();
     $('#downloadButtonContainer').hide();
+    $('#deleteUserContainer').hide();
   });
 
   $('#addUserLink').on('click', function () {
@@ -160,6 +169,7 @@ $(document).ready(function () {
     $('#createUserForm').show();
     $('#userDataContainer').hide();
     $('#downloadButtonContainer').hide();
+    $('#deleteUserContainer').hide();
   });
 
   $('#userDataLink').on('click', function () {
@@ -167,26 +177,110 @@ $(document).ready(function () {
     $('#createUserForm').hide();
     $('#userDataContainer').show();
     $('#downloadButtonContainer').show();
+    $('#deleteUserContainer').hide();
   });
+
+  $('#searchUserButton').on('click', function () {
+  console.log('Search button clicked');
+  const searchUsername = $('#searchUserInput').val();
+  // Call the function to search for the user
+  searchUser(searchUsername);
+});
+
+$('#deleteUserLink').on('click', function () {
+$('#deleteUserContainer').show();
+  $('#resetPasswordFormContainer').hide();
+    $('#createUserForm').hide();
+    $('#userDataContainer').hide();
+    $('#downloadButtonContainer').hide();
 });
 
 $('#downloadButton').on('click', function () {
   // Call the downloadExcel function with the allUsers data
   downloadExcel(allUsers);
 });
+});
+
+function searchUser(username) {
+  fetch(`/api/searchUser?username=${username}`)  // Add the /api prefix here
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+    })
+    .then(users => {
+      // Display search results
+      displaySearchResults(users);
+    })
+    .catch(error => {
+      console.error('Search error:', error);
+      // Handle errors, e.g., display an alert
+    });
+}
+
+// Function to display search results
+function displaySearchResults(users) {
+  const searchResultsList = $('#searchResultsList');
+
+  // Clear previous results
+  searchResultsList.empty();
+
+  if (users && users.length > 0) {
+    users.forEach(user => {
+      const listItem = `<li>${user.username} - <button class="deleteUserButton" data-username="${user.username}">Delete</button></li>`;
+      searchResultsList.append(listItem);
+    });
+
+    // Show the search results container
+    $('#searchResultsContainer').show();
+  } else {
+    // Hide the search results container if no results
+    $('#searchResultsContainer').hide();
+  }
+}
+// Event listener for delete user button in search results
+$('#searchResultsList').on('click', '.deleteUserButton', function () {
+  const usernameToDelete = $(this).data('username');
+  console.log('Before fetch for user deletion');
+  // Make a fetch request to delete the user
+  fetch(`/api/deleteUser/${usernameToDelete}`, {
+    method: 'DELETE',
+  })
+  .then(response => {
+    console.log('Inside fetch response handler');
+    if (response.ok) {
+      // Assuming your server sends a JSON response
+      return response.json();
+    } else {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+  })
+  .then(data => {
+    console.log('User deletion success:', data);
+    alert('User deleted successfully');
+    $('#searchResultsContainer').hide();
+  })
+  .catch(error => {
+    console.error('User deletion error:', error);
+    alert('Failed to delete user. Please try again.');
+    // Handle errors, e.g., display an alert
+  });
+});
+
 
 function downloadExcel(allUsers) {
   if (allUsers && allUsers.length > 0) {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('All Users');
-    const headers = ['Name', 'Username', 'Email', 'Password', 'Last Login', 'Job Title'];
+    const headers = ['Name', 'Username', 'Email', 'Last Login', 'Job Title'];
     worksheet.addRow(headers);
     allUsers.forEach(user => {
       const rowData = [
         user.name || '',
         user.username || '',
         user.email || '',
-        user.password || '',
         user.lastLogin ? new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) : '',
         user.jobTitle || ''
       ];
