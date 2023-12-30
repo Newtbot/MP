@@ -3,7 +3,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 const { sequelize } = require("../mySQL");
 
 
-sequelize.sync();
+//sequelize.sync();
 const api_log_Model = sequelize.define("api-logs",{
 		// Model attributes are defined here
 		id: {

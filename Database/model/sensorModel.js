@@ -1,10 +1,10 @@
 "use strict";
 const { Sequelize, DataTypes } = require("sequelize");
 const { sequelize } = require("../mySQL");
+const { locationModel } = require("./locationModel");
 
 //sequelize.sync();
-const locationModel = sequelize.define(
-	"location",
+const sensorModel = sequelize.define("sensors",
 	{
 		id: {
 			type: DataTypes.INTEGER,
@@ -12,7 +12,7 @@ const locationModel = sequelize.define(
 			primaryKey: true,
             autoIncrement: true,
 		},
-		name: {
+		sensortype: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 10,
@@ -27,6 +27,16 @@ const locationModel = sequelize.define(
 			allowNull: true,
 			length: 100,
 		},
+        location: {
+            type: DataTypes.INTEGER,
+			allowNull: true,
+			length: 100,
+            //one to many relationship
+            references: {
+                model: locationModel,
+                key: 'id'
+            }
+        },
 		createdAt: {
 			type: DataTypes.DATE,
 			allowNull: true,
@@ -41,4 +51,4 @@ const locationModel = sequelize.define(
 	}
 );
 
-module.exports = { locationModel };
+module.exports = { sensorModel };

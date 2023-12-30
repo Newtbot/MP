@@ -1,20 +1,11 @@
 const { sequelize } = require("../../Database/mySql.js");
 const { IoTModel } = require("../../Database/model/IoTModel.js");
 const { locationModel } = require("../../Database/model/locationModel.js");
+const { sensorModel } = require("../../Database/model/sensorModel.js");
 
 async function getLocation() {
 	try {
-		sequelize.sync();
-		const location = await locationModel.findAll({
-			attributes: [
-				"id",
-				"name",
-				"added_by",
-				"description",
-				"createdAt",
-				"updatedAt",
-			],
-		});
+		const location = await locationModel.findAll();
 		return location;
 	} catch (error) {
 		console.error(error);
@@ -24,7 +15,6 @@ async function getLocation() {
 
 async function addLocation(name, added_by, description) {
 	try {
-		sequelize.sync();
 		const location = await locationModel.create({
 			name: name,
 			added_by: added_by,
@@ -38,7 +28,6 @@ async function addLocation(name, added_by, description) {
 
 async function updateLocation(id, name, added_by, description) {
 	try {
-		sequelize.sync();
 		//update by id
 		const location = await locationModel.update(
 			{
@@ -60,7 +49,6 @@ async function updateLocation(id, name, added_by, description) {
 
 async function deleteLocation(id) {
 	try {
-		sequelize.sync();
 		//delete by id
 		const location = await locationModel.destroy({
 			where: {
@@ -75,8 +63,6 @@ async function deleteLocation(id) {
 
 async function getLocationById(id) {
 	try {
-		sequelize.sync();
-		//delete by id
 		const location = await locationModel.findAll({
 			where: {
 				id: id,
@@ -89,9 +75,85 @@ async function getLocationById(id) {
 	}
 }
 
+async function getSensor() {
+	try {
+		const sensor = await sensorModel.findAll();
+		return sensor;
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+}
+
+async function addSensor(sensortype, added_by, description, location) {
+	try {
+		const sensor = await sensorModel.create({
+			sensortype: sensortype,
+			added_by: added_by,
+			description: description,
+			location: location,
+		});
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+}
+
+async function updateSensor(id, sensortype, added_by, description, location) {
+	try {
+		//update by id
+		const sensor = await sensorModel.update(
+			{
+				sensortype: sensortype,
+				added_by: added_by,
+				description: description,
+				location: location,
+
+			},
+			{
+				where: {
+					id: id,
+				},
+			}
+		);
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+
+}
+
+async function deleteSensor(id) {
+	try {
+		//delete by id
+		const sensor = await sensorModel.destroy({
+			where: {
+				id: id,
+			},
+		});
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+}
+
+async function getSensorById(id) {
+	try {
+		const sensor = await sensorModel.findAll({
+			where: {
+				id: id,
+			},
+		});
+		return sensor;
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+}
+
+
 async function getallData() {
 	try {
-		sequelize.sync();
 		const allData = await IoTModel.findAll({
 			attributes: [
 				"id",
@@ -118,7 +180,6 @@ async function getallData() {
 
 async function getLatestData() {
 	try {
-		sequelize.sync();
 		const latestData = await IoTModel.findAll({
 			limit: 1,
 			order: [["createdAt", "DESC"]],
@@ -138,4 +199,9 @@ module.exports = {
 	updateLocation,
 	deleteLocation,
 	getLocationById,
+	getSensor,
+	addSensor,
+	updateSensor,
+	deleteSensor,
+	getSensorById,
 };

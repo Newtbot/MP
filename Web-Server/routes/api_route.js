@@ -18,11 +18,10 @@ module.exports = router;
 const router = require('express').Router();
 
 //location route
-router.use('/location', require('./getLocation'));
-router.use('/add-location', require('./addLocation'));
-router.use('/update-location', require('./updateLocation'));
-router.use('/delete-location', require('./deleteLocation'));
-router.use('/', require('./getLocationId'));
+router.use('/location', require('./Location'));
+
+//sensor route
+router.use('/sensor', require('./Sensor'))
 
 
 
@@ -30,5 +29,8 @@ router.use('/', require('./getLocationId'));
 router.use('/test' , require('./test'));
 router.use('/latest-data', require('./latest-data'));
 router.use('/:month', require('./monthlyData'));
+
+
+
 
 module.exports = router;
