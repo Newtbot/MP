@@ -1,98 +1,49 @@
 /* style.css */
 
-/* Sidebar Styles */
 body {
 	margin: 0;
 	font-family: 'Arial', sans-serif;
   }
   
-  #sidebar {
-	height: 100%;
-	width: 250px;
-	position: fixed;
+  #navbar {
 	background-color: #333;
-	padding-top: 60px;
-	transition: 0.5s;
+	overflow: hidden;
+	text-align: center;
   }
   
-  #sidebar img {
-	width: 100%;
-	margin-bottom: 20px;
+  #navbar h1 {
+	color: white;
+	padding: 14px 16px;
+	margin: 0;
+	font-size: 24px;
   }
   
-  #sidebar a {
-	padding: 10px 15px;
+  #navbar a {
+	display: inline-block;
+	color: white;
+	text-align: center;
+	padding: 14px 16px;
 	text-decoration: none;
 	font-size: 18px;
-	color: white;
-	display: block;
-	transition: 0.3s;
   }
   
-  #sidebar a:hover {
+  #navbar a:hover {
 	background-color: #555;
   }
   
   #content {
-	margin-left: 250px;
 	padding: 16px;
+	text-align: center;
   }
   
-  @media screen and (max-width: 600px) {
-	#sidebar {
-	  width: 0;
-	  overflow-x: hidden;
-	}
-  
-	#content {
-	  margin-left: 0;
-	}
-  }
-  
-  #sidebarCollapse {
-	width: 40px;
-	height: 40px;
-	position: absolute;
-	top: 10px;
-	left: 10px;
-	cursor: pointer;
-	z-index: 1;
-  }
-  
-  #sidebarCollapse span {
-	display: block;
-	background: white;
-	height: 5px;
-	width: 30px;
-	margin: 6px auto;
-	transition: 0.3s;
-  }
-  
-  #sidebarCollapse:hover span:nth-child(1) {
-	transform: rotate(-45deg) translate(-5px, 6px);
-  }
-  
-  #sidebarCollapse:hover span:nth-child(2) {
-	opacity: 0;
-  }
-  
-  #sidebarCollapse:hover span:nth-child(3) {
-	transform: rotate(45deg) translate(-5px, -6px);
-  }
-  
-  #userDataContainer {
-	margin-top: 20px;
-  }
-  
-  /* Table Styles */
   table {
 	border-collapse: collapse;
-	width: 100%;
-	margin-top: 20px;
+	width: 80%;
+	margin: 20px auto;
+	font-size: 16px;
   }
   
-  th,
-  td {
+  th, td {
 	border: 1px solid #dddddd;
 	text-align: left;
 	padding: 12px;
@@ -108,40 +59,6 @@ body {
   
   td {
 	white-space: nowrap;
-  }
-  
-  /* Dropdown Styles */
-  .dropdown {
-	display: block;
-	margin-top: 20px;
-  }
-  
-  .dropdown-toggle {
-	color: white;
-	background-color: #333;
-	border: 1px solid #555;
-	padding: 10px 15px;
-	text-decoration: none;
-	font-size: 18px;
-	display: block;
-	width: 100%;
-	text-align: left;
-  }
-  
-  .dropdown-toggle:hover {
-	background-color: #555;
-  }
-  
-  .dropdown-menu {
-	background-color: #333;
-  }
-  
-  .dropdown-item {
-	color: white;
-  }
-  
-  .dropdown-item:hover {
-	background-color: #555;
   }
   
   /* Additional styles for Bootstrap form */
