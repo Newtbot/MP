@@ -221,4 +221,18 @@ body {
 	background-color: #0056b3;
 	border-color: #0056b3;
   }
+  .logs-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 10px;
+  }
   
+  .logs-table th, .logs-table td {
+	border: 1px solid #ddd;
+	padding: 8px;
+	text-align: left;
+  }
+  
+  .logs-table th {
+	background-color: #f2f2f2;
+  }	

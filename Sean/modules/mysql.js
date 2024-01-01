@@ -37,10 +37,10 @@ const connection = mysql.createConnection({
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: "adminusers",
+	timezone: "Z", // Set the timezone to UTC
   });
 
   
 module.exports = { connection };
 
   
-module.exports = { connection };

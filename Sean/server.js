@@ -722,7 +722,28 @@ app.get('/api/users', (req, res) => {
 	});
   }
   
+  app.get('/api/getLogs', (req, res) => {
+	// Query the database to fetch logs
+	const query = 'SELECT id, username, activity, timestamp FROM user_logs';
+	connection.query(query, (err, results) => {
+	  if (err) {
+		console.error('Error fetching logs from MySQL:', err);
+		res.status(500).json({ error: 'Error fetching logs from MySQL' });
+		return;
+	  }
   
+	  // Format timestamps to a more readable format
+	  const formattedLogs = results.map((log) => ({
+		id: log.id,
+		username: log.username,
+		activity: log.activity,
+		timestamp: new Date(log.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }),
+	  }));
+  
+	  // Send the formatted logs as a JSON response
+	  res.json(formattedLogs);
+	});
+  });
   
 
 app.use(express.static("views"));

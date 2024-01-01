@@ -94,5 +94,11 @@ button:hover {
       <p>If you have forgotten your password, please <span class="reset-link" onclick="location.href='/forgot-password'">reset here</span>.</p>
     </div>
   </div>
+  <script>
+    // Function to escape HTML characters
+    function escapeHTML(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+  </script>
 </body>
 </html>
