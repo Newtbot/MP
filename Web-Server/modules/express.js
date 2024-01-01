@@ -15,11 +15,11 @@ app.disable("x-powered-by");
 app.use(express.json());
 app.set("json spaces", 2);
 
-//const { APIlogger } = require('../middleware/ApiLogger.js');
+const { APIlogger } = require('../middleware/ApiLogger.js');
 
-//middleware logic
+//middleware logic ( called by next() )
 //app.use('/api/v0', require('../middleware/ApiKey.js'));
-//app.use('/api/v0', APIlogger, require('../routes/api_route.js'));
+app.use('/api/v0', APIlogger, require('../routes/api_route.js'));
 
 //route logic
 app.use("/api/v0", require("../routes/api_route.js"));
@@ -41,13 +41,20 @@ app.use(function (err, req, res, next) {
 		console.error(err.stack);
 		console.error("=========================================");
 	}
+	//validation error
+	if (err.name === "SequelizeValidationError") {
+		err.status = 400;
+		err.message = "Validation Error";
+	}
+	else if (err.name === "SequelizeUniqueConstraintError") 
+	{
+		console.log("this is my custom error!" + err);
+	}
 
 	res.status(err.status || 500);
 	res.json({
 		name: err.name,
 		message: err.message,
-		runner: err.runner && err.runner.name,
-		duration: err.duration,
 	});
 });
 app.listen(port, () => {

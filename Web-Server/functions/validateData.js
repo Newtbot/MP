@@ -22,4 +22,11 @@ function validateData(data) {
   );
 }
 
-module.exports = { validateData };
+const dateRegex = /^[A-Za-z]{3}, \d{2} [A-Za-z]{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/;
+
+function isValidDateString(){
+  return dateRegex.test(value);
+}
+
+
+module.exports = { validateData  , isValidDateString };

@@ -2,6 +2,8 @@ const { sequelize } = require("../../Database/mySql.js");
 const { IoTModel } = require("../../Database/model/IoTModel.js");
 const { locationModel } = require("../../Database/model/locationModel.js");
 const { sensorModel } = require("../../Database/model/sensorModel.js");
+const { sensorDataModel } = require("../../Database/model/sensorDataModel.js");
+
 
 async function getLocation() {
 	try {
@@ -9,7 +11,6 @@ async function getLocation() {
 		return location;
 	} catch (error) {
 		console.error(error);
-		return null;
 	}
 }
 
@@ -22,7 +23,6 @@ async function addLocation(name, added_by, description) {
 		});
 	} catch (error) {
 		console.error(error);
-		return null;
 	}
 }
 
@@ -43,7 +43,6 @@ async function updateLocation(id, name, added_by, description) {
 		);
 	} catch (error) {
 		console.error(error);
-		return null;
 	}
 }
 
@@ -57,7 +56,6 @@ async function deleteLocation(id) {
 		});
 	} catch (error) {
 		console.error(error);
-		return null;
 	}
 }
 
@@ -71,7 +69,6 @@ async function getLocationById(id) {
 		return location;
 	} catch (error) {
 		console.error(error);
-		return null;
 	}
 }
 
@@ -81,31 +78,31 @@ async function getSensor() {
 		return sensor;
 	} catch (error) {
 		console.error(error);
-		return null;
 	}
 }
 
-async function addSensor(sensortype, added_by, description, location) {
+async function addSensor(sensorname, added_by, mac_address , description, location) {
 	try {
 		const sensor = await sensorModel.create({
-			sensortype: sensortype,
+			sensorname: sensorname,
 			added_by: added_by,
+			mac_address: mac_address,
 			description: description,
 			location: location,
 		});
 	} catch (error) {
 		console.error(error);
-		return null;
 	}
 }
 
-async function updateSensor(id, sensortype, added_by, description, location) {
+async function updateSensor(id, sensorname, added_by, mac_address ,description, location) {
 	try {
 		//update by id
 		const sensor = await sensorModel.update(
 			{
-				sensortype: sensortype,
+				sensorname: sensorname,
 				added_by: added_by,
+				mac_address: mac_address,
 				description: description,
 				location: location,
 
@@ -118,7 +115,6 @@ async function updateSensor(id, sensortype, added_by, description, location) {
 		);
 	} catch (error) {
 		console.error(error);
-		return null;
 	}
 
 }
@@ -133,7 +129,6 @@ async function deleteSensor(id) {
 		});
 	} catch (error) {
 		console.error(error);
-		return null;
 	}
 }
 
@@ -147,34 +142,88 @@ async function getSensorById(id) {
 		return sensor;
 	} catch (error) {
 		console.error(error);
-		return null;
 	}
 }
 
+async function getSensorData() {
+	try {
+		const sensorData = await sensorDataModel.findAll();
+		return sensorData;
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+async function addSensorData(id , id_sensor , id_location , sensordata){
+	try{
+		console.log(typeof sensordata);
+		console.log(sensordata);
+		if (!sensordata){
+			console.log("Sensor Data is null");
+		}
+		const sensorData = await sensorDataModel.create({
+			id: id,
+			id_sensor: id_sensor,
+			id_location: id_location,
+			sensordata: sensordata,
+		});
+	}catch(error){
+		console.error(error);
+	}
+
+}
+
+async function updateSensorData(id, id_sensor, id_location, sensordata) {
+	try {
+		const sensorData = await sensorDataModel.update(
+			{
+				id_sensor: id_sensor,
+				id_location: id_location,
+				sensordata: sensordata,
+			},
+			{
+				where: {
+					id: id,
+				},
+			}
+		);
+	} catch (error) {
+		console.error(error);
+	}
+
+}
+
+async function deleteSensorData(id) {
+	try {
+		const sensorData = await sensorDataModel.destroy({
+			where: {
+				id: id,
+			},
+		});
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+async function getSensorDataById(id) {
+	try {
+		const sensorData = await sensorDataModel.findAll({
+			where: {
+				id: id,
+			},
+		});
+		return sensorData;
+	} catch (error) {
+		console.error(error);
+	}
+}
 
 async function getallData() {
 	try {
-		const allData = await IoTModel.findAll({
-			attributes: [
-				"id",
-				"psiData",
-				"humidityData",
-				"o3Data",
-				"no2Data",
-				"so2Data",
-				"coData",
-				"temperatureData",
-				"windspeedData",
-				"currentTime",
-				"regionData",
-				"createdAt",
-				"updatedAt",
-			],
-		});
+		const allData = await IoTModel.findAll();
 		return allData;
 	} catch (error) {
 		console.error(error);
-		return null;
 	}
 }
 
@@ -187,7 +236,6 @@ async function getLatestData() {
 		return latestData;
 	} catch (error) {
 		console.error(error);
-		return null;
 	}
 }
 
@@ -204,4 +252,9 @@ module.exports = {
 	updateSensor,
 	deleteSensor,
 	getSensorById,
+	getSensorData,
+	addSensorData,
+	updateSensorData,
+	deleteSensorData,
+	getSensorDataById,
 };

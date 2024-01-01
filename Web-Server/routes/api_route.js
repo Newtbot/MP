@@ -23,12 +23,14 @@ router.use('/location', require('./Location'));
 //sensor route
 router.use('/sensor', require('./Sensor'))
 
+//sensor data route
+router.use('/sensor-data', require('./SensorData'));
+
 
 
 
 router.use('/test' , require('./test'));
 router.use('/latest-data', require('./latest-data'));
-router.use('/:month', require('./monthlyData'));
 
 
 

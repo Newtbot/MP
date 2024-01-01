@@ -1,19 +1,21 @@
 const { sequelize } = require("../../Database/mySql.js");
-const { sensorModel } = require("../../Database/model/sensorModel.js");
+const { sensorDataModel } = require("../../Database/model/sensorDataModel.js");
 const {
-	getSensor,
-	addSensor,
-	updateSensor,
-    deleteSensor,
-    getSensorById
+    getSensorData,
+    addSensorData,
+    updateSensorData,
+    deleteSensorData,
+    getSensorDataById,
+
 } = require("../functions/APIDatabase.js");
 
 const express = require("express");
+const { json } = require("body-parser");
 const router = express.Router();
 
 router.get("/", async (req, res, next) => {
 	try {
-		const sensor = await getSensor();
+		const sensor = await getSensorData();
 		res.json(sensor);
 	} catch (error) {
 		console.error(error);
@@ -23,8 +25,10 @@ router.get("/", async (req, res, next) => {
 
 router.post("/new", async (req, res, next) => {
 	try {
-		const { sensorname, added_by, mac_address ,  description, location } = req.body;
-		await addSensor(sensorname, added_by, mac_address ,description, location);
+    //JSON.parse(d) /* d is the parameter of the method 'add()'  */
+
+        const { id, id_sensor, id_location, sensordata } = req.body;
+        await addSensorData(id , id_sensor , id_location , sensordata);
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -33,8 +37,8 @@ router.post("/new", async (req, res, next) => {
 
 router.put("/update", async (req, res, next) => {
 	try {
-		const { id, sensorname, added_by, mac_address ,description, location } = req.body;
-		await updateSensor(id, sensorname, added_by, mac_address ,  description, location);
+		const { id , id_sensor , id_location , sensordata } = req.body;
+		await updateSensorData( id , id_sensor , id_location , sensordata );
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -44,7 +48,7 @@ router.put("/update", async (req, res, next) => {
 router.delete("/delete", async (req, res, next) => {
     try {
         const { id } = req.body;
-        await deleteSensor(id);
+        await deleteSensorData(id);
     } catch (error) {
         console.error(error);
         next(error);
@@ -53,7 +57,7 @@ router.delete("/delete", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
     try {
-        const sensor = await getSensorById(req.params.id);
+        const sensor = await getSensorDataById(req.params.id);
         res.json(sensor);
     } catch (error) {
         console.error(error);

@@ -12,7 +12,7 @@ const sensorModel = sequelize.define("sensors",
 			primaryKey: true,
             autoIncrement: true,
 		},
-		sensortype: {
+		sensorname: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 10,
@@ -21,6 +21,11 @@ const sensorModel = sequelize.define("sensors",
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 10,
+		},
+		mac_address: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			length: 12,
 		},
 		description: {
 			type: DataTypes.STRING,
