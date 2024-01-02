@@ -13,6 +13,11 @@ body {
   }
 }
 
+.centered-content {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
 
 a.btn-primary{
 	background-color: #4eae3a;
