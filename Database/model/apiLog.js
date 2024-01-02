@@ -15,7 +15,7 @@ const api_log_Model = sequelize.define(
 			allowNull: true,
 			primaryKey: true,
             autoIncrement: true,
-			validator: {
+			validate: {
 				isNumeric: true,
 			},
 		},
@@ -23,7 +23,7 @@ const api_log_Model = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 45,
-			validator: {
+			validate: {
 				isIP: true,
 			},
 		},
@@ -31,7 +31,7 @@ const api_log_Model = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 20,
-			validator: {
+			validate: {
 				//validate     time: new Date().toUTCString(),
 				isValidDateString(value) {
 					if (!isValidDateString(value)) {
@@ -46,7 +46,7 @@ const api_log_Model = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 10,
-			validator: {
+			validate: {
 				isIn: [["GET", "POST", "PUT", "DELETE"]],
 			},
 		},
@@ -54,18 +54,12 @@ const api_log_Model = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 45,
-			validator: {
-				//http://localhost/api/test
-				//remember to add domain name to the list
-				isIn: [["localhost"]],
-				//isFqdn: true,
-			},
 		},
 		statusCode: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 10,
-			validator: {
+			validate: {
 				isNumeric: true,
 				len: [1, 3],
 			},
@@ -74,7 +68,7 @@ const api_log_Model = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 10,
-			validator: {
+			validate: {
 				isNumeric: true,
 				len: [1, 100],
 			},
@@ -83,7 +77,7 @@ const api_log_Model = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 45,
-			validator: {
+			validate: {
 				isString(value) {
 					if (typeof value !== "string") {
 						throw new Error("Referrer must be a string");
@@ -97,7 +91,7 @@ const api_log_Model = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 100,
-			validator: {
+			validate: {
 				isString(value) {
 					if (typeof value !== "string") {
 						throw new Error("UserAgent must be a string");

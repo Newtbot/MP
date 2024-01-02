@@ -11,7 +11,7 @@ const locationModel = sequelize.define(
 			allowNull: true,
 			primaryKey: true,
             autoIncrement: true,
-			validator: {
+			validate: {
 				isNumeric: true,
 			},
 		},
@@ -19,7 +19,7 @@ const locationModel = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 10,
-			validator: {
+			validate: {
 				notEmpty: { msg: "Name cannot be empty" },
 				len: [1, 20],
 				/*
@@ -27,7 +27,8 @@ const locationModel = sequelize.define(
 				"hello world" (contains a space)
 				"hello@123" (contains a symbol)
 				"" (empty string)
-
+				is: /^[a-z]+$/i,          // matches this RegExp
+				is: ["^[a-z]+$",'i'], 
 				*/
 				is: ["^[a-z0-9]+$", "i"]
 			},
@@ -36,16 +37,9 @@ const locationModel = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 10,
-			validator: {
+			validate: {
 				notEmpty: { msg: "Added by cannot be empty" },
-				len: [1, 20],
-				/*
-				//will not validate this and fail it
-				"hello world" (contains a space)
-				"hello@123" (contains a symbol)
-				"" (empty string)
-
-				*/				
+				len: [1, 20],			
 				is: ["^[a-z0-9]+$", "i"]
 			},
 		},
@@ -53,17 +47,16 @@ const locationModel = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: true,
 			length: 100,
-			validator: {
+			validate: {
 				notEmpty: { msg: "Description cannot be empty" },
 				len: [1, 100],
 				/*
 				//will not validate this and fail it
-				"hello world" (contains a space)
 				"hello@123" (contains a symbol)
 				"" (empty string)
 
 				*/				
-				is: ["^[a-z0-9]+$", "i"]
+				is: ["^[a-zA-Z0-9 ]+$", "i"]
 			},
 		},
 		createdAt: {

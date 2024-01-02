@@ -6,29 +6,20 @@ const { sensorDataModel } = require("../../Database/model/sensorDataModel.js");
 
 
 async function getLocation() {
-	try {
 		const location = await locationModel.findAll();
 		return location;
-	} catch (error) {
-		console.error(error);
-	}
 }
 
 async function addLocation(name, added_by, description) {
-	try {
 		const location = await locationModel.create({
 			name: name,
 			added_by: added_by,
 			description: description,
 		});
-	} catch (error) {
-		console.error(error);
-	}
+
 }
 
 async function updateLocation(id, name, added_by, description) {
-	try {
-		//update by id
 		const location = await locationModel.update(
 			{
 				name: name,
@@ -41,35 +32,24 @@ async function updateLocation(id, name, added_by, description) {
 				},
 			}
 		);
-	} catch (error) {
-		console.error(error);
-	}
 }
 
 async function deleteLocation(id) {
-	try {
 		//delete by id
 		const location = await locationModel.destroy({
 			where: {
 				id: id,
 			},
 		});
-	} catch (error) {
-		console.error(error);
-	}
 }
 
 async function getLocationById(id) {
-	try {
 		const location = await locationModel.findAll({
 			where: {
 				id: id,
 			},
 		});
 		return location;
-	} catch (error) {
-		console.error(error);
-	}
 }
 
 async function getSensor() {

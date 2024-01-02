@@ -22,11 +22,12 @@ router.get("/", async (req, res, next) => {
 	}
 });
 
-//add location
+//add location 
 router.post("/new", async (req, res, next) => {
 	try {
 		const { name, added_by, description } = req.body;
 		await addLocation(name, added_by, description);
+		res.sendStatus(200)
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -38,6 +39,7 @@ router.put("/update", async (req, res, next) => {
 	try {
 		const { id, name, added_by, description } = req.body;
 		await updateLocation(id, name, added_by, description);
+		res.status(200).json({ message: "Location " + id + " updated"  });
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -49,6 +51,7 @@ router.delete("/delete", async (req, res, next) => {
 	try {
 		const { id } = req.body;
 		await deleteLocation(id);
+		res.status(200).json({ message: "Location " + id + " deleted" });
 	} catch (error) {
 		console.error(error);
 		next(error);

@@ -8,11 +8,21 @@ curl http://localhost/api/v0/location/3
 //post
 curl localhost/api/v0/location/new -H "Content-Type: application/json" -X POST -d '{"name": "test", "added_by": "noot" , "description": "test"}'
 
+status: 200 
+
 //put
 curl localhost/api/v0/location/update -X PUT -H "Content-Type: application/json" -d '{"id": "2" , "name": "test", "added_by": "noot", "description": "test12344444444"}'
 
+  status: 200 
+  "message": "Location 13 updated"
+
 //delete
 curl localhost/api/v0/location/delete -X DELETE -H "Content-Type: application/json" -d '{"id": "6" }'
+
+status: 200
+{
+  "message": "Location 13 deleted"
+}
 
 //sensor
 //GET all
@@ -68,3 +78,6 @@ curl localhost/api/v0/sensor-data/update -H "Content-Type: application/json" -X 
 //delete 
 curl localhost/api/v0/sensor-data/delete -X DELETE -H "Content-Type: application/json" -d '{"id": "3" }'
 
+//seed 
+
+curl localhost/api/seed/v0/seed/new -H "Content-Type: application/json" -X POST -d '{"mockLocation": ["test", "test123"]}'
