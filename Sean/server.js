@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const otpGenerator = require('otp-generator');
+
 
 const { transporter } = require("./modules/nodeMailer");
 const { connection } = require("./modules/mysql"); 
@@ -32,108 +34,165 @@ function isAuthenticated(req, res, next) {
 		res.redirect("/login");
 	}
 }
+const generateOTP = () => {
+	const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false });
+	const expirationTime = Date.now() + 5 * 60 * 1000; // 5 minutes expiration
+	return { otp, expirationTime };
+  };
+
+const sendOTPByEmail = async (email, otp) => {
+	try {
+	  const transporter = nodemailer.createTransport({
+		service: 'gmail',
+		auth: {
+		  user: process.env.euser,  // replace with your email
+		  pass: process.env.epass   // replace with your email password
+		}
+	  });
+  
+	  const mailOptions = {
+		from: process.env.euser,
+		to: email,
+		subject: 'Login OTP',
+		text: `Your OTP for login is: ${otp}`
+	  };
+  
+	  await transporter.sendMail(mailOptions);
+	  console.log('OTP sent successfully to', email);
+	} catch (error) {
+	  console.error('Error sending OTP:', error);
+	  throw error;
+	}
+  };
+
 
 app.get("/login", (req, res) => {
 	// Pass an initial value for the error variable
 	res.render("login", { error: null });
 });
 
-const logActivity = async (username, success) => {
+const logActivity = async (username, success, message) => {
 	try {
-		const activity = success
-			? "successful login"
-			: "unsuccessful login due to invalid password or username";
-		const logSql =
-			"INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)";
-		const logParams = [username, activity];
-
-		connection.query(logSql, logParams, (error, results) => {
-			if (error) {
-				console.error("Error logging activity:", error);
-				// Handle error (you may want to log it or take other appropriate actions)
-			} else {
-				console.log("Activity logged successfully");
-			}
-
-		});
+	  if (!username) {
+		console.error("Error logging activity: Username is null or undefined");
+		return;
+	  }
+  
+	  const activity = success ? `successful login: ${message}` : `unsuccessful login: ${message}`;
+	  const logSql =
+		"INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)";
+	  const logParams = [username, activity];
+  
+	  connection.query(logSql, logParams, (error, results) => {
+		if (error) {
+		  console.error("Error executing logSql:", error);
+		  // Handle error (you may want to log it or take other appropriate actions)
+		} else {
+		  console.log("Activity logged successfully");
+		}
+	  });
 	} catch (error) {
-		console.error("Error in logActivity function:", error);
-		// Handle error (you may want to log it or take other appropriate actions)
+	  console.error("Error in logActivity function:", error);
+	  // Handle error (you may want to log it or take other appropriate actions)
 	}
-};
-
-app.post("/login", async (req, res) => {
+  };
+  
+  
+  
+  // Login route
+  app.post("/login", async (req, res) => {
 	try {
-		let { username, password } = req.body;
-		username = username.trim();
-
-		const loginSql = "SELECT * FROM users WHERE username = ?";
-		const updateLastLoginSql =
-			"UPDATE users SET lastLogin = CURRENT_TIMESTAMP WHERE username = ?";
-
-		console.log("Login Query:", loginSql);
-		console.log("Query Parameters:", [username]);
-
-		connection.query(loginSql, [username], async (error, results) => {
-			console.log("Login Results:", results);
-
-			if (error) {
-				console.error("Error executing login query:", error);
-				res.status(500).send("Internal Server Error");
-				return;
+	  let { username, password } = req.body;
+	  username = username.trim();
+  
+	  const loginSql = "SELECT * FROM users WHERE username = ?";
+	  const updateLastLoginSql = "UPDATE users SET lastLogin = CURRENT_TIMESTAMP WHERE username = ?";
+  
+	  connection.query(loginSql, [username], async (error, results) => {
+		if (error) {
+		  console.error("Error executing login query:", error);
+		  res.status(500).send("Internal Server Error");
+		  return;
+		}
+  
+		if (results.length > 0) {
+		  const isLoginSuccessful = await bcrypt.compare(password, results[0].password);
+  
+		  if (isLoginSuccessful) {
+			// Log successful login attempt
+			await logActivity(username, true, "Credentials entered correctly");
+  
+			const user = results[0];
+			const { otp, expirationTime } = generateOTP();
+  
+			// Store the OTP and expiration time in the session for verification
+			req.session.otp = otp;
+			req.session.otpExpiration = expirationTime;
+			req.session.save();
+  
+			// Send OTP via email
+			try {
+			  await sendOTPByEmail(user.email, otp);
+			  // Log successful OTP sending
+			  await logActivity(username, true, "OTP successfully sent to user");
+			} catch (sendOTPError) {
+			  // Log unsuccessful OTP sending
+			  await logActivity(username, false, "OTP failed to send to user");
+			  console.error("Error sending OTP:", sendOTPError);
+			  res.status(500).send("Internal Server Error");
+			  return;
 			}
-
-			const isLoginSuccessful =
-				results.length > 0 &&
-				(await bcrypt.compare(password, results[0].password));
-
-			// Log login attempt
-			await logActivity(username, isLoginSuccessful);
-
-			if (isLoginSuccessful) {
-				const user = results[0];
-
-				// Update lastLogin field for the user
-				connection.query(
-					updateLastLoginSql,
-					[username],
-					(updateError, updateResults) => {
-						if (updateError) {
-							console.error("Error updating lastLogin:", updateError);
-							res.status(500).send("Internal Server Error");
-							return;
-						}
-
-						// Check if the update affected any rows
-						if (updateResults.affectedRows > 0) {
-							// Set session data for authentication
-							req.session.regenerate((err) => {
-								if (err) {
-									console.error("Error regenerating session:", err);
-								}
-								console.log("Session regenerated successfully");
-								req.session.authenticated = true;
-								req.session.username = username;
-								res.redirect("/home");
-							});
-						} else {
-							// Pass the error to the template
-							res.render("login", {
-								error: "Error updating lastLogin. No rows affected.",
-							});
-						}
-					}
-				);
-			} else {
-				// Pass the error to the template
-				res.render("login", { error: "Invalid username or password" });
-			}
-		});
+  
+			// Render OTP input page
+			res.render("otp", { error: null, username: user.username });
+		  } else {
+			// Log unsuccessful login attempt
+			await logActivity(username, false, "Incorrect password");
+			res.render("login", { error: "Invalid username or password" });
+		  }
+		} else {
+		  // Log unsuccessful login attempt
+		  await logActivity(username, false, "User not found");
+		  res.render("login", { error: "Invalid username or password" });
+		}
+	  });
 	} catch (error) {
-		console.error("Error in login route:", error);
-		res.status(500).send("Internal Server Error");
+	  console.error("Error in login route:", error);
+	  res.status(500).send("Internal Server Error");
 	}
-});
+  });
+  app.post("/verify-otp", async (req, res) => {
+	try {
+	  const enteredOTP = req.body.otp;
+  
+	  if (enteredOTP === req.session.otp) {
+		// Log successful OTP entry and login
+		if (req.body.username) {
+		  await logActivity(req.body.username, true, "OTP entered correctly. Successful login");
+		  
+		}
+  
+		// Correct OTP, redirect to home page
+		req.session.authenticated = true;
+		req.session.username = req.body.username;
+		res.redirect("/home");
+	  } else {
+		// Log unsuccessful OTP entry
+		if (req.body.username) {
+		  await logActivity(req.body.username, false, "Incorrect OTP entered");
+		  
+		}
+  
+		// Incorrect OTP, render login page with error
+		res.render("login", { error: "Incorrect OTP. Please try again." });
+	  }
+	} catch (error) {
+	  console.error("Error in OTP verification route:", error);
+	  res.status(500).send("Internal Server Error");
+	}
+  });
+  
+  
 
 // Update your /home route to retrieve the overall last 10 logins for all users
 app.get("/home", isAuthenticated, (req, res) => {
