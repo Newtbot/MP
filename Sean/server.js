@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const otpGenerator = require('otp-generator');
-
+const { body, validationResult } = require('express-validator');
 
 const { transporter } = require("./modules/nodeMailer");
 const { connection } = require("./modules/mysql"); 
@@ -20,7 +20,7 @@ require("dotenv").config();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
 	session({
-		secret: "your_session_secret",
+		secret: process.env.key,
 		resave: false,
 		saveUninitialized: true,
 	})
@@ -100,67 +100,79 @@ const logActivity = async (username, success, message) => {
   
   
   // Login route
-  app.post("/login", async (req, res) => {
-	try {
-	  let { username, password } = req.body;
-	  username = username.trim();
+  app.post('/login',[
+	  body('username').escape().trim().isLength({ min: 1 }).withMessage('Username must not be empty'),
+	  body('password').escape().trim().isLength({ min: 1 }).withMessage('Password must not be empty'),
+	],
+	async (req, res) => {
+	  try {
+		const errors = validationResult(req);
   
-	  const loginSql = "SELECT * FROM users WHERE username = ?";
-	  const updateLastLoginSql = "UPDATE users SET lastLogin = CURRENT_TIMESTAMP WHERE username = ?";
-  
-	  connection.query(loginSql, [username], async (error, results) => {
-		if (error) {
-		  console.error("Error executing login query:", error);
-		  res.status(500).send("Internal Server Error");
-		  return;
+		if (!errors.isEmpty()) {
+		  // Handle validation errors, e.g., return an error message to the client
+		  return res.render('login', { error: 'Invalid input. Please check your credentials.' });
 		}
   
-		if (results.length > 0) {
-		  const isLoginSuccessful = await bcrypt.compare(password, results[0].password);
+		let { username, password } = req.body;
+		username = username.trim();
   
-		  if (isLoginSuccessful) {
-			// Log successful login attempt
-			await logActivity(username, true, "Credentials entered correctly");
+		const loginSql = "SELECT * FROM users WHERE username = ?";
+		const updateLastLoginSql = "UPDATE users SET lastLogin = CURRENT_TIMESTAMP WHERE username = ?";
   
-			const user = results[0];
-			const { otp, expirationTime } = generateOTP();
+		connection.query(loginSql, [username], async (error, results) => {
+		  if (error) {
+			console.error("Error executing login query:", error);
+			res.status(500).send("Internal Server Error");
+			return;
+		  }
   
-			// Store the OTP and expiration time in the session for verification
-			req.session.otp = otp;
-			req.session.otpExpiration = expirationTime;
-			req.session.save();
+		  if (results.length > 0) {
+			const isLoginSuccessful = await bcrypt.compare(password, results[0].password);
   
-			// Send OTP via email
-			try {
-			  await sendOTPByEmail(user.email, otp);
-			  // Log successful OTP sending
-			  await logActivity(username, true, "OTP successfully sent to user");
-			} catch (sendOTPError) {
-			  // Log unsuccessful OTP sending
-			  await logActivity(username, false, "OTP failed to send to user");
-			  console.error("Error sending OTP:", sendOTPError);
-			  res.status(500).send("Internal Server Error");
-			  return;
+			if (isLoginSuccessful) {
+			  // Log successful login attempt
+			  await logActivity(username, true, "Credentials entered correctly");
+  
+			  const user = results[0];
+			  const { otp, expirationTime } = generateOTP();
+  
+			  // Store the OTP and expiration time in the session for verification
+			  req.session.otp = otp;
+			  req.session.otpExpiration = expirationTime;
+			  req.session.save();
+  
+			  // Send OTP via email
+			  try {
+				await sendOTPByEmail(user.email, otp);
+				// Log successful OTP sending
+				await logActivity(username, true, "OTP successfully sent to user");
+			  } catch (sendOTPError) {
+				// Log unsuccessful OTP sending
+				await logActivity(username, false, "OTP failed to send to user");
+				console.error("Error sending OTP:", sendOTPError);
+				res.status(500).send("Internal Server Error");
+				return;
+			  }
+  
+			  // Render OTP input page
+			  res.render("otp", { error: null, username: user.username });
+			} else {
+			  // Log unsuccessful login attempt
+			  await logActivity(username, false, "Incorrect password");
+			  res.render("login", { error: "Invalid username or password" });
 			}
-  
-			// Render OTP input page
-			res.render("otp", { error: null, username: user.username });
 		  } else {
 			// Log unsuccessful login attempt
-			await logActivity(username, false, "Incorrect password");
+			await logActivity(username, false, "User not found");
 			res.render("login", { error: "Invalid username or password" });
 		  }
-		} else {
-		  // Log unsuccessful login attempt
-		  await logActivity(username, false, "User not found");
-		  res.render("login", { error: "Invalid username or password" });
-		}
-	  });
-	} catch (error) {
-	  console.error("Error in login route:", error);
-	  res.status(500).send("Internal Server Error");
+		});
+	  } catch (error) {
+		console.error("Error in login route:", error);
+		res.status(500).send("Internal Server Error");
+	  }
 	}
-  });
+  );
   app.post("/verify-otp", async (req, res) => {
 	try {
 	  const enteredOTP = req.body.otp;
