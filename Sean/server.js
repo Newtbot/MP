@@ -42,6 +42,7 @@ const generateOTP = () => {
 
 const sendOTPByEmail = async (email, otp) => {
 	try {
+	  /* 
 	  const transporter = nodemailer.createTransport({
 		service: 'gmail',
 		auth: {
@@ -49,6 +50,7 @@ const sendOTPByEmail = async (email, otp) => {
 		  pass: process.env.epass   // replace with your email password
 		}
 	  });
+	  */
   
 	  const mailOptions = {
 		from: process.env.euser,
