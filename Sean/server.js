@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const otpGenerator = require('otp-generator');
 const { body, validationResult } = require('express-validator');
+const validator = require('validator');
 
 const { transporter } = require("./modules/nodeMailer");
 const { connection } = require("./modules/mysql"); 
@@ -296,173 +297,198 @@ const logUserCreationActivity = async (creatorUsername, success, message) => {
 	}
 };
 
-app.post("/createUser", async (req, res) => {
-	try {
+app.post(
+	'/createUser',
+	[
+	  body('name').trim().isLength({ min: 1 }).withMessage('Name must not be empty').escape(),
+	  body('username').trim().isLength({ min: 1 }).withMessage('Username must not be empty').escape(),
+	  body('email').isEmail().withMessage('Invalid email address').normalizeEmail(),
+	  body('password').custom((value) => {
+		if (!isStrongPassword(value)) {
+		  throw new Error('Password does not meet complexity requirements');
+		}
+		return true;
+	  }),
+	  body('jobTitle').trim().isLength({ min: 1 }).withMessage('Job title must not be empty').escape(),
+	],
+	async (req, res) => {
+	  try {
+		const errors = validationResult(req);
+  
+		if (!errors.isEmpty()) {
+		  return res.status(400).json({ errors: errors.array() });
+		}
+  
 		const { name, username, email, password, jobTitle } = req.body;
-
+        console.log("Sanitized Input:", {
+			name,
+			username,
+			email,
+			password: "*****", // Avoid logging passwords
+			jobTitle,
+		  });
 		// Extract the username of the user creating a new user
 		const creatorUsername = req.session.username; // Adjust this based on how you store the creator's username in your session
-
-		// Validate password complexity
+  
+		// Validate password complexity (additional check)
 		if (!isStrongPassword(password)) {
-			return res
-				.status(400)
-				.json({ error: "Password does not meet complexity requirements" });
+		  return res
+			.status(400)
+			.json({ error: "Password does not meet complexity requirements" });
 		}
-
+  
 		// Check if the username is already taken
 		const checkUsernameQuery = "SELECT * FROM users WHERE username = ?";
 		connection.query(
-			checkUsernameQuery,
-			[username],
-			(usernameQueryErr, usernameResults) => {
-				if (usernameQueryErr) {
-					console.error("Error checking username:", usernameQueryErr);
-					return res.status(500).json({ error: "Internal Server Error" });
-				}
-
-				if (usernameResults.length > 0) {
-					// Log unsuccessful user creation due to username taken
-					logUserCreationActivity(creatorUsername, false, "username taken");
-					return res
-						.status(400)
-						.json({
-							error: "Username is already taken",
-							message:
-								"Username is already taken. Please choose a different username.",
-						});
-				}
-
-				// Check if the email is already taken
-				const checkEmailQuery = "SELECT * FROM users WHERE email = ?";
-				connection.query(
-					checkEmailQuery,
-					[email],
-					(emailQueryErr, emailResults) => {
-						if (emailQueryErr) {
-							console.error("Error checking email:", emailQueryErr);
-							return res.status(500).json({ error: "Internal Server Error" });
-						}
-
-						if (emailResults.length > 0) {
-							// Log unsuccessful user creation due to email taken
-							logUserCreationActivity(creatorUsername, false, "email taken");
-							return res
-								.status(400)
-								.json({
-									error: "Email is already in use",
-									message:
-										"Email is already in use. Please choose another email.",
-								});
-						}
-
-						// Hash the password before storing it in the database
-						bcrypt.hash(password, 10, (hashError, hashedPassword) => {
-							if (hashError) {
-								console.error("Error hashing password:", hashError);
-								return res.status(500).json({ error: "Internal Server Error" });
-							}
-
-							// Start a transaction
-							connection.beginTransaction((transactionErr) => {
-								if (transactionErr) {
-									console.error("Error starting transaction:", transactionErr);
-									return res
-										.status(500)
-										.json({ error: "Internal Server Error" });
-								}
-
-								// Define the insert query
-								const insertUserQuery =
-									"INSERT INTO users (name, username, email, password, lastLogin, jobTitle) VALUES (?, ?, ?, ?, NULL, ?)";
-
-								// Log the query and its parameters
-								console.log("Insert Query:", insertUserQuery);
-								console.log("Query Parameters:", [
-									name,
-									username,
-									email,
-									hashedPassword,
-									jobTitle,
-								]);
-
-								// Execute the query with user data
-								connection.query(
-									insertUserQuery,
-									[name, username, email, hashedPassword, jobTitle],
-									(queryErr, results) => {
-										if (queryErr) {
-											console.error("Error executing query:", queryErr);
-
-											// Rollback the transaction in case of an error
-											connection.rollback((rollbackErr) => {
-												if (rollbackErr) {
-													console.error(
-														"Error rolling back transaction:",
-														rollbackErr
-													);
-												}
-												// Log unsuccessful user creation due to an error
-												logUserCreationActivity(
-													creatorUsername,
-													false,
-													"internal error"
-												);
-												return res
-													.status(500)
-													.json({ error: "Internal Server Error" });
-											});
-											return;
-										}
-
-										// Commit the transaction
-										connection.commit((commitErr) => {
-											if (commitErr) {
-												console.error(
-													"Error committing transaction:",
-													commitErr
-												);
-												// Log unsuccessful user creation due to an error
-												logUserCreationActivity(
-													creatorUsername,
-													false,
-													"internal error"
-												);
-												return res
-													.status(500)
-													.json({ error: "Internal Server Error" });
-											}
-
-											// Log successful user creation
-											logUserCreationActivity(
-												creatorUsername,
-												true,
-												"user created successfully"
-											);
-
-											// Log the results of the query
-											console.log("Query Results:", results);
-
-											// Respond with a success message
-											res
-												.status(201)
-												.json({ message: "User created successfully" });
-										});
-									}
-								);
-							});
-						});
-					}
-				);
+		  checkUsernameQuery,
+		  [username],
+		  (usernameQueryErr, usernameResults) => {
+			if (usernameQueryErr) {
+			  console.error("Error checking username:", usernameQueryErr);
+			  return res.status(500).json({ error: "Internal Server Error" });
 			}
+  
+			if (usernameResults.length > 0) {
+			  // Log unsuccessful user creation due to username taken
+			  logUserCreationActivity(creatorUsername, false, "username taken");
+			  return res
+				.status(400)
+				.json({
+				  error: "Username is already taken",
+				  message: "Username is already taken. Please choose a different username.",
+				});
+			}
+  
+			// Check if the email is already taken
+			const checkEmailQuery = "SELECT * FROM users WHERE email = ?";
+			connection.query(
+			  checkEmailQuery,
+			  [email],
+			  (emailQueryErr, emailResults) => {
+				if (emailQueryErr) {
+				  console.error("Error checking email:", emailQueryErr);
+				  return res.status(500).json({ error: "Internal Server Error" });
+				}
+  
+				if (emailResults.length > 0) {
+				  // Log unsuccessful user creation due to email taken
+				  logUserCreationActivity(creatorUsername, false, "email taken");
+				  return res
+					.status(400)
+					.json({
+					  error: "Email is already in use",
+					  message: "Email is already in use. Please choose another email.",
+					});
+				}
+  
+				// Hash the password before storing it in the database
+				bcrypt.hash(password, 10, (hashError, hashedPassword) => {
+				  if (hashError) {
+					console.error("Error hashing password:", hashError);
+					return res.status(500).json({ error: "Internal Server Error" });
+				  }
+  
+				  // Start a transaction
+				  connection.beginTransaction((transactionErr) => {
+					if (transactionErr) {
+					  console.error("Error starting transaction:", transactionErr);
+					  return res
+						.status(500)
+						.json({ error: "Internal Server Error" });
+					}
+  
+					// Define the insert query
+					const insertUserQuery =
+					  "INSERT INTO users (name, username, email, password, lastLogin, jobTitle) VALUES (?, ?, ?, ?, NULL, ?)";
+  
+					// Log the query and its parameters
+					console.log("Insert Query:", insertUserQuery);
+					console.log("Query Parameters:", [
+					  name,
+					  username,
+					  email,
+					  hashedPassword,
+					  jobTitle,
+					]);
+  
+					// Execute the query with user data
+					connection.query(
+					  insertUserQuery,
+					  [name, username, email, hashedPassword, jobTitle],
+					  (queryErr, results) => {
+						if (queryErr) {
+						  console.error("Error executing query:", queryErr);
+  
+						  // Rollback the transaction in case of an error
+						  connection.rollback((rollbackErr) => {
+							if (rollbackErr) {
+							  console.error(
+								"Error rolling back transaction:",
+								rollbackErr
+							  );
+							}
+							// Log unsuccessful user creation due to an error
+							logUserCreationActivity(
+							  creatorUsername,
+							  false,
+							  "internal error"
+							);
+							return res
+							  .status(500)
+							  .json({ error: "Internal Server Error" });
+						  });
+						  return;
+						}
+  
+						// Commit the transaction
+						connection.commit((commitErr) => {
+						  if (commitErr) {
+							console.error(
+							  "Error committing transaction:",
+							  commitErr
+							);
+							// Log unsuccessful user creation due to an error
+							logUserCreationActivity(
+							  creatorUsername,
+							  false,
+							  "internal error"
+							);
+							return res
+							  .status(500)
+							  .json({ error: "Internal Server Error" });
+						  }
+  
+						  // Log successful user creation
+						  logUserCreationActivity(
+							creatorUsername,
+							true,
+							"user created successfully"
+						  );
+  
+						  // Log the results of the query
+						  console.log("Query Results:", results);
+  
+						  // Respond with a success message
+						  res
+							.status(201)
+							.json({ message: "User created successfully" });
+						});
+					  }
+					);
+				  });
+				});
+			  }
+			);
+		  }
 		);
-	} catch (error) {
+	  } catch (error) {
 		console.error("Error creating user:", error);
 		// Log unsuccessful user creation due to an error
 		logUserCreationActivity(req.session.username, false, "internal error"); // Adjust this based on how you store the creator's username in your session
 		res.status(500).json({ error: "Internal Server Error" });
+	  }
 	}
-});
+  );
 
 app.get("/forgot-password", (req, res) => {
 	res.render("forgot-password"); // Assuming you have an EJS template for this
@@ -475,71 +501,74 @@ app.get("/forgot-password", (req, res) => {
 // Handle the submission of the forgot password form
 app.post("/forgot-password", (req, res) => {
 	const { usernameOrEmail } = req.body;
-
+  
+	// Sanitize the input
+	const sanitizedUsernameOrEmail = validator.escape(usernameOrEmail);
+  
 	// Perform the logic for sending the reset password email
-
+  
 	// Check if the username or email exists in the database
 	const checkUserQuery = "SELECT * FROM users WHERE username = ? OR email = ?";
 	connection.query(
-		checkUserQuery,
-		[usernameOrEmail, usernameOrEmail],
-		(checkError, checkResults) => {
-			if (checkError) {
-				console.error("Error checking user:", checkError);
-				const error = "An error occurred during the password reset process.";
+	  checkUserQuery,
+	  [sanitizedUsernameOrEmail, sanitizedUsernameOrEmail],
+	  (checkError, checkResults) => {
+		if (checkError) {
+		  console.error("Error checking user:", checkError);
+		  const error = "An error occurred during the password reset process.";
+		  res.render("forgot-password", { error, success: null });
+		} else if (checkResults.length === 0) {
+		  const error = "Username or email not found.";
+		  res.render("forgot-password", { error, success: null });
+		} else {
+		  // Assuming the user exists, generate a reset token and send an email
+		  const user = checkResults[0];
+		  const resetToken = crypto.randomBytes(20).toString("hex");
+		  const resetTokenExpiry = new Date(Date.now() + 3600000); // Token expires in 1 hour
+  
+		  // Update user with reset token and expiry
+		  const updateQuery =
+			"UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?";
+		  connection.query(
+			updateQuery,
+			[resetToken, resetTokenExpiry, user.id],
+			(updateError) => {
+			  if (updateError) {
+				console.error("Error updating reset token:", updateError);
+				const error =
+				  "An error occurred during the password reset process.";
 				res.render("forgot-password", { error, success: null });
-			} else if (checkResults.length === 0) {
-				const error = "Username or email not found.";
-				res.render("forgot-password", { error, success: null });
-			} else {
-				// Assuming the user exists, generate a reset token and send an email
-				const user = checkResults[0];
-				const resetToken = crypto.randomBytes(20).toString("hex");
-				const resetTokenExpiry = new Date(Date.now() + 3600000); // Token expires in 1 hour
-
-				// Update user with reset token and expiry
-				const updateQuery =
-					"UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?";
-				connection.query(
-					updateQuery,
-					[resetToken, resetTokenExpiry, user.id],
-					(updateError) => {
-						if (updateError) {
-							console.error("Error updating reset token:", updateError);
-							const error =
-								"An error occurred during the password reset process.";
-							res.render("forgot-password", { error, success: null });
-						} else {
-							// Send email with reset link
-							const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
-							const mailOptions = {
-								to: user.email,
-								subject: "Password Reset",
-								text: `Click on the following link to reset your password: ${resetLink}`,
-							};
-							transporter.sendMail(mailOptions, (emailError, info) => {
-								if (emailError) {
-									console.error("Error sending email:", emailError);
-									const error =
-										"An error occurred during the password reset process.";
-									res.render("forgot-password", { error, success: null });
-								} else {
-									console.log("Email sent: " + info.response);
-									const success =
-										"Password reset email sent successfully. Check your inbox.";
-									res.render("forgot-password", { error: null, success });
-
-									// Log the successful sending of the reset link in the database
-									logPasswordResetActivity(user.username,"link sent successfully");
-								}
-							});
-						}
-					}
-				);
+			  } else {
+				// Send email with reset link
+				const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
+				const mailOptions = {
+				  to: user.email,
+				  subject: "Password Reset",
+				  text: `Click on the following link to reset your password: ${resetLink}`,
+				};
+				transporter.sendMail(mailOptions, (emailError, info) => {
+				  if (emailError) {
+					console.error("Error sending email:", emailError);
+					const error =
+					  "An error occurred during the password reset process.";
+					res.render("forgot-password", { error, success: null });
+				  } else {
+					console.log("Email sent: " + info.response);
+					const success =
+					  "Password reset email sent successfully. Check your inbox.";
+					res.render("forgot-password", { error: null, success });
+  
+					// Log the successful sending of the reset link in the database
+					logPasswordResetActivity(user.username,"link sent successfully");
+				  }
+				});
+			  }
 			}
+		  );
 		}
+	  }
 	);
-});
+  });
 
 // Function to log the password reset activity in the database
 function logPasswordResetActivity(username, activity) {
@@ -558,73 +587,78 @@ function logPasswordResetActivity(username, activity) {
 app.post("/reset-password/:token", async (req, res) => {
 	const { token } = req.params;
 	const { password, confirmPassword } = req.body;
-
+  
+	// Sanitize the inputs
+	const sanitizedToken = validator.escape(token);
+	const sanitizedPassword = validator.escape(password);
+	const sanitizedConfirmPassword = validator.escape(confirmPassword);
+  
 	// Find user with matching reset token and not expired
 	const selectQuery =
-		"SELECT * FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()";
-	connection.query(selectQuery, [token], async (selectErr, selectResults) => {
-		if (selectErr) {
-			console.error("Error querying reset token:", selectErr);
-			return res.status(500).json({ error: "Error querying reset token" });
-		}
-
-		if (selectResults.length === 0) {
-			// Pass the error to the template when rendering the reset-password page
-			return res.render("reset-password", {
-				token,
-				resetError: "Invalid or expired reset token",
-			});
-		}
-
-		// Check if passwords match
-		if (password !== confirmPassword) {
-			// Pass the error to the template when rendering the reset-password page
-			return res.render("reset-password", {
-				token,
-				resetError: "Passwords do not match",
-			});
-		}
-
-		// Check if the new password meets complexity requirements
-		if (!isStrongPassword(password)) {
-			// Pass the error to the template when rendering the reset-password page
-			return res.render("reset-password", {
-				token,
-				resetError:
-					"Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.",
-			});
-		}
-
-		// Hash the new password
-		const hashedPassword = await bcrypt.hash(password, 10);
-
-		// Update user's password and clear reset token
-		const updateQuery =
-			"UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE reset_token = ?";
-			connection.query(updateQuery, [hashedPassword, token], async (updateErr, updateResults) => {
-				if (updateErr) {
-					console.error("Error updating password:", updateErr);
-					// Pass the error to the template when rendering the reset-password page
-					res.render("reset-password", {
-						token,
-						resetError: "Error updating password",
-					});
-				} else {
-					// Log password reset activity
-					const username = selectResults[0].username; // Assuming 'username' is the column name
-					const logQuery = "INSERT INTO user_logs (username, activity, timestamp) VALUES (?, 'Password Reseted successfully', NOW())";
-					connection.query(logQuery, [username], (logErr) => {
-						if (logErr) {
-							console.error("Error logging password reset:", logErr);
-							// You might want to handle the logging error here
-						}
-					});
-					// Redirect to the success page upon successful password reset
-					res.redirect("/success");
-			}
+	  "SELECT * FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()";
+	connection.query(selectQuery, [sanitizedToken], async (selectErr, selectResults) => {
+	  if (selectErr) {
+		console.error("Error querying reset token:", selectErr);
+		return res.status(500).json({ error: "Error querying reset token" });
+	  }
+  
+	  if (selectResults.length === 0) {
+		// Pass the error to the template when rendering the reset-password page
+		return res.render("reset-password", {
+		  token,
+		  resetError: "Invalid or expired reset token",
 		});
+	  }
+  
+	  // Check if passwords match
+	  if (sanitizedPassword !== sanitizedConfirmPassword) {
+		// Pass the error to the template when rendering the reset-password page
+		return res.render("reset-password", {
+		  token,
+		  resetError: "Passwords do not match",
+		});
+	  }
+  
+	  // Check if the new password meets complexity requirements
+	  if (!isStrongPassword(sanitizedPassword)) {
+		// Pass the error to the template when rendering the reset-password page
+		return res.render("reset-password", {
+		  token,
+		  resetError:
+			"Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.",
+		});
+	  }
+  
+	  // Hash the new password
+	  const hashedPassword = await bcrypt.hash(sanitizedPassword, 10);
+  
+	  // Update user's password and clear reset token
+	  const updateQuery =
+		"UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE reset_token = ?";
+	  connection.query(updateQuery, [hashedPassword, sanitizedToken], async (updateErr, updateResults) => {
+		if (updateErr) {
+		  console.error("Error updating password:", updateErr);
+		  // Pass the error to the template when rendering the reset-password page
+		  res.render("reset-password", {
+			token,
+			resetError: "Error updating password",
+		  });
+		} else {
+		  // Log password reset activity
+		  const username = selectResults[0].username; // Assuming 'username' is the column name
+		  const logQuery = "INSERT INTO user_logs (username, activity, timestamp) VALUES (?, 'Password Reseted successfully', NOW())";
+		  connection.query(logQuery, [username], (logErr) => {
+			if (logErr) {
+			  console.error("Error logging password reset:", logErr);
+			  // You might want to handle the logging error here
+			}
+		  });
+		  // Redirect to the success page upon successful password reset
+		  res.redirect("/success");
+		}
+	  });
 	});
-});
+  });
 
 app.get("/success", (req, res) => {
 	res.render("success");
@@ -643,15 +677,20 @@ app.get("/reset-password/:token", (req, res) => {
 });
 app.post("/reset-password", async (req, res) => {
     const { username, password, confirmPassword } = req.body;
-	const creatorUsername = req.session.username;
+    const creatorUsername = req.session.username;
+
+    // Sanitize the inputs
+    const sanitizedUsername = validator.escape(username);
+    const sanitizedPassword = validator.escape(password);
+    const sanitizedConfirmPassword = validator.escape(confirmPassword);
 
     // Check if passwords match
-    if (password !== confirmPassword) {
+    if (sanitizedPassword !== sanitizedConfirmPassword) {
         return res.status(400).json({ error: "Passwords do not match" });
     }
 
     // Check if the new password meets complexity requirements
-    if (!isStrongPassword(password)) {
+    if (!isStrongPassword(sanitizedPassword)) {
         return res.status(400).json({
             error:
                 "Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.",
@@ -659,10 +698,10 @@ app.post("/reset-password", async (req, res) => {
     }
 
     // Hash the new password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(sanitizedPassword, 10);
 
     // Check if the user exists in the database before updating the password
-    const userExists = await checkIfUserExists(username);
+    const userExists = await checkIfUserExists(sanitizedUsername);
 
     if (!userExists) {
         return res.status(404).json({ error: "User does not exist" });
@@ -670,7 +709,7 @@ app.post("/reset-password", async (req, res) => {
 
     // Update user's password based on the username
     const updateQuery = "UPDATE users SET password = ? WHERE username = ?";
-    connection.query(updateQuery, [hashedPassword, username], async (updateErr, updateResults) => {
+    connection.query(updateQuery, [hashedPassword, sanitizedUsername], async (updateErr, updateResults) => {
         if (updateErr) {
             console.error("Error updating password:", updateErr);
             return res.status(500).json({ error: "Error updating password" });
@@ -680,7 +719,7 @@ app.post("/reset-password", async (req, res) => {
         if (updateResults.affectedRows > 0) {
             // Log password reset activity
             const logQuery = "INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, NOW())";
-            const logActivity = `Password has been reset for ${username}`;
+            const logActivity = `Password has been reset for ${sanitizedUsername}`;
             connection.query(logQuery, [creatorUsername, logActivity], (logErr) => {
                 if (logErr) {
                     console.error("Error logging password reset:", logErr);
@@ -712,9 +751,13 @@ async function checkIfUserExists(username) {
 }
 app.get('/searchUser', (req, res) => {
 	const { username } = req.query;
+  
+	// Sanitize the input
+	const sanitizedUsername = validator.escape(username);
+  
 	const query = 'SELECT * FROM users WHERE username = ?';
   
-	connection.query(query, [username], (err, results) => {
+	connection.query(query, [sanitizedUsername], (err, results) => {
 	  if (err) {
 		console.error('MySQL query error:', err);
 		res.status(500).json({ success: false, error: 'Internal Server Error' });
