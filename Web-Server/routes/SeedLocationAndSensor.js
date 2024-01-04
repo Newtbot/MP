@@ -22,14 +22,13 @@ router.post("/new", async (req, res, next) => {
             await sensorModel.create({
                 sensorname: `AQI-${Math.floor(Math.random()*898)+101}`,
                 added_by: "system",
-                //random mac address
                 mac_address: `${Math.floor(Math.random()*256).toString(16).padStart(2, '0')}-${Math.floor(Math.random()*256).toString(16).padStart(2, '0')}-${Math.floor(Math.random()*256).toString(16).padStart(2, '0')}-${Math.floor(Math.random()*256).toString(16).padStart(2, '0')}-${Math.floor(Math.random()*256).toString(16).padStart(2, '0')}-${Math.floor(Math.random()*256).toString(16).padStart(2, '0')}`,
                 description: "system generated sensor",
                 location: location.id
 
             });
         }
-        res.sendStatus(200).json({message: "seeded"})
+        res.sendStatus(200)
 	} catch (error) {
 		console.error(error);
 		next(error);

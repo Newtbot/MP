@@ -1,4 +1,3 @@
-const { getAPIKey } = require('../db/ApiKeys');
 
 function apiKeyMiddleware(req, res, next) {
     const apiKey = req.headers['x-api-key'];

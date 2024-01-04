@@ -15,11 +15,11 @@ app.disable("x-powered-by");
 app.use(express.json());
 app.set("json spaces", 2);
 
-//const { APIlogger } = require('../middleware/ApiLogger.js');
+const { APIlogger } = require('../middleware/apiLogger.js');
 
 //middleware logic ( called by next() )
 //app.use('/api/v0', require('../middleware/ApiKey.js'));
-//app.use('/api/v0', APIlogger, require('../routes/api_route.js'));
+app.use('/api/v0', APIlogger, require('../routes/api_route.js'));
 
 //route logic
 app.use("/api/v0", require("../routes/api_route.js"));

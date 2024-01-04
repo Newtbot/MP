@@ -2,7 +2,9 @@
 const router = require('express').Router();
 
 //location route
-router.use('/seed', require('./SeedLocationAndSensor'));
+router.use('/seed', require('./seedLocationAndSensor'));
+
+router.use('/seedSensorData ', require('./seedsensorData')); 
 
 
 

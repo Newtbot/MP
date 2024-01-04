@@ -1,7 +1,7 @@
 const { app } = require("./modules/express.js");
 const client   = require("./modules/mqtt");
 const { validateData } = require("./functions/validateData.js");
-const { insertData } = require("./functions/Database.js");
+const { insertData } = require("./functions/database.js");
 /*
 1) validate data from IoT sensor
 2) upload data to database

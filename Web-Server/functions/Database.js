@@ -23,7 +23,7 @@ function insertData(data) {
     }
 }
 
-function insertLogData(log){
+async function insertLogData(log){
     try{
         api_log_Model.create({
             ip: log.ip,

@@ -3,6 +3,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 const { sequelize } = require("../mySQL");
 const { locationModel } = require("./locationModel");
 const { sensorModel } = require("./sensorModel");
+const { isJson } = require("../../Web-Server/functions/validateData");
 
 //sequelize.sync();
 const sensorDataModel = sequelize.define(
@@ -13,6 +14,11 @@ const sensorDataModel = sequelize.define(
 			allowNull: true,
 			primaryKey: true,
 			autoIncrement: true,
+			unique: true,
+			validate: {
+				isNumeric: true,
+				notEmpty: true,
+			},
 		},
 		id_sensor: {
 			type: DataTypes.INTEGER,
@@ -22,6 +28,10 @@ const sensorDataModel = sequelize.define(
 			references: {
 				model: sensorModel,
 				key: "id",
+			},
+			validate: {
+				isNumeric: true,
+				notEmpty: true,
 			},
 		},
 		id_location: {
@@ -33,10 +43,22 @@ const sensorDataModel = sequelize.define(
 				model: locationModel,
 				key: "id",
 			},
+			validate: {
+				isNumeric: true,
+				notEmpty: true,
+			},
 		},
 		sensordata: {
 			type: DataTypes.JSON,
 			allowNull: false,
+			validate: {
+				notEmpty: true,
+				isJson(value) 
+				{
+					if (isJson(value) !== true)
+						throw new Error("sensordata must be a JSON");
+				},
+			},
 		},
 		createdAt: {
 			type: DataTypes.DATE,

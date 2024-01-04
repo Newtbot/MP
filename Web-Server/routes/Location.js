@@ -6,7 +6,7 @@ const {
 	getLocationById,
 	updateLocation,
 	deleteLocation,
-} = require("../functions/APIDatabase.js");
+} = require("../functions/apiDatabase.js");
 
 const express = require("express");
 const router = express.Router();
@@ -15,7 +15,8 @@ const router = express.Router();
 router.get("/", async (req, res, next) => {
 	try {
 		const location = await getLocation();
-		res.json(location);
+		//res send json and status code
+		res.status(200).json(location);
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -64,7 +65,7 @@ router.get("/:id", async (req, res, next) => {
 		//get params
 		const { id } = req.params;
 		const location = await getLocationById(id);
-		res.json(location);
+		res.status(200).json(location);
 	} catch (error) {
 		console.error(error);
 		next(error);

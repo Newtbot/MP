@@ -6,9 +6,11 @@ curl localhost/api/v0/location
 curl http://localhost/api/v0/location/3
 
 //post
-curl localhost/api/v0/location/new -H "Content-Type: application/json" -X POST -d '{"name": "test", "added_by": "noot" , "description": "test"}'
+curl localhost/api/v0/location/new -H "Content-Type: application/json" -X POST -d '{"name": "SAMPLE", "added_by": "system" , "description": "test"}'
 
 status: 200 
+added_name allowed: system , admin
+name allowed: shld contain alphanumeric only
 
 //put
 curl localhost/api/v0/location/update -X PUT -H "Content-Type: application/json" -d '{"id": "2" , "name": "test", "added_by": "noot", "description": "test12344444444"}'
@@ -18,7 +20,6 @@ curl localhost/api/v0/location/update -X PUT -H "Content-Type: application/json"
 
 //delete
 curl localhost/api/v0/location/delete -X DELETE -H "Content-Type: application/json" -d '{"id": "6" }'
-
 status: 200
 {
   "message": "Location 13 deleted"
@@ -32,13 +33,26 @@ curl localhost/api/v0/sensor
 curl http://localhost/api/v0/sensor/3
 
 //POST
-curl localhost/api/v0/sensor/new -H "Content-Type: application/json" -X POST -d '{"sensorname": "test", "added_by": "noot" , "mac_address": "99-6A-F8-7D-B4-90", "description": "test" , "location": "2"}'
+curl localhost/api/v0/sensor/new -H "Content-Type: application/json" -X POST -d '{"sensorname": "test", "added_by": "system" , "mac_address": "99-6A-F8-7D-B4-94", "description": "test" , "location": "11"}'
+
+status: 200 
+added_name allowed: system , admin
+sensor name : shld contain alphanumeric only and be unique
 
 //put
-curl localhost/api/v0/sensor/update -H "Content-Type: application/json" -X PUT -d '{"id": "2" ,"sensorname": "test", "added_by": "noot" , "mac_address": "99-6A-F8-7D-B4-90" , "description": "test123333333" , "location": "3" }'
+curl localhost/api/v0/sensor/update -H "Content-Type: application/json" -X PUT -d '{"id": "2" ,"sensorname": "test", "added_by": "system" , "mac_address": "99-6A-F8-7D-B4-94" , "description": "test123" , "location": "11" }'
+
+status: 200 
+added_name allowed: system , admin
+sensor name : shld contain alphanumeric only and be unique
+"message": "Sensor 13 updated"
 
 //delete
 curl localhost/api/v0/sensor/delete -X DELETE -H "Content-Type: application/json" -d '{"id": "2" }'
+{
+  "message": "sensor 13 deleted"
+}
+
 
 //sensor data
 curl http://localhost/api/v0/sensor-data/
@@ -48,7 +62,7 @@ curl http://localhost/api/v0/sensor-data/1
 
 
 //post 
-curl localhost/api/v0/sensor-data/new -H "Content-Type: application/json" -X POST -d '{"id": "2", "id_sensor": "1" , "id_location": "2" , "sensordata": { 
+curl localhost/api/v0/sensor-data/new -H "Content-Type: application/json" -X POST -d '{"id_sensor": "1" , "id_location": "11" , "sensordata": { 
   "psi": "34",
   "humidity": "11%",
   "o3": "326ppm",
@@ -79,5 +93,4 @@ curl localhost/api/v0/sensor-data/update -H "Content-Type: application/json" -X 
 curl localhost/api/v0/sensor-data/delete -X DELETE -H "Content-Type: application/json" -d '{"id": "3" }'
 
 //seed 
-
 curl localhost/api/seed/v0/seed/new -H "Content-Type: application/json" -X POST -d '{"mockLocation": ["test", "test123"]}'

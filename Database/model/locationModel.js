@@ -1,6 +1,7 @@
 "use strict";
 const { Sequelize, DataTypes } = require("sequelize");
 const { sequelize } = require("../mySQL");
+const { isAlphaNumericwithSpaces } = require('../../Web-Server/functions/validateData')
 
 //sequelize.sync();
 const locationModel = sequelize.define(
@@ -19,28 +20,27 @@ const locationModel = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 10,
+			unique: true,
 			validate: {
-				notEmpty: { msg: "Name cannot be empty" },
+				notEmpty: true,
 				len: [1, 20],
-				/*
-				//will not validate this and fail it
-				"hello world" (contains a space)
-				"hello@123" (contains a symbol)
-				"" (empty string)
-				is: /^[a-z]+$/i,          // matches this RegExp
-				is: ["^[a-z]+$",'i'], 
-				*/
-				is: ["^[a-z0-9]+$", "i"]
-			},
+				//accept only alphanumeric and spaces
+				isAlphaNumericwithSpaces(value){
+					if(!isAlphaNumericwithSpaces(value)){
+						throw new Error('Invalid characters in name')
+					}
+				}									
+				},
 		},
 		added_by: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 10,
 			validate: {
-				notEmpty: { msg: "Added by cannot be empty" },
+				notEmpty: true,
 				len: [1, 20],			
-				is: ["^[a-z0-9]+$", "i"]
+				is: ["^[a-z0-9]+$", "i"],
+				isIn: [['admin', 'system' , 'Admin', 'System']],  
 			},
 		},
 		description: {
@@ -48,13 +48,12 @@ const locationModel = sequelize.define(
 			allowNull: true,
 			length: 100,
 			validate: {
-				notEmpty: { msg: "Description cannot be empty" },
+				notEmpty: true,
 				len: [1, 100],
 				/*
 				//will not validate this and fail it
 				"hello@123" (contains a symbol)
 				"" (empty string)
-
 				*/				
 				is: ["^[a-zA-Z0-9 ]+$", "i"]
 			},

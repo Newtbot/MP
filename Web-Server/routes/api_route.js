@@ -18,18 +18,14 @@ module.exports = router;
 const router = require('express').Router();
 
 //location route
-router.use('/location', require('./Location'));
+router.use('/location', require('./location'));
 
 //sensor route
-router.use('/sensor', require('./Sensor'))
+router.use('/sensor', require('./sensor'))
 
 //sensor data route
-router.use('/sensor-data', require('./SensorData'));
+router.use('/sensor-data', require('./sensorData'));
 
-
-
-
-router.use('/test' , require('./test'));
 router.use('/latest-data', require('./latest-data'));
 
 
