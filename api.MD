@@ -85,8 +85,6 @@ curl localhost/api/v0/sensor-data/update -H "Content-Type: application/json" -X 
   "co": "16ppm",
   "temperature": "25C",
   "windspeed": "2km/h",
-  "time": "2023-12-21 14:24:44",
-  "region": "east"
 }}'
 
 //delete 
@@ -94,3 +92,24 @@ curl localhost/api/v0/sensor-data/delete -X DELETE -H "Content-Type: application
 
 //seed 
 curl localhost/api/seed/v0/seed/new -H "Content-Type: application/json" -X POST -d '{"mockLocation": ["test", "test123"]}'
+
+//router.use('/seedSensorData ', require('./seedSensorData.js'));
+
+//seed
+curl localhost/api/seed/v0/seedSensorData/new -H "Content-Type: application/json" -X POST -d '{
+  "startDate": "10-10-2020",
+  "endDate": "10-12-2020",
+  "interval": "150000",
+  "sensorid": ["1", "4"],
+  "locationid": ["11", "12"],
+  "seedData": {
+    "psi": "30",
+    "humidity": "15%",
+    "o3": "50ppm",
+    "no2": "45ppm",
+    "so2": "30ppm",
+    "co": "16ppm",
+    "temperature": "30C",
+    "windspeed": "4km/h"
+  }
+}'
