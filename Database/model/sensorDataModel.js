@@ -5,7 +5,7 @@ const { locationModel } = require("./locationModel");
 const { sensorModel } = require("./sensorModel");
 const { isJson } = require("../../Web-Server/functions/validateData");
 
-//sequelize.sync();
+sequelize.sync();
 const sensorDataModel = sequelize.define(
 	"sensorData",
 	{
@@ -20,7 +20,7 @@ const sensorDataModel = sequelize.define(
 				notEmpty: true,
 			},
 		},
-		id_sensor: {
+		sensorid: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			length: 100,
@@ -34,7 +34,7 @@ const sensorDataModel = sequelize.define(
 				notEmpty: true,
 			},
 		},
-		id_location: {
+		locationid: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			length: 100,
@@ -48,7 +48,7 @@ const sensorDataModel = sequelize.define(
 				notEmpty: true,
 			},
 		},
-		sensordata: {
+		measurement: {
 			type: DataTypes.JSON,
 			allowNull: false,
 			validate: {

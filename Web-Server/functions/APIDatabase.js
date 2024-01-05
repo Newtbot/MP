@@ -1,5 +1,4 @@
 const { sequelize } = require("../../Database/mySql.js");
-const { IoTModel } = require("../../Database/model/IoTModel.js");
 const { locationModel } = require("../../Database/model/locationModel.js");
 const { sensorModel } = require("../../Database/model/sensorModel.js");
 const { sensorDataModel } = require("../../Database/model/sensorDataModel.js");
@@ -64,7 +63,7 @@ async function getSensor() {
 async function addSensor(sensorname, added_by, mac_address , description, location) {
 	try {
 		const sensor = await sensorModel.create({
-			sensorname: sensorname,
+			name: sensorname,
 			added_by: added_by,
 			mac_address: mac_address,
 			description: description,
@@ -80,7 +79,7 @@ async function updateSensor(id, sensorname, added_by, mac_address ,description, 
 		//update by id
 		const sensor = await sensorModel.update(
 			{
-				sensorname: sensorname,
+				name: sensorname,
 				added_by: added_by,
 				mac_address: mac_address,
 				description: description,
@@ -143,9 +142,9 @@ async function addSensorData(id , id_sensor , id_location , sensordata){
 		}
 		const sensorData = await sensorDataModel.create({
 			id: id,
-			id_sensor: id_sensor,
-			id_location: id_location,
-			sensordata: sensordata,
+			sensorid: id_sensor,
+			locationid: id_location,
+			measurement: sensordata,
 		});
 	}catch(error){
 		console.error(error);
@@ -157,9 +156,9 @@ async function updateSensorData(id, id_sensor, id_location, sensordata) {
 	try {
 		const sensorData = await sensorDataModel.update(
 			{
-				id_sensor: id_sensor,
-				id_location: id_location,
-				sensordata: sensordata,
+				ensorid: id_sensor,
+				locationid: id_location,
+				measurement: sensordata,
 			},
 			{
 				where: {

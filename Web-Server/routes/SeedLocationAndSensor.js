@@ -20,11 +20,11 @@ router.post("/new", async (req, res, next) => {
                 description: "system generated location",
             });
             await sensorModel.create({
-                sensorname: `AQI-${Math.floor(Math.random()*898)+101}`,
+                name: `AQI-${Math.floor(Math.random()*898)+101}`,
                 added_by: "system",
                 mac_address: `${Math.floor(Math.random()*256).toString(16).padStart(2, '0')}-${Math.floor(Math.random()*256).toString(16).padStart(2, '0')}-${Math.floor(Math.random()*256).toString(16).padStart(2, '0')}-${Math.floor(Math.random()*256).toString(16).padStart(2, '0')}-${Math.floor(Math.random()*256).toString(16).padStart(2, '0')}-${Math.floor(Math.random()*256).toString(16).padStart(2, '0')}`,
                 description: "system generated sensor",
-                location: location.id
+                locationid: location.id
 
             });
         }
