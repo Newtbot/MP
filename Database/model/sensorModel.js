@@ -23,7 +23,7 @@ const sensorModel = sequelize.define(
 				isNumeric: true,
 			},
 		},
-		sensorname: {
+		name: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 10,
@@ -79,7 +79,7 @@ const sensorModel = sequelize.define(
 				},
 			},
 		},
-		location: {
+		locationid: {
 			type: DataTypes.INTEGER,
 			allowNull: true,
 			length: 100,

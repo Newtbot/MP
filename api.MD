@@ -91,17 +91,17 @@ curl localhost/api/v0/sensor-data/update -H "Content-Type: application/json" -X 
 curl localhost/api/v0/sensor-data/delete -X DELETE -H "Content-Type: application/json" -d '{"id": "3" }'
 
 //seed 
-curl localhost/api/seed/v0/seed/new -H "Content-Type: application/json" -X POST -d '{"mockLocation": ["test", "test123"]}'
+curl localhost/api/seed/v0/seed/new -H "Content-Type: application/json" -X POST -d '{"mockLocation": ["Ang Mo Kio", "Bishan" , "Tampines" , "Jurong" , "Marine Parade" , "Woodlands "]}'
 
 //router.use('/seedSensorData ', require('./seedSensorData.js'));
 
 //seed
 curl localhost/api/seed/v0/seedSensorData/new -H "Content-Type: application/json" -X POST -d '{
-  "startDate": "10-10-2020",
-  "endDate": "10-12-2020",
-  "interval": "150000",
-  "sensorid": ["1", "4"],
-  "locationid": ["11", "12"],
+  "startDate": "2023-01-01T16:00:00.000Z",
+  "endDate": "2023-02-01T16:00:00.000Z",
+  "interval": "15",
+  "sensorid": ["1", "2" , "3" , "4" , "5" , "6"],
+  "locationid": ["1", "2" , "3" , "4" , "5" , "6"],
   "seedData": {
     "psi": "30",
     "humidity": "15%",

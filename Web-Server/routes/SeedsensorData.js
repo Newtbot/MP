@@ -5,40 +5,45 @@ const { sensorDataModel } = require("../../Database/model/sensorDataModel.js");
 
 const express = require("express");
 const router = express.Router();
+var moment = require("moment");
 
 async function seedSensorData(seedOptions) {
-	//2024-01-01 18:48:04
-    seedOptions.endDate = seedOptions.endDate || Date.now();
-    seedOptions.interval = seedOptions.interval || 150000; //15 minutes
-    seedOptions.sensorid = seedOptions.sensorid || (await sensorModel.findAll()).map((i) => i.id);
-    seedOptions.seedData = seedOptions.seedData || {};
-    
-    let rows = []
+	seedOptions.endDate = new Date(seedOptions.endDate) || Date.now();
+	seedOptions.interval = seedOptions.interval || 15; //15 minutes
+	seedOptions.sensorid = seedOptions.sensorid || (await sensorModel.findAll()).map((i) => i.id);
+	seedOptions.seedData = seedOptions.seedData || {};
 
-    for (let sensorId of seedOptions.sensorid) {
-        let sensor = await sensorModel.findByPk(sensorId)
-		let locationID = sensor.location_id;
-		
-        let currentRow = firstDataRow(seedOptions.startDate , sensorId, locationID);
-        rows.push(currentRow);
-        while (currentRow.createdAt < seedOptions.endDate) {
-            currentRow = nextDataRow(currentRow, seedOptions.interval);
-            rows.push(currentRow);
-        }
-    }
+	let rows = [];
 
-    //await sensorDataModel.bulkCreate(rows)
-	console.log(rows);
+	for (let sensorId of seedOptions.sensorid) {
+		let sensor = await sensorModel.findByPk(sensorId);
+		let locationId = sensor.locationid;
+
+		let currentRow = firstDataRow(seedOptions.startDate, sensorId, locationId);
+		rows.push(currentRow);
+		while (currentRow.createdAt <= seedOptions.endDate) {
+			currentRow = nextDataRow(currentRow, seedOptions.interval);
+			rows.push(currentRow);
+		}
+	}
+
+	await sensorDataModel.bulkCreate(rows)
+	//console.log(rows);
+}
+
+function convertDateToUTC(startDate) {
+	let date = new Date(startDate);
+	date = moment(date).utc().toDate();
+	//return as object
+	return date;
 }
 
 //populate first row of sensordata model with random data from seedData
-function firstDataRow(startDate , sensorId, locationID) {
-	console.log(startDate);
-	console.log(locationID);
+function firstDataRow(startDate, sensorId, locationId) {
 	return {
 		sensorid: sensorId,
-		locationid: locationID,
-		sensordata: {
+		locationid: locationId,
+		measurement: {
 			//console.log(Math.floor(Math.random() * 30) + 5)
 			psi: Math.floor(Math.random() * 30) + 5,
 			humidity: Math.floor(Math.random() * (90 - 80 + 1) + 80),
@@ -49,57 +54,37 @@ function firstDataRow(startDate , sensorId, locationID) {
 			temperature: Math.floor(Math.random() * (30 - 23 + 1) + 25),
 			windspeed: Math.floor(Math.random() * (10 - 1 + 1) + 1),
 		},
-		createdAt: startDate,
+		createdAt: convertDateToUTC(startDate),
 	};
 }
 
-function numberWithinTenPercent(inputNumber) {
-    // Calculate the range for 10% of the input number
-    const range = 0.1 * inputNumber;
-
-    // Generate a random number within the range (-10% to +10%)
-    const randomOffset = Math.random() * range * 2 - range;
-
-    // Calculate the new number within the +/- 10% range
-    const newNumber = inputNumber + randomOffset;
-
-    return newNumber;
-}
-
 function nextDataRow(currentRow, interval) {
-    return {
-        sensorid: currentRow.sensorid,
-        locationid: currentRow.locationid,
-        sensordata: {
-            psi: numberWithinTenPercent(currentRow.sensordata.psi),
-            humidity: numberWithinTenPercent(currentRow.sensordata.humidity),
-            o3: numberWithinTenPercent(currentRow.sensordata.o3),
-            no2: numberWithinTenPercent(currentRow.sensordata.no2),
-            so2: numberWithinTenPercent(currentRow.sensordata.so2),
-            co: numberWithinTenPercent(currentRow.sensordata.co),
-            temperature: numberWithinTenPercent(currentRow.sensordata.temperatue),
-            windspeed: numberWithinTenPercent(currentRow.sensordata.windspeed),
-        },
-		//convert 10-10-2020 to utc time
-		/*	
-		const createdAtString = 'Sat Oct 10 2020 00:00:00 GMT+0800 (Singapore Standard Time)';
-		const createdAtDateObject = new Date(createdAtString);
-
-		// Add 150000 milliseconds
-		const updatedTimestamp = createdAtDateObject.getTime() + 150000;
-
-		// Create a new Date object with the updated timestamp
-		const updatedDateObject = new Date(updatedTimestamp);
-
-		console.log(updatedDateObject);
-		*/
-        createdAt: new Date (currentRow.createdAt).getTime() + interval,
-    };    
-
+	return {
+		sensorid: currentRow.sensorid,
+		locationid: currentRow.locationid,
+		measurement: {
+			psi: numberWithinPercent(currentRow.measurement.psi),
+			humidity: Math.floor(Math.random() * (90 - 80 + 1) + 80),
+			o3: Math.floor(Math.random() * (100 - 20 + 1) + 30),
+			no2: numberWithinPercent(currentRow.measurement.no2),
+			so2: numberWithinPercent(currentRow.measurement.so2),
+			co: Math.floor(Math.random() * 25 - 0.5),
+			temperature: Math.floor(Math.random() * (30 - 23 + 1) + 25),
+			windspeed: Math.floor(Math.random() * (10 - 1 + 1) + 1),
+		},
+		createdAt: moment(currentRow.createdAt).add(interval, "m").toDate(),
+	};
 }
 
+function numberWithinPercent(inputNumber) {
+	const range = inputNumber * 0.003;
 
+	const randomOffset = Math.random() * range;
 
+	const newNumber = inputNumber + randomOffset;
+
+	return Math.floor(newNumber);
+}
 
 //add seed
 router.post("/new", async (req, res, next) => {
@@ -107,7 +92,7 @@ router.post("/new", async (req, res, next) => {
 		const seedOptions = req.body;
 		console.log(seedOptions);
 		seedSensorData(seedOptions);
-
+		res.status(200)
 	} catch (error) {
 		console.error(error);
 		next(error);
