@@ -6,6 +6,7 @@ const {
     updateSensorData,
     deleteSensorData,
     getSensorDataById,
+    getData,
 
 } = require("../functions/apiDatabase.js");
 
@@ -55,6 +56,42 @@ router.delete("/delete", async (req, res, next) => {
         next(error);
     }
 });
+
+
+router.get("/data", async (req, res, next) => {
+	try {
+        let query = {
+            //can be desc or asc
+            order: req.query.order,
+
+            // number of data to be returned
+            limit: req.query.limit,
+
+            //can be  sensorid, locationid
+            sensorid: req.query.sensorid,
+
+            //can be  sensorid, locationid
+            locationid: req.query.locationid,
+            //yearly
+            year: req.query.year,
+
+            //monthly
+            month: req.query.month,
+
+            //weekly
+            week: req.query.week,
+
+          };
+          
+          const data = await getData(query);
+          res.status(200).json(data);
+                   
+	} catch (error) {
+		console.error(error);
+		next(error);
+	}
+});
+
 
 router.get("/:id", async (req, res, next) => {
     try {
