@@ -81,6 +81,16 @@ router.get("/data", async (req, res, next) => {
             //weekly
             week: req.query.week,
 
+            //daily
+            day: req.query.day,
+
+            //hourly
+            hour: req.query.hour,
+
+            //minute
+            minute: req.query.minute,
+            
+
           };
           
           const data = await getData(query);

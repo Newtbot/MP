@@ -67,9 +67,6 @@ module.exports = {
 	isAlphaNumericwithSpaces,
 	isAlphaNumericWithSpacesAndDash,
 	isMacAddress,
-  isJson,
+	isJson,
 };
-/*
-isMACAddress(str [, options])
 
-*/
