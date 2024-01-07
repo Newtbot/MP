@@ -137,29 +137,20 @@ month = 1 or jan
 //get by week
 curl http://localhost/api/v0/sensor-data/data?week=1
 
+week = 1 or wtv
+
 //get by daily 
+curl http://localhost/api/v0/sensor-data/data?day=1
+
+day = 1 or wtv 
 
 //get by hourly 
+http://localhost/api/v0/sensor-data/data?hour=1
 
-//get data by year by specific sensor
-
-//get by month by specific sensor 
-
-//get by week by specific sensor 
-
-//get by daily  by specific sensor 
-
-//get by hourly by specific sensor 
+Hour = 1 or wtv
 
 
-//get data by year by specific location
-
-//get by month by specific location
-
-//get by week by specific location
-
-//get by daily  by specific location
-
-//get by hourly by specific location
+//strong optional chaining
+curl 'http://localhost/api/v0/sensor-data/data?year=2023&month=1&week=1&day=1&sensorid=1&locationid=1'
 
 //get specific data
