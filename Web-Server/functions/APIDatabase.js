@@ -2,7 +2,7 @@ const { sequelize } = require("../../Database/mySql.js");
 const { locationModel } = require("../../Database/model/locationModel.js");
 const { sensorModel } = require("../../Database/model/sensorModel.js");
 const { sensorDataModel } = require("../../Database/model/sensorDataModel.js");
-const { Op } = require("sequelize");
+const { Op, where, or } = require("sequelize");
 
 //helper function to convert month name to month number
 //https://stackoverflow.com/questions/13566552/easiest-way-to-convert-month-name-to-month-number-in-js-jan-01
@@ -175,6 +175,7 @@ async function getData(query) {
 	let ormQuery = {};
 	let whereClause = {};
 	let whereNest = {};
+	let whereDate = {};
 
 	if (query.limit !== undefined && query.order !== undefined)
 		ormQuery = {
@@ -194,7 +195,11 @@ async function getData(query) {
 		query.hour ||
 		query.minute ||
 		query.sensorid ||
-		query.locationid
+		query.locationid ||
+		query.startdate ||
+		query.enddate
+
+		//get specific data like psi or wtv
 	) {
 		if (query.limit !== undefined && query.order !== undefined)
 			ormQuery = {
@@ -266,6 +271,15 @@ async function getData(query) {
 				query.minute
 			);
 		}
+		if (query.startdate) {
+			let startdate = new Date(query.startdate);
+			whereDate.startdate = startdate;
+		}
+		if (query.enddate) {
+			let enddate = new Date(query.enddate);
+			whereDate.enddate = enddate;
+		}
+
 		if (query.sensorid) {
 			whereNest.sensorid = sequelize.where(
 				sequelize.col("sensorid"),
@@ -380,32 +394,84 @@ async function getData(query) {
 		};
 	}
 
-	//get specific data like psi or wtv
-
-	//range of date values
-
 	if (!whereClause) {
 		return await sensorDataModel.findAll(ormQuery);
-	} else {
+	} else if (whereClause && whereNest) {
 		console.log(whereClause);
 		console.log(whereNest);
+		console.log(whereDate);
 		console.log(query);
 		console.log(ormQuery);
+
 		return await sensorDataModel.findAll({
 			//The operators Op.and, Op.or and Op.not can be used to create arbitrarily complex nested logical comparisons.
 			//https://sequelize.org/docs/v6/core-concepts/model-querying-basics/#examples-with-opand-and-opor
 			where: {
 				[Op.and]: [whereNest, whereClause],
+				createdAt: {
+					//https://stackoverflow.com/questions/43115151/sequelize-query-to-find-all-records-that-falls-in-between-date-range
+					[Op.between]: [whereDate.startdate, whereDate.enddate],
+				},
 			},
 
 			//only use where clause to lookup based on condition that i put into whereClause
-			//where: whereClause,
 			...ormQuery,
 		});
 	}
 }
-/*
 
+async function getdataFilter(query) {
+	let ormQuery = {};
+	//get highest and lowest data of measurement from all data
+	if (query.psi !== undefined && query.psi === "highest") {
+		ormQuery = {
+			where: sequelize.where(
+				sequelize.fn("JSON_EXTRACT", sequelize.col("measurement"), "$.psi"),
+				//sequelize.fn('JSON_EXTRACT', sequelize.col('aa.bb.field'), sequelize.literal(`'$.attr'`))
+				sequelize.literal(`'$$.type'`),
+
+				//max value of psi
+				sequelize.fn("MAX", sequelize.col("measurement.psi"))
+			),
+		};
+	}
+
+	console.log(ormQuery);
+	return await sensorDataModel.findAll(ormQuery);
+}
+
+/*
+sequelize.fn('JSON_EXTRACT', sequelize.col('aa.bb.field'), sequelize.literal(`'$.attr'`))
+
+	else if (query.hour !== undefined) {
+		ormQuery = {
+			where: sequelize.where(
+				sequelize.fn("HOUR", sequelize.col("createdAt")),
+				query.hour
+			),
+			...ormQuery,
+		};
+	}
+
+
+
+*/
+
+/*'		ormQuery = {
+			order: [sequelize.fn("max", sequelize.col("measurement.psi::int"))],
+			limit: 1,
+		};
+					sequelize.literal('(SELECT MAX(`measurement`->>"$.psi") FROM `sensorData`)'),
+					'max_psi'
+		if (query.highest) {
+			//[sequelize.fn("max", sequelize.col("measurement.psi")), "max_psi"],
+
+			ormQuery = {
+				attributes: [
+					[sequelize.fn("max", sequelize.col("measurement")), "max"],
+				],
+			};
+		}
 
 */
 
@@ -426,4 +492,5 @@ module.exports = {
 	deleteSensorData,
 	getSensorDataById,
 	getData,
+	getdataFilter,
 };
