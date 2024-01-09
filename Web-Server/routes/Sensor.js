@@ -20,6 +20,7 @@ router.get("/", async (req, res, next) => {
 		next(error);
 	}
 });
+/*
 
 router.post("/new", async (req, res, next) => {
 	try {
@@ -53,7 +54,7 @@ router.delete("/delete", async (req, res, next) => {
         next(error);
     }
 });
-
+*/
 router.get("/:id", async (req, res, next) => {
     try {
         const sensor = await getSensorById(req.params.id);

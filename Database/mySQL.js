@@ -3,6 +3,7 @@ const path = require('path')
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
 const Sequelize = require("sequelize");
 const fs = require('fs');
+const { escape } = require("querystring");
 
 const sequelize = new Sequelize(
  "eco_saver",
@@ -11,12 +12,17 @@ const sequelize = new Sequelize(
  {
     host: "mpsqldatabase.mysql.database.azure.com",
     dialect: 'mysql',
+    //  attributeBehavior?: 'escape' | 'throw' | 'unsafe-legacy';
+    attributeBehavior: 'escape',
     dialectOptions: {
       ssl: {
          ca: fs.readFileSync(path.resolve(__dirname, '../cert/DigiCertGlobalRootCA.crt.pem')),
-      }
+      },
+
     },
-   }
+   },
+
+   
 );
 
 sequelize.authenticate().then(() => {
