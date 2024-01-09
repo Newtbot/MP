@@ -22,6 +22,7 @@ router.get("/", async (req, res, next) => {
 		next(error);
 	}
 });
+/*
 
 //add location 
 router.post("/new", async (req, res, next) => {
@@ -58,6 +59,8 @@ router.delete("/delete", async (req, res, next) => {
 		next(error);
 	}
 });
+
+*/
 
 //get location by id
 router.get("/:id", async (req, res, next) => {

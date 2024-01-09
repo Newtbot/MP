@@ -174,9 +174,12 @@ async function getSensorDataById(id) {
 async function getData(query) {
 	let ormQuery = {};
 	let whereClause = {};
-	let whereNest = {};
-	let whereDate = {};
-
+	//let whereNest = {};
+	//let whereDate = {};
+	//limit default value if query.limit is undefined
+	if (query.limit === undefined) {
+		query.limit = 10;
+	}
 	if (query.limit !== undefined && query.order !== undefined)
 		ormQuery = {
 			limit: parseInt(query.limit),
@@ -184,6 +187,9 @@ async function getData(query) {
 			order: [["createdAt", query.order.toUpperCase()]],
 			...ormQuery,
 		};
+	}
+
+	/*	
 	//handle year and month and week and day and hour and minute and sensorid and locationid through optional chaining
 	else if (
 		query.limit ||
@@ -198,8 +204,6 @@ async function getData(query) {
 		query.locationid ||
 		query.startdate ||
 		query.enddate
-
-		//get specific data like psi or wtv
 	) {
 		if (query.limit !== undefined && query.order !== undefined)
 			ormQuery = {
@@ -273,24 +277,210 @@ async function getData(query) {
 		}
 		if (query.startdate) {
 			let startdate = new Date(query.startdate);
-			whereDate.startdate = startdate;
+			whereClause.startdate = startdate;
 		}
 		if (query.enddate) {
 			let enddate = new Date(query.enddate);
-			whereDate.enddate = enddate;
+			whereClause.enddate = enddate;
 		}
 
+		//WHERE NEST PREVIOUSLY
 		if (query.sensorid) {
-			whereNest.sensorid = sequelize.where(
+			whereClause.sensorid = sequelize.where(
 				sequelize.col("sensorid"),
 				query.sensorid
 			);
 		}
 		if (query.locationid) {
-			whereNest.locationid = sequelize.where(
+			whereClause.locationid = sequelize.where(
 				sequelize.col("locationid"),
 				query.locationid
 			);
+		}
+		//highest and lowest
+		if (query.psi !== undefined && query.psi === "highest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.psi')"), "max_psi"],
+					"createdAt",
+				],
+				//group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_psi"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.psi !== undefined && query.psi === "lowest") {
+			//https://gist.github.com/WunGCQ/c4df1929c5975c2a79133bc8300fcd6e
+
+			ormQuery = {
+				attributes: [
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.psi')"), "min_psi"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_psi"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.co !== undefined && query.co === "highest") {
+			ormQuery = {
+				attributes: [
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.co')"), "max_co"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_co"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.co !== undefined && query.co === "lowest") {
+			ormQuery = {
+				attributes: [
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.co')"), "min_co"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_co"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.o3 !== undefined && query.o3 === "highest") {
+			ormQuery = {
+				attributes: [
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.o3')"), "max_o3"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_o3"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.o3 !== undefined && query.o3 === "lowest") {
+			ormQuery = {
+				attributes: [
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.o3')"), "min_o3"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_o3"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.no2 !== undefined && query.no2 === "highest") {
+			ormQuery = {
+				attributes: [
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.no2')"), "max_no2"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_no2"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.no2 !== undefined && query.no2 === "lowest") {
+			ormQuery = {
+				attributes: [
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.no2')"), "min_no2"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_no2"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.so2 !== undefined && query.so2 === "highest") {
+			ormQuery = {
+				attributes: [
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.so2')"), "max_so2"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_so2"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.so2 !== undefined && query.so2 === "lowest") {
+			ormQuery = {
+				attributes: [
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.so2')"), "min_so2"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_so2"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.humidity !== undefined && query.humidity === "highest") {
+			ormQuery = {
+				attributes: [
+					[
+						sequelize.literal("JSON_EXTRACT(measurement, '$.humidity')"),
+						"max_humidity",
+					],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_humidity"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.humidity !== undefined && query.humidity === "lowest") {
+			ormQuery = {
+				attributes: [
+					[
+						sequelize.literal("JSON_EXTRACT(measurement, '$.humidity')"),
+						"min_humidity",
+					],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_humidity"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.windspeed !== undefined && query.windspeed === "highest") {
+			ormQuery = {
+				attributes: [
+					[
+						sequelize.literal("JSON_EXTRACT(measurement, '$.windspeed')"),
+						"max_windspeed",
+					],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_windspeed"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.windspeed !== undefined && query.windspeed === "lowest") {
+			ormQuery = {
+				attributes: [
+					[
+						sequelize.literal("JSON_EXTRACT(measurement, '$.windspeed')"),
+						"min_windspeed",
+					],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_windspeed"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.temperature !== undefined && query.temperature === "highest") {
+			ormQuery = {
+				attributes: [
+					[
+						sequelize.literal("JSON_EXTRACT(measurement, '$.temperature')"),
+						"max_temperature",
+					],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_temperature"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.temperature !== undefined && query.temperature === "lowest") {
+			ormQuery = {
+				attributes: [
+					[
+						sequelize.literal("JSON_EXTRACT(measurement, '$.temperature')"),
+						"min_temperature",
+					],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_temperature"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
 		}
 	}
 	//accept year
@@ -396,21 +586,24 @@ async function getData(query) {
 
 	if (!whereClause) {
 		return await sensorDataModel.findAll(ormQuery);
-	} else if (whereClause && whereNest) {
+	} else if (whereClause) {
 		console.log(whereClause);
-		console.log(whereNest);
-		console.log(whereDate);
+		//console.log(whereNest);
+		//console.log(whereDate);
 		console.log(query);
 		console.log(ormQuery);
 
 		return await sensorDataModel.findAll({
+			//limit default value if query.limit is undefined or not provided
+			limit: query.limit,
 			//The operators Op.and, Op.or and Op.not can be used to create arbitrarily complex nested logical comparisons.
 			//https://sequelize.org/docs/v6/core-concepts/model-querying-basics/#examples-with-opand-and-opor
 			where: {
-				[Op.and]: [whereNest, whereClause],
+				//[Op.and]: [whereNest, whereClause],
+				[Op.and]: [whereClause],
 				createdAt: {
 					//https://stackoverflow.com/questions/43115151/sequelize-query-to-find-all-records-that-falls-in-between-date-range
-					[Op.between]: [whereDate.startdate, whereDate.enddate],
+					[Op.between]: [whereClause.startdate, whereClause.enddate],
 				},
 			},
 
@@ -419,59 +612,269 @@ async function getData(query) {
 		});
 	}
 }
-
-async function getdataFilter(query) {
-	let ormQuery = {};
-	//get highest and lowest data of measurement from all data
-	if (query.psi !== undefined && query.psi === "highest") {
-		ormQuery = {
-			where: sequelize.where(
-				sequelize.fn("JSON_EXTRACT", sequelize.col("measurement"), "$.psi"),
-				//sequelize.fn('JSON_EXTRACT', sequelize.col('aa.bb.field'), sequelize.literal(`'$.attr'`))
-				sequelize.literal(`'$$.type'`),
-
-				//max value of psi
-				sequelize.fn("MAX", sequelize.col("measurement.psi"))
-			),
-		};
-	}
-
-	console.log(ormQuery);
-	return await sensorDataModel.findAll(ormQuery);
-}
+*/
+//if no query is provided
 
 /*
-sequelize.fn('JSON_EXTRACT', sequelize.col('aa.bb.field'), sequelize.literal(`'$.attr'`))
-
-	else if (query.hour !== undefined) {
-		ormQuery = {
-			where: sequelize.where(
-				sequelize.fn("HOUR", sequelize.col("createdAt")),
-				query.hour
-			),
-			...ormQuery,
-		};
+async function getdataFilter(query) {
+	let allowWords = ["highest", "lowest", "Highest", "Lowest"];
+	let ormQuery = {};
+	//preset limit if limit is not provided
+	if (query.limit === undefined) {
+		query.limit = 10;
 	}
-
-
-
-*/
-
-/*'		ormQuery = {
-			order: [sequelize.fn("max", sequelize.col("measurement.psi::int"))],
-			limit: 1,
-		};
-					sequelize.literal('(SELECT MAX(`measurement`->>"$.psi") FROM `sensorData`)'),
-					'max_psi'
-		if (query.highest) {
-			//[sequelize.fn("max", sequelize.col("measurement.psi")), "max_psi"],
+	if (
+		allowWords.includes(query.psi) ||
+		allowWords.includes(query.co) ||
+		allowWords.includes(query.o3) ||
+		allowWords.includes(query.no2) ||
+		allowWords.includes(query.so2) ||
+		allowWords.includes(query.humidity) ||
+		allowWords.includes(query.windspeed) ||
+		allowWords.includes(query.temperature)
+	) {
+		//get highest and lowest data of measurement from all data
+		if (query.psi !== undefined && query.psi === "highest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.psi')"), "max_psi"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_psi"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.psi !== undefined && query.psi === "lowest") {
+			//https://gist.github.com/WunGCQ/c4df1929c5975c2a79133bc8300fcd6e
 
 			ormQuery = {
 				attributes: [
-					[sequelize.fn("max", sequelize.col("measurement")), "max"],
+					"id",
+					"sensorid",
+					"locationid",
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.psi')"), "min_psi"],
 				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_psi"), "ASC"]],
+				limit: parseInt(query.limit),
 			};
 		}
+		if (query.co !== undefined && query.co === "highest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.co')"), "max_co"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_co"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.co !== undefined && query.co === "lowest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.co')"), "min_co"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_co"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.o3 !== undefined && query.o3 === "highest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.o3')"), "max_o3"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_o3"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.o3 !== undefined && query.o3 === "lowest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.o3')"), "min_o3"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_o3"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.no2 !== undefined && query.no2 === "highest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.no2')"), "max_no2"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_no2"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.no2 !== undefined && query.no2 === "lowest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.no2')"), "min_no2"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_no2"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.so2 !== undefined && query.so2 === "highest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.so2')"), "max_so2"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_so2"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.so2 !== undefined && query.so2 === "lowest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[sequelize.literal("JSON_EXTRACT(measurement, '$.so2')"), "min_so2"],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_so2"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.humidity !== undefined && query.humidity === "highest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[
+						sequelize.literal("JSON_EXTRACT(measurement, '$.humidity')"),
+						"max_humidity",
+					],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_humidity"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.humidity !== undefined && query.humidity === "lowest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[
+						sequelize.literal("JSON_EXTRACT(measurement, '$.humidity')"),
+						"min_humidity",
+					],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_humidity"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.windspeed !== undefined && query.windspeed === "highest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[
+						sequelize.literal("JSON_EXTRACT(measurement, '$.windspeed')"),
+						"max_windspeed",
+					],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_windspeed"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.windspeed !== undefined && query.windspeed === "lowest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[
+						sequelize.literal("JSON_EXTRACT(measurement, '$.windspeed')"),
+						"min_windspeed",
+					],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_windspeed"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.temperature !== undefined && query.temperature === "highest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[
+						sequelize.literal("JSON_EXTRACT(measurement, '$.temperature')"),
+						"max_temperature",
+					],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("max_temperature"), "DESC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+		if (query.temperature !== undefined && query.temperature === "lowest") {
+			ormQuery = {
+				attributes: [
+					"id",
+					"sensorid",
+					"locationid",
+					[
+						sequelize.literal("JSON_EXTRACT(measurement, '$.temperature')"),
+						"min_temperature",
+					],
+				],
+				group: ["id", "sensorid", "locationid"],
+				order: [[sequelize.literal("min_temperature"), "ASC"]],
+				limit: parseInt(query.limit),
+			};
+		}
+
+		console.log(ormQuery);
+		console.log(query);
+		return await sensorDataModel.findAll(ormQuery);
+	} else {
+		return "Please enter correct query or Please provide a query";
+	}
+}
+*/
+async function getAverage(query) {}
+
+/*
+
 
 */
 
@@ -493,4 +896,5 @@ module.exports = {
 	getSensorDataById,
 	getData,
 	getdataFilter,
+	getAverage,
 };
