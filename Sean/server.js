@@ -11,7 +11,7 @@ const validator = require('validator');
 
 const { transporter } = require("./modules/nodeMailer");
 const { connection } = require("./modules/mysql"); 
-
+const { connection2 } = require("./modules/mysql"); 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -207,28 +207,40 @@ const logActivity = async (username, success, message) => {
   
   
 
-// Update your /home route to retrieve the overall last 10 logins for all users
-app.get("/home", isAuthenticated, (req, res) => {
-	// Retrieve the overall last 10 logins for all users
-	const loginsQuery =
-		"SELECT username, lastLogin FROM users ORDER BY lastLogin DESC LIMIT 10";
-	connection.query(loginsQuery, (error, loginResults) => {
-		if (error) {
-			console.error("Error executing login logs query:", error);
-			res.status(500).send("Internal Server Error");
-			return;
-		}
-
-		// Log the results on the server side
-		console.log("Login Logs on Server:", loginResults);
-
-		// Render the home page with login logs data
-		res.render("home", {
-			username: req.session.username,
-			loginLogs: loginResults,
-		});
+  app.get("/home", isAuthenticated, (req, res) => {
+	
+	// Retrieve the last 10 sensor data records from the sensordata table
+	const sensorDataQuery =
+	  "SELECT locationid, measurement, createdAt FROM sensordata ORDER BY createdAt DESC LIMIT 10";
+  
+	connection2.query(sensorDataQuery, (error, sensorDataResults) => {
+	  if (error) {
+		console.error("Error executing sensor data query:", error);
+		res.status(500).send("Internal Server Error");
+		return;
+	  }
+  
+	  // Log the results on the server side
+	  
+	  
+	  // Render the home page with sensor data
+	  res.render("home", {
+		username: req.session.username,
+		sensorData: sensorDataResults,
+	  });
 	});
+  });
+ app.get('/api/locations', (req, res) => {
+  connection2.query('SELECT `id`, `name` FROM `locations`', (error, results) => {
+    if (error) {
+      console.error('Error fetching locations:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+      return;
+    }
+    res.json(results);
+  });
 });
+  
 app.get("/inusers", isAuthenticated, (req, res) => {
 	// Fetch all user data from the database
 	const allUsersQuery = "SELECT * FROM users";
