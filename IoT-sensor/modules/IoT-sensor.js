@@ -10,17 +10,15 @@
 
 /*
 1) generate random data for each sensor
-3) send the coap request to the server
+2) pass to mqtt broker
 */
-
-const { isNumber } = require("../../Web-Server/functions/validateData");
 
 let region = ["central", "north-east", "north", "east", "west"];
 
 function generateRandomData() {
 	const psiData = getRandomValue(0, 500);
 	const humidityData = getRandomValue(0, 100);
-	const o3Data = getRandomValue(0, 600); //max 600
+	const o3Data = getRandomValue(0, 600); //max 600 
 	const no2Data = getRandomValue(0, 1000); //max 1000
 	const so2Data = getRandomValue(0, 1000); //max 1000
 	const coData = getRandomValue(0 , 100); 
@@ -51,15 +49,9 @@ function getRandomValue(min, max) {
 	return Math.random() * (max - min) + min;
 }
 
-async function iot_sensor_data() {
-	//5 minutes
-	setInterval(() => {
-		var json = generateRandomData();
-		console.log(json);
-	}, 600); //every 1 second
+function iot_sensor_data() {
+	return generateRandomData();
 }
 
-iot_sensor_data()
-
-module.exports = { iot_sensor_data } 
+module.exports = { iot_sensor_data };
 

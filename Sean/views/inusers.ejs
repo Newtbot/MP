@@ -17,17 +17,13 @@
 
 <body>
 
-  <div id="sidebar">
-    <img src="LOGO.PNG" alt="Custom Image">
-    <div id="sidebarCollapse">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
+  <div id="navbar">
+    <h1>Eco Saver</h1>
     <a href="#" id="userDataLink">User Data</a>
     <a href="#" id="addUserLink">Add User</a>
     <a href="#" id="deleteUserLink">Delete User</a>
     <a href="#" id="resetPasswordLink">Reset Password</a>
+    <a href="#" id="logsLink">Logs</a>
     <a href="/home" id="homeLink">Home</a>
   </div>
 
@@ -44,7 +40,6 @@
             <th>Name</th>
             <th>Username</th>
             <th>Email</th>
-            <th>Password</th>
             <th>Last Login</th>
             <th>Job Title</th>
           </tr>
@@ -53,12 +48,11 @@
           <% if (allUsers && allUsers.length > 0) { %>
             <% allUsers.forEach(user => { %>
               <tr>
-                <td><%= user.name %></td>
-                <td><%= user.username %></td>
-                <td><%= user.email %></td>
-                <td><%= user.password %></td>
-                <td><%= new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) %></td>
-                <td><%= user.jobTitle %></td>                
+                <td><%- user.name %></td>
+                <td><%- user.username %></td>
+                <td><%- user.email %></td>
+                <td><%- new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) %></td>
+                <td><%- user.jobTitle %></td>                
               </tr>
             <% }); %>
           <% } else { %>
@@ -134,172 +128,32 @@
         </div>
       </div>
     </div>
-    
+    <div id="deleteUserContainer" style="display: none;">
+      <h3>Delete User</h3>
+      <div class="search-container">
+        <input type="text" id="searchUserInput" placeholder="Search by username">
+        <button id="searchUserButton">Search</button>
+      </div>
+      <div id="searchResultsContainer" style="display: none;">
+        <h4>Search Results</h4>
+        <ul id="searchResultsList"></ul>
+      </div>
+    </div>
 
-  <!-- Your existing script tags -->
-  
+    <div id="logsContainer" style="display: none;">
+      <!-- Content for logs will be added here -->
+    </div>
+    <script>
+      const allUsers = <%- JSON.stringify(allUsers) %>;
+  </script>
+ 
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-     const allUsers = <%- JSON.stringify(allUsers) %>;
-
-$(document).ready(function () {
-  $('#resetPasswordLink').on('click', function () {
-    $('#resetPasswordFormContainer').show();
-    $('#createUserForm').hide();
-    $('#userDataContainer').hide();
-    $('#downloadButtonContainer').hide();
-  });
-
-  $('#addUserLink').on('click', function () {
-    $('#resetPasswordFormContainer').hide();
-    $('#createUserForm').show();
-    $('#userDataContainer').hide();
-    $('#downloadButtonContainer').hide();
-  });
-
-  $('#userDataLink').on('click', function () {
-    $('#resetPasswordFormContainer').hide();
-    $('#createUserForm').hide();
-    $('#userDataContainer').show();
-    $('#downloadButtonContainer').show();
-  });
-});
-$('#downloadButton').on('click', function () {
-    // Call the downloadExcel function with the allUsers data
-    downloadExcel(allUsers);
-  });
-    function downloadExcel(allUsers) {
-      if (allUsers && allUsers.length > 0) {
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('All Users');
-        const headers = ['Name', 'Username', 'Email', 'Password', 'Last Login', 'Job Title'];
-        worksheet.addRow(headers);
-        allUsers.forEach(user => {
-          const rowData = [
-            user.name || '',
-            user.username || '',
-            user.email || '',
-            user.password || '',
-            user.lastLogin ? new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) : '',
-            user.jobTitle || ''
-          ];
-          worksheet.addRow(rowData);
-        });
-        workbook.xlsx.writeBuffer().then(buffer => {
-          const currentDate = new Date();
-          const formattedDate = currentDate.toISOString().split('T')[0];
-          const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '-');
-          const fileName = `user_data_${formattedDate}_${formattedTime}.xlsx`;
-          const blob = new Blob([buffer], {
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-          });
-          saveAs(blob, fileName);
-        });
-      } else {
-        console.error('No data available for download.');
-      }
-    }
- 
-  function isStrongPassword(password) {
-    // Password must be at least 10 characters long
-    if (password.length < 10) {
-      return false;
-    }
-
-    // Password must contain at least one uppercase letter
-    if (!/[A-Z]/.test(password)) {
-      return false;
-    }
-
-    // Password must contain at least one lowercase letter
-    if (!/[a-z]/.test(password)) {
-      return false;
-    }
-
-    // Password must contain at least one digit
-    if (!/\d/.test(password)) {
-      return false;
-    }
-
-    // Password must contain at least one symbol
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      return false;
-    }
-
-    return true;
-  }
-
-  $('#resetPasswordForm').on('submit', function (e) {
-    e.preventDefault();
-
-    // Get values from the form
-    const username = $('#resetUsername').val();
-    const password = $('#resetPassword').val();
-    const confirmPassword = $('#resetConfirmPassword').val();
-
-    console.log('Username:', username);
-    console.log('New Password:', password);
-
-    // Validate passwords
-    if (password !== confirmPassword) {
-        alert('Passwords do not match. Please enter the same password in both fields.');
-        return;
-    }
-
-    // Check if the new password meets complexity requirements
-    if (!isStrongPassword(password)) {
-        alert('Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.');
-        return;
-    }
-
-    // Make a fetch request
-    fetch('/reset-password', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            username: username,
-            password: password,
-            confirmPassword: confirmPassword,
-        }),
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Success:', data);
-
-            // Show an alert with the received data
-            alert(data.success || data.error || 'Password change status unknown');
-
-            // Optionally, you can clear the form or take other actions after the password change
-            $('#resetUsername').val('');
-            $('#resetPassword').val('');
-            $('#resetConfirmPassword').val('');
-
-            // You might want to hide the reset password form after submission
-            $('#resetPasswordFormContainer').hide();
-        })
-        .catch(error => {
-            // Handle 404 error separately to show an alert
-            if (error.message.includes('HTTP error! Status: 404')) {
-                alert('User not found. Please enter a valid username.');
-            } else {
-                console.error('Fetch Error:', error);
-            }
-        });
-});
-  
-  </script>
+  <script src="inusers.js"></script>
 
   </div>
 

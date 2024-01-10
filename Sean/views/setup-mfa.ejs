@@ -1,0 +1,10 @@
+<!-- setup-mfa.ejs (or your template engine's file) -->
+<h2>Setup Multi-Factor Authentication</h2>
+<p>Scan the QR code below with your authenticator app:</p>
+<img src="<%= qrCodeDataUri %>" alt="QR Code">
+
+<form action="/setup-mfa" method="post">
+    <label for="mfaCode">Enter MFA Code:</label>
+    <input type="text" id="mfaCode" name="mfaCode" required>
+    <button type="submit">Verify and Save</button>
+</form>

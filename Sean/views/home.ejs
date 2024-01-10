@@ -8,90 +8,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+    .chart-container {
+    width: 400px;
+    height: 250px;
+    margin: 20px;
+    border: 1px solid #ddd;
+    display: inline-block;
+  }
     body {
       margin: 0;
       font-family: 'Arial', sans-serif;
     }
 
-    #sidebar {
-      height: 100%;
-      width: 250px;
-      position: fixed;
+    #navbar {
       background-color: #333;
-      padding-top: 60px; 
-      transition: 0.5s;
+      overflow: hidden;
+      text-align: center;
     }
 
-    #sidebar img {
-      width: 100%;
-      margin-bottom: 20px;
+    #navbar h1 {
+      color: white;
+      padding: 14px 16px;
+      margin: 0;
+      font-size: 24px;
     }
 
-    #sidebar a {
-      padding: 10px 15px;
+    #navbar a {
+      display: inline-block;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
       text-decoration: none;
       font-size: 18px;
-      color: white;
-      display: block;
-      transition: 0.3s;
     }
 
-    #sidebar a:hover {
+    #navbar a:hover {
       background-color: #555;
     }
 
     #content {
-      margin-left: 250px;
       padding: 16px;
-    }
-
-    @media screen and (max-width: 600px) {
-      #sidebar {
-        width: 0;
-        overflow-x: hidden;
-      }
-
-      #content {
-        margin-left: 0;
-      }
-    }
-
-    #sidebarCollapse {
-      width: 40px;
-      height: 40px;
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      cursor: pointer;
-      z-index: 1;
-    }
-
-    #sidebarCollapse span {
-      display: block;
-      background: white;
-      height: 5px;
-      width: 30px;
-      margin: 6px auto;
-      transition: 0.3s;
-    }
-
-    #sidebarCollapse:hover span:nth-child(1) {
-      transform: rotate(-45deg) translate(-5px, 6px);
-    }
-
-    #sidebarCollapse:hover span:nth-child(2) {
-      opacity: 0;
-    }
-
-    #sidebarCollapse:hover span:nth-child(3) {
-      transform: rotate(45deg) translate(-5px, -6px);
+      text-align: center;
     }
 
     table {
       border-collapse: collapse;
       width: 80%;
-      margin: 20px 0;
+      margin: 20px auto;
       font-size: 16px;
     }
 
@@ -116,14 +81,10 @@
 </head>
 
 <body>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <div id="sidebar">
-    <img src="LOGO.PNG" alt="Custom Image">
-    <div id="sidebarCollapse">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
+  <div id="navbar">
+    <h1>Eco Saver</h1>
     <a href="/inusers">In-House Users</a>
     <a href="#">Users</a>
     <a href="#">Data Analysis</a>
@@ -132,31 +93,154 @@
 
   <div id="content">
     <h2>Welcome to the Home Page, <%= username %>!</h2>
-    <h3>Last 10 Logins:</h3>
+    <h3>Last 10 Sensor Data Records:</h3>
+
+  
+
     <table>
       <thead>
         <tr>
-          <th>Username</th>
-          <th>Last Login Time</th>
+          <th>Location</th>
+          <th>CO</th>
+          <th>O3</th>
+          <th>NO2</th>
+          <th>PSI</th>
+          <th>SO2</th>
+          <th>Humidity</th>
+          <th>Wind Speed</th>
+          <th>Temperature</th>
+          <th>Created At</th>
         </tr>
       </thead>
       <tbody>
-        <% loginLogs.forEach(log => { %>
+        <% sensorData.forEach(data => { %>
           <tr>
-            <td><%= log.username %></td>
-            <td><%= new Date(log.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) %></td>
+            <td><%= data.locationid %></td>
+            <td><%= data.measurement.co %></td>
+            <td><%= data.measurement.o3 %></td>
+            <td><%= data.measurement.no2 %></td>
+            <td><%= data.measurement.psi %></td>
+            <td><%= data.measurement.so2 %></td>
+            <td><%= data.measurement.humidity %></td>
+            <td><%= data.measurement.windspeed %></td>
+            <td><%= data.measurement.temperature %></td>
+            <td><%= new Date(data.createdAt).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) %></td>
           </tr>
         <% }); %>
       </tbody>
     </table>
-
-    <script>
-      document.getElementById('sidebarCollapse').addEventListener('click', function () {
-        document.getElementById('sidebar').style.width = (document.getElementById('sidebar').style.width === '250px') ? '0' : '250px';
-      });
-    </script>
   </div>
-
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+      console.log("DOM Loaded");
+  
+      // Extract data from sensorData
+      const sensorData = JSON.parse('<%- JSON.stringify(sensorData) %>');
+      console.log("Sensor Data:", sensorData);
+  
+      // Fetch location names from the server
+      const locationNames = await fetch('/api/locations') // Adjust the API endpoint
+        .then(response => response.json())
+        .then(data => data.map(location => ({ id: location.id, name: location.name })))
+        .catch(error => console.error('Error fetching location names:', error));
+  
+      // Group sensorData by locationid
+      const groupedData = groupBy(sensorData, 'locationid');
+  
+      // Get the content div
+      const contentDiv = document.getElementById('content');
+  
+      // Create a chart for each location
+      Object.keys(groupedData).forEach(locationId => {
+        const locationData = groupedData[locationId];
+  
+        // Find the corresponding location name
+        const locationName = locationNames.find(location => location.id === parseInt(locationId, 10))?.name || `Unknown Location ${locationId}`;
+  
+        // Create a container for the chart
+        const container = document.createElement('div');
+        container.className = 'chart-container';
+  
+        // Create a title for the container with location name
+        const title = document.createElement('h4');
+        title.textContent = `Location: ${locationName}`;
+        container.appendChild(title);
+  
+        // Get labels (Location IDs)
+        const labels = locationData.map(data => new Date(data.createdAt).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }));
+  
+        // Create datasets for each measurement
+        const datasets = [
+          {
+            label: 'CO',
+            data: locationData.map(data => data.measurement.co),
+            backgroundColor: 'rgba(255, 99, 132, 0.5)', // Red color
+          },
+          {
+            label: 'O3',
+            data: locationData.map(data => data.measurement.o3),
+            backgroundColor: 'rgba(54, 162, 235, 0.5)', // Blue color
+          },
+          {
+            label: 'NO2',
+            data: locationData.map(data => data.measurement.no2),
+            backgroundColor: 'rgba(255, 206, 86, 0.5)', // Yellow color
+          },
+          {
+            label: 'SO2',
+            data: locationData.map(data => data.measurement.so2),
+            backgroundColor: 'rgba(75, 192, 192, 0.5)', // Green color
+          },
+        ];
+  
+        // Create a canvas element for each location
+        const canvas = document.createElement('canvas');
+        canvas.width = 400;
+        canvas.height = 200;
+  
+        // Append canvas to the container
+        container.appendChild(canvas);
+  
+        // Append container to the content div
+        contentDiv.appendChild(container);
+  
+        // Create a bar chart for each location
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: datasets,
+          },
+          options: {
+            scales: {
+              x: {
+                beginAtZero: true,
+              },
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+      });
+  
+      // Helper function to group data by a specified key
+      function groupBy(arr, key) {
+        return arr.reduce((acc, obj) => {
+          const groupKey = obj[key];
+          acc[groupKey] = acc[groupKey] || [];
+          acc[groupKey].push(obj);
+          return acc;
+        }, {});
+      }
+    });
+  </script>
+  
+  
+  
+  
 </body>
 
 </html>

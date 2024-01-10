@@ -1,12 +1,19 @@
-{
-  psi: '34',
-  humidity: '11%',
-  o3: '326ppm',
-  no2: '445ppm',
-  so2: '511ppm',
-  co: '16ppm',
-  temperature: '25°C',
-  windspeed: '2km/h',
-  time: '2023-12-21 14:24:44',
-  region: 'east'
-}
+
+  {
+    "id": 1,
+    "sensorid": 1,
+    "locationid": 1,
+    "measurement": {
+      "co": 8,
+      "o3": 89,
+      "no2": 31,
+      "psi": 34,
+      "so2": 17,
+      "humidity": 86,
+      "windspeed": 10,
+      "temperature": 26
+    },
+    "createdAt": "2023-01-01T16:00:00.000Z",
+    "updatedAt": "2024-01-05T11:34:10.000Z"
+  },
+  
