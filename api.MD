@@ -91,8 +91,6 @@ curl localhost/api/v0/sensor-data/delete -X DELETE -H "Content-Type: application
 //seed
 curl localhost/api/seed/v0/seed/new -H "Content-Type: application/json" -X POST -d '{"mockLocation": ["Ang Mo Kio", "Bishan" , "Tampines" , "Jurong" , "Marine Parade" , "Woodlands "]}'
 
-//router.use('/seedSensorData ', require('./seedSensorData.js'));
-
 //seed
 curl localhost/api/seed/v0/seedSensorData/new -H "Content-Type: application/json" -X POST -d '{
 "startDate": "2023-01-01T16:00:00.000Z",
