@@ -7,7 +7,7 @@ const {
 	deleteSensorData,
 	getSensorDataById,
 	getData,
-    getdataFilter,
+	getdataFilter,
 	getAverage,
 } = require("../functions/apiDatabase.js");
 
@@ -59,63 +59,17 @@ router.delete("/delete", async (req, res, next) => {
 });
 */
 router.get("/data", async (req, res, next) => {
-	try {
-		let query = {
-			//can be desc or asc
-			order: req.query.order,
+    try {
+        const data = await getData(req.query);
+        res.status(200).json(data);
 
-			// number of data to be returned
-			limit: req.query.limit,
-
-			//can be  sensorid, locationid
-			sensorid: req.query.sensorid,
-
-			//can be  sensorid, locationid
-			locationid: req.query.locationid,
-			//yearly
-			year: req.query.year,
-
-			//monthly
-			month: req.query.month,
-
-			//weekly
-			week: req.query.week,
-
-			//daily
-			day: req.query.day,
-
-			//hourly
-			hour: req.query.hour,
-
-			//minute
-			minute: req.query.minute,
-
-			//start date
-			startdate: req.query.startdate,
-
-			//end date
-			enddate: req.query.enddate,
-
-            //highest or lowest of psi, co, o3, no2, so2, humidity, windspeed, temperature
-			psi: req.query.psi,
-            co: req.query.co,
-            o3: req.query.o3,
-            no2: req.query.no2,
-            so2: req.query.so2,
-            humidity: req.query.humidity,
-            windspeed: req.query.windspeed,
-            temperature: req.query.temperature,
-
-		};
-
-		const data = await getData(query);
-		res.status(200).json(data);
-	} catch (error) {
-		console.error(error);
-		next(error);
-	}
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
 });
 
+/*
 
 router.get("/filter", async (req, res, next) => {
 	try {
@@ -139,9 +93,9 @@ router.get("/filter", async (req, res, next) => {
 		next(error);
 	}
 });
+*/
 
-
-//average 
+//average
 router.get("/average", async (req, res, next) => {
 	try {
 		const query = {
@@ -162,14 +116,12 @@ router.get("/average", async (req, res, next) => {
 			//monthly
 			month: req.query.month,
 			//yearly
-			year: req.query.year,			
+			year: req.query.year,
 		};
 		const data = await getAverage(query);
-		
-		res.status(200).json(data);
 
-	}
-	catch (error) {
+		res.status(200).json(data);
+	} catch (error) {
 		console.error(error);
 		next(error);
 	}
