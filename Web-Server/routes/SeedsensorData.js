@@ -115,4 +115,18 @@ POST /api/v0/seed/sensordata
 2) nextDataRow(lastRow, interval)
 3) seedSensorData({post object from abovr})
 
+function randomizeDataPoint(value, delta, maxDelta){
+  // https://stackoverflow.com/a/36756480
+  delta = Math.random() < 0.9 ? delta : maxDelta
+  return Math.floor(Math.random() * ((value+delta) - Math.abs(delta-value)) + Math.abs(delta-value));
+}
+
+let count = 0
+let currentValue = 85
+while(count <50){
+  count++
+  console.log(currentValue)
+  currentValue = randomizeDataPoint(currentValue, 2, 5)
+}
+
 */
