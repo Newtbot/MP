@@ -7,6 +7,7 @@ const {
 	deleteSensorData,
 	getSensorDataById,
 	getData,
+	getDatabyRange,
 	getdataFilter,
 	getAverage,
 } = require("../functions/apiDatabase.js");
@@ -60,6 +61,7 @@ router.delete("/delete", async (req, res, next) => {
 */
 router.get("/data", async (req, res, next) => {
     try {
+		console.log(req.query);
         const data = await getData(req.query);
         res.status(200).json(data);
 
@@ -69,63 +71,19 @@ router.get("/data", async (req, res, next) => {
     }
 });
 
-/*
-
-router.get("/filter", async (req, res, next) => {
-	try {
-		const query = {
-			limit: req.query.limit,
-			psi: req.query.psi,
-            co: req.query.co,
-            o3: req.query.o3,
-            no2: req.query.no2,
-            so2: req.query.so2,
-            humidity: req.query.humidity,
-            windspeed: req.query.windspeed,
-            temperature: req.query.temperature,
-
-			//sensorid and locationid
-		};
-        const data = await getdataFilter(query);
+//date range
+router.get("/range", async (req, res, next) => {
+    try {
+		console.log(req.query);
+        const data = await getDatabyRange(req.query);
         res.status(200).json(data);
-	} catch (error) {
-		console.error(error);
-		next(error);
-	}
-});
-*/
 
-//average
-router.get("/average", async (req, res, next) => {
-	try {
-		const query = {
-			psi: req.query.psi,
-			co: req.query.co,
-			o3: req.query.o3,
-			no2: req.query.no2,
-			so2: req.query.so2,
-			humidity: req.query.humidity,
-			windspeed: req.query.windspeed,
-			temperature: req.query.temperature,
-			//daily
-			day: req.query.day,
-			//hourly
-			hour: req.query.hour,
-			//weekly
-			week: req.query.week,
-			//monthly
-			month: req.query.month,
-			//yearly
-			year: req.query.year,
-		};
-		const data = await getAverage(query);
-
-		res.status(200).json(data);
-	} catch (error) {
-		console.error(error);
-		next(error);
-	}
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
 });
+
 
 router.get("/:id", async (req, res, next) => {
 	try {
@@ -138,26 +96,4 @@ router.get("/:id", async (req, res, next) => {
 });
 
 module.exports = router;
-/*
-**Aggregate Sensor Data (e.g., Average PSI):**
 
-- **Route:** `GET /api/v0/sensor-data/aggregate`
-- **Query Parameter:** `metric` (e.g., `psi`, `co`, `o3`)
-- **Description:** Calculate aggregate metrics for the specified parameter.
-
-
-*/
-
-/*
-"measurement": {
-      "co": 8,
-      "o3": 89,
-      "no2": 31,
-      "psi": 34,
-      "so2": 17,
-      "humidity": 86,
-      "windspeed": 10,
-      "temperature": 26
-    },
-
-*/
