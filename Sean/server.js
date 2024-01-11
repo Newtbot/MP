@@ -24,6 +24,11 @@ app.use(
 		secret: process.env.key,
 		resave: false,
 		saveUninitialized: true,
+		cookie: {
+			secure: false, // Make sure to set this to true in a production environment with HTTPS
+			httpOnly: true,
+			maxAge: 24 * 60 * 60 * 1000, // Session duration in milliseconds (here set to 1 day)
+		  },
 	})
 );
 app.set("view engine", "ejs");
@@ -68,7 +73,7 @@ const sendOTPByEmail = async (email, otp) => {
 
 
 app.get("/login", (req, res) => {
-	// Pass an initial value for the error variable
+	
 	res.render("login", { error: null });
 });
 
@@ -98,6 +103,31 @@ const logActivity = async (username, success, message) => {
 	}
   };
   
+  const logLogoutActivity = async (username, success, message) => {
+	try {
+	  if (!username) {
+		console.error("Error logging activity: Username is null or undefined");
+		return;
+	  }
+  
+	  const activity = success ? `successful logout: ${message}` : `unsuccessful logout: ${message}`;
+	  const logSql =
+		"INSERT INTO user_logs (username, activity, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)";
+	  const logParams = [username, activity];
+  
+	  connection.query(logSql, logParams, (error, results) => {
+		if (error) {
+		  console.error("Error executing logSql:", error);
+		  // Handle error (you may want to log it or take other appropriate actions)
+		} else {
+		  console.log("Activity logged successfully");
+		}
+	  });
+	} catch (error) {
+	  console.error("Error in logActivity function:", error);
+	  // Handle error (you may want to log it or take other appropriate actions)
+	}
+  };
   
   
   // Login route
@@ -118,7 +148,6 @@ const logActivity = async (username, success, message) => {
 		username = username.trim();
   
 		const loginSql = "SELECT * FROM users WHERE username = ?";
-		const updateLastLoginSql = "UPDATE users SET lastLogin = CURRENT_TIMESTAMP WHERE username = ?";
   
 		connection.query(loginSql, [username], async (error, results) => {
 		  if (error) {
@@ -182,18 +211,23 @@ const logActivity = async (username, success, message) => {
 		// Log successful OTP entry and login
 		if (req.body.username) {
 		  await logActivity(req.body.username, true, "OTP entered correctly. Successful login");
-		  
 		}
   
-		// Correct OTP, redirect to home page
+		// Correct OTP, generate a session token
+		const sessionToken = crypto.randomBytes(32).toString('hex');
+  
+		// Store the session token in the session
 		req.session.authenticated = true;
 		req.session.username = req.body.username;
+		req.session.sessionToken = sessionToken;
+		console.log(`Generated Session Token: ${sessionToken}`);
+  
+		// Redirect to home page with session token
 		res.redirect("/home");
 	  } else {
 		// Log unsuccessful OTP entry
 		if (req.body.username) {
 		  await logActivity(req.body.username, false, "Incorrect OTP entered");
-		  
 		}
   
 		// Incorrect OTP, render login page with error
@@ -204,6 +238,33 @@ const logActivity = async (username, success, message) => {
 	  res.status(500).send("Internal Server Error");
 	}
   });
+  
+  app.get("/logout", (req, res) => {
+	try {
+		const username = req.session.username || "Unknown User";
+	  // Log the user out by clearing the session
+	  req.session.destroy(async (err) => {
+		if (err) {
+		  console.error("Error destroying session:", err);
+		  await logLogoutActivity(username, false, "User logged out unsucessfully. Session not destroyed.");
+		} else {
+		  
+		  console.log(`Session destroyed.`);
+		  
+		  // Log the logout activity using a separate async function
+		  await logLogoutActivity(username, true, "User logged out. Session destroyed.");
+		}
+		// Redirect to the login page after logout
+		res.redirect("/login");
+	  });
+	} catch (error) {
+	  console.error("Error in logout route:", error);
+	  res.status(500).send("Internal Server Error");
+	}
+  });
+  
+
+ 
   
   
 
@@ -219,10 +280,6 @@ const logActivity = async (username, success, message) => {
 		res.status(500).send("Internal Server Error");
 		return;
 	  }
-  
-	  // Log the results on the server side
-	  
-	  
 	  // Render the home page with sensor data
 	  res.render("home", {
 		username: req.session.username,
