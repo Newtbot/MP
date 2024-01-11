@@ -150,7 +150,9 @@ Hour = 1 or wtv
 
 //strong optional chaining
 curl 'http://localhost/api/v0/sensor-data/data?year=2023&month=1&week=1&day=1&sensorid=1&locationid=1'
-http://localhost/api/v0/sensor-data/data?startdate=2023-01-01T00:00:00.000&enddate=2023-01-03T&sensorid=1&locationid=1
+
+
+
 
 //get specific data
 http://localhost/api/v0/sensor-data/filter?windspeed=highest&limit=1
