@@ -64,42 +64,30 @@ function nextDataRow(currentRow, interval) {
 		measurement: {
 			psi: numberWithinPercent(currentRow.measurement.psi),
 			humidity: Math.floor(Math.random() * (90 - 80 + 1) + 80),
-			o3: Math.floor(Math.random() * (100 - 20 + 1) + 30),
+			o3: numberWithinPercent(currentRow.measurement.o3),
 			no2: numberWithinPercent(currentRow.measurement.no2),
 			so2: numberWithinPercent(currentRow.measurement.so2),
-			co: Math.floor(Math.random() * 25 - 0.5),
+			co: numberWithinPercent(currentRow.measurement.co),
 			temperature: Math.floor(Math.random() * (30 - 23 + 1) + 25),
 			windspeed: Math.floor(Math.random() * (10 - 1 + 1) + 1),
 		},
+		//add 15 minutes to current row time to get next row time in UTC
 		createdAt: moment(currentRow.createdAt).add(interval, "m").toDate(),
 	};
 }
 
 function numberWithinPercent(inputNumber) {
-	const range = inputNumber * 0.003;
+	//random percent with max of 1 and min of -1
+	const percent = Math.random() * 1 - Math.random();
 
-	const randomOffset = Math.random() * range;
+    const range = inputNumber * percent;
 
-	const newNumber = inputNumber + randomOffset;
+    const randomOffset = Math.random() * range;
 
-	return Math.floor(newNumber);
+    const newNumber = inputNumber + randomOffset;
+
+    return Math.floor(newNumber);
 }
-/*
-function randomizeDataPoint(value, delta, maxDelta){
-	// https://stackoverflow.com/a/36756480
-	delta = Math.random() < 0.9 ? delta : maxDelta
-	return Math.floor(Math.random() * ((value+delta) - Math.abs(delta-value)) + Math.abs(delta-value));
-  }
-  
-  let count = 0
-  let currentValue = 85
-  while(count <50){
-	count++
-	console.log(currentValue)
-	currentValue = randomizeDataPoint(currentValue, 2, 5)
-  }
-
-*/
 
 //add seed
 router.post("/new", async (req, res, next) => {
@@ -129,7 +117,5 @@ POST /api/v0/seed/sensordata
 1) firstDataRow(startDate)
 2) nextDataRow(lastRow, interval)
 3) seedSensorData({post object from abovr})
-
-
 
 */
