@@ -8,8 +8,6 @@ const {
 	getSensorDataById,
 	getData,
 	getDatabyRange,
-	getdataFilter,
-	getAverage,
 } = require("../functions/apiDatabase.js");
 
 const express = require("express");

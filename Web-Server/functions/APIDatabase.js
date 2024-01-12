@@ -617,6 +617,11 @@ buildQuery = {
 };
 
 buildFunc = {
+	limit: async function (queryString) {
+		if (queryString.limit !== undefined) {
+			ormQuery.limit = parseInt(queryString.limit);
+		}
+	},
 	startdate: async function (queryString) {
 		if (queryString.startdate !== undefined) {
 			whereDate.startdate = new Date(queryString.startdate);
@@ -692,59 +697,130 @@ buildFunc = {
 };
 
 async function getData(queryString) {
-	//reset keys in whereClause and ormQuery. else it will keep appending to the previous query
-	ormQuery = {};
-	whereClause = {};
-	whereDate = {};
+	if (queryString.pagesize || queryString.page) {
+		//https://blog.bitsrc.io/pagination-with-sequelize-explained-83054df6e041
+		//pass pageSize taken from page=4 or default to 50
+		queryString.pagesize = queryString.pagesize || 50;
+		let offset = (queryString.page || 0) * queryString.pagesize;
+		queryString.limit = queryString.pagesize;
+		//reset keys in whereClause and ormQuery. else it will keep appending to the previous query
+		ormQuery = {};
+		whereClause = {};
+		whereDate = {};
 
-	for (let query in queryString) {
-		if (buildQuery[query]) {
-			await buildQuery[query](queryString);
+		for (let query in queryString) {
+			if (buildQuery[query]) {
+				await buildQuery[query](queryString);
+			}
 		}
-	}
-	if (!whereClause) {
-		return await sensorDataModel.findAll(ormQuery);
-	} else if (whereClause) {
-		console.log(whereClause);
-		console.log(ormQuery);
-		console.log(whereDate);
-		return await sensorDataModel.findAll({
-			limit: queryString.limit || 1000000,
-			//The operators Op.and, Op.or and Op.not can be used to create arbitrarily complex nested logical comparisons.
-			//https://sequelize.org/docs/v6/core-concepts/model-querying-basics/#examples-with-opand-and-opor
-			where: {
-				[Op.and]: [whereClause],
-			},
-			//only use where clause to lookup based on condition that i put into whereClause
-			...ormQuery,
-		});
+		if (!whereClause) {
+			return await sensorDataModel.findAll(ormQuery);
+		} else if (whereClause) {
+			console.log(whereClause);
+			console.log(ormQuery);
+			console.log(whereDate);
+			return await sensorDataModel.findAll({
+				limit: queryString.limit || 1000000,
+				//https://sequelize.org/docs/v6/core-concepts/model-querying-basics/#limits-and-pagination
+				offset: parseInt(offset),
+				//The operators Op.and, Op.or and Op.not can be used to create arbitrarily complex nested logical comparisons.
+				//https://sequelize.org/docs/v6/core-concepts/model-querying-basics/#examples-with-opand-and-opor
+				where: {
+					[Op.and]: [whereClause],
+				},
+				//only use where clause to lookup based on condition that i put into whereClause
+				...ormQuery,
+			});
+		}
+	} else {
+		//reset keys in whereClause and ormQuery. else it will keep appending to the previous query
+		ormQuery = {};
+		whereClause = {};
+		whereDate = {};
+
+		for (let query in queryString) {
+			if (buildQuery[query]) {
+				await buildQuery[query](queryString);
+			}
+		}
+		if (!whereClause) {
+			return await sensorDataModel.findAll(ormQuery);
+		} else if (whereClause) {
+			console.log(whereClause);
+			console.log(ormQuery);
+			console.log(whereDate);
+			return await sensorDataModel.findAll({
+				limit: queryString.limit || 1000000,
+				//The operators Op.and, Op.or and Op.not can be used to create arbitrarily complex nested logical comparisons.
+				//https://sequelize.org/docs/v6/core-concepts/model-querying-basics/#examples-with-opand-and-opor
+				where: {
+					[Op.and]: [whereClause],
+				},
+				//only use where clause to lookup based on condition that i put into whereClause
+				...ormQuery,
+			});
+		}
 	}
 }
 
 async function getDatabyRange(queryString) {
-	whereDate = {};
-	for (let query in queryString) {
-		if (buildFunc[query]) {
-			await buildFunc[query](queryString);
+	if (queryString.pagesize || queryString.page) {
+		//https://blog.bitsrc.io/pagination-with-sequelize-explained-83054df6e041
+		//pass pageSize taken from page=4 or default to 50
+		queryString.pagesize = queryString.pagesize || 50;
+		let offset = (queryString.page || 0) * queryString.pagesize;
+		queryString.limit = queryString.pagesize;
+
+		whereDate = {};
+		for (let query in queryString) {
+			if (buildFunc[query]) {
+				await buildFunc[query](queryString);
+			}
 		}
-	}
-	if (whereClause) {
-		console.log(ormQuery);
-		console.log(whereDate);
-		return await sensorDataModel.findAll({
-			limit: queryString.limit || 1000000,
-			//The operators Op.and, Op.or and Op.not can be used to create arbitrarily complex nested logical comparisons.
-			//https://sequelize.org/docs/v6/core-concepts/model-querying-basics/#examples-with-opand-and-opor
-			where: {
-				createdAt: {
-					[Op.between]: [whereDate.startdate, whereDate.enddate],
+		if (whereClause) {
+			console.log(ormQuery);
+			console.log(whereDate);
+			return await sensorDataModel.findAll({
+				limit: queryString.limit || 1000000,
+				offset: offset,
+				//The operators Op.and, Op.or and Op.not can be used to create arbitrarily complex nested logical comparisons.
+				//https://sequelize.org/docs/v6/core-concepts/model-querying-basics/#examples-with-opand-and-opor
+				where: {
+					createdAt: {
+						[Op.between]: [whereDate.startdate, whereDate.enddate],
+					},
 				},
-			},
-			//only use where clause to lookup based on condition that i put into whereClause
-			...ormQuery,
-		});
+				//only use where clause to lookup based on condition that i put into whereClause
+				...ormQuery,
+			});
+		} else {
+			return "Invalid query";
+		}
 	} else {
-		return "Invalid query";
+		whereDate = {};
+		for (let query in queryString) {
+			if (buildFunc[query]) {
+				await buildFunc[query](queryString);
+			}
+		}
+		if (whereClause) {
+			console.log(ormQuery);
+			console.log(whereDate);
+			return await sensorDataModel.findAll({
+				limit: queryString.limit || 1000000,
+				//The operators Op.and, Op.or and Op.not can be used to create arbitrarily complex nested logical comparisons.
+				//https://sequelize.org/docs/v6/core-concepts/model-querying-basics/#examples-with-opand-and-opor
+				where: {
+					createdAt: {
+						[Op.between]: [whereDate.startdate, whereDate.enddate],
+					},
+				},
+				//only use where clause to lookup based on condition that i put into whereClause
+				...ormQuery,
+			});
+		} else {
+			return "Invalid query";
+		}
 	}
 }
 

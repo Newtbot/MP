@@ -157,4 +157,5 @@ curl 'http://localhost/api/v0/sensor-data/data?year=2023&month=1&week=1&day=1&se
 //get specific data
 http://localhost/api/v0/sensor-data/filter?windspeed=highest&limit=1
 
-//average 
+//pagination
+http://localhost/api/v0/sensor-data/data?week=1&sensorid=1&locationid=1&page=2&pagesize=10
