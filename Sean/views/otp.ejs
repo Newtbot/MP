@@ -69,6 +69,7 @@
         <label for="otp">OTP:</label>
         <input type="text" id="otp" name="otp" required>
         <br>
+        <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
         <button type="submit">Submit OTP</button>
     </form>
 </body>

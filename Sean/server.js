@@ -31,6 +31,18 @@ app.use(
 		  },
 	})
 );
+
+app.use((req, res, next) => {
+    if (!req.session.csrfToken) {
+        req.session.csrfToken = crypto.randomBytes(32).toString('hex');
+    }
+
+    // Make the CSRF token available in the response context
+    res.locals.csrfToken = req.session.csrfToken;
+	console.log(`Server-side CSRF Token: ${req.session.csrfToken}`);
+    next();
+});
+
 app.set("view engine", "ejs");
 
 function isAuthenticated(req, res, next) {
@@ -129,115 +141,138 @@ const logActivity = async (username, success, message) => {
 	}
   };
   
-  
-  // Login route
-  app.post('/login',[
-	  body('username').escape().trim().isLength({ min: 1 }).withMessage('Username must not be empty'),
-	  body('password').escape().trim().isLength({ min: 1 }).withMessage('Password must not be empty'),
-	],
-	async (req, res) => {
-	  try {
-		const errors = validationResult(req);
-  
-		if (!errors.isEmpty()) {
-		  // Handle validation errors, e.g., return an error message to the client
-		  return res.render('login', { error: 'Invalid input. Please check your credentials.' });
-		}
-  
-		let { username, password } = req.body;
-		username = username.trim();
-  
-		const loginSql = "SELECT * FROM users WHERE username = ?";
-  
-		connection.query(loginSql, [username], async (error, results) => {
-		  if (error) {
-			console.error("Error executing login query:", error);
-			res.status(500).send("Internal Server Error");
-			return;
-		  }
-  
-		  if (results.length > 0) {
-			const isLoginSuccessful = await bcrypt.compare(password, results[0].password);
-  
-			if (isLoginSuccessful) {
-			  // Log successful login attempt
-			  await logActivity(username, true, "Credentials entered correctly");
-  
-			  const user = results[0];
-			  const { otp, expirationTime } = generateOTP();
-  
-			  // Store the OTP and expiration time in the session for verification
-			  req.session.otp = otp;
-			  req.session.otpExpiration = expirationTime;
-			  req.session.save();
-  
-			  // Send OTP via email
-			  try {
-				await sendOTPByEmail(user.email, otp);
-				// Log successful OTP sending
-				await logActivity(username, true, "OTP successfully sent to user");
-			  } catch (sendOTPError) {
-				// Log unsuccessful OTP sending
-				await logActivity(username, false, "OTP failed to send to user");
-				console.error("Error sending OTP:", sendOTPError);
-				res.status(500).send("Internal Server Error");
-				return;
-			  }
-  
-			  // Render OTP input page
-			  res.render("otp", { error: null, username: user.username });
-			} else {
-			  // Log unsuccessful login attempt
-			  await logActivity(username, false, "Incorrect password");
-			  res.render("login", { error: "Invalid username or password" });
-			}
-		  } else {
-			// Log unsuccessful login attempt
-			await logActivity(username, false, "User not found");
-			res.render("login", { error: "Invalid username or password" });
-		  }
-		});
-	  } catch (error) {
-		console.error("Error in login route:", error);
-		res.status(500).send("Internal Server Error");
-	  }
-	}
-  );
-  app.post("/verify-otp", async (req, res) => {
-	try {
-	  const enteredOTP = req.body.otp;
-  
-	  if (enteredOTP === req.session.otp) {
-		// Log successful OTP entry and login
-		if (req.body.username) {
-		  await logActivity(req.body.username, true, "OTP entered correctly. Successful login");
-		}
-  
-		// Correct OTP, generate a session token
-		const sessionToken = crypto.randomBytes(32).toString('hex');
-  
-		// Store the session token in the session
-		req.session.authenticated = true;
-		req.session.username = req.body.username;
-		req.session.sessionToken = sessionToken;
-		console.log(`Generated Session Token: ${sessionToken}`);
-  
-		// Redirect to home page with session token
-		res.redirect("/home");
-	  } else {
-		// Log unsuccessful OTP entry
-		if (req.body.username) {
-		  await logActivity(req.body.username, false, "Incorrect OTP entered");
-		}
-  
-		// Incorrect OTP, render login page with error
-		res.render("login", { error: "Incorrect OTP. Please try again." });
-	  }
-	} catch (error) {
-	  console.error("Error in OTP verification route:", error);
-	  res.status(500).send("Internal Server Error");
-	}
-  });
+  app.post('/login', [
+    body('username').escape().trim().isLength({ min: 1 }).withMessage('Username must not be empty'),
+    body('password').escape().trim().isLength({ min: 1 }).withMessage('Password must not be empty'),
+    body('csrf_token').escape().trim().isLength({ min: 1 }).withMessage('CSRF token must not be empty'),
+],
+async (req, res) => {
+    try {
+        const errors = validationResult(req);
+
+        // Validate CSRF token
+        if (req.body.csrf_token !== req.session.csrfToken) {
+            return res.status(403).send("Invalid CSRF token");
+        }
+
+        if (!errors.isEmpty()) {
+            // Handle validation errors, e.g., return an error message to the client
+            return res.render('login', { error: 'Invalid input. Please check your credentials.', csrfToken: req.session.csrfToken });
+        }
+
+        let { username, password } = req.body;
+        username = username.trim();
+
+        const loginSql = "SELECT * FROM users WHERE username = ?";
+
+        connection.query(loginSql, [username], async (error, results) => {
+            if (error) {
+                console.error("Error executing login query:", error);
+                res.status(500).send("Internal Server Error");
+                return;
+            }
+
+            if (results.length > 0) {
+                const isLoginSuccessful = await bcrypt.compare(password, results[0].password);
+
+                if (isLoginSuccessful) {
+                    // Log successful login attempt
+                    await logActivity(username, true, "Credentials entered correctly");
+
+                    const user = results[0];
+                    const { otp, expirationTime } = generateOTP();
+
+                    // Store the OTP and expiration time in the session for verification
+                    req.session.otp = otp;
+                    req.session.otpExpiration = expirationTime;
+                    req.session.save();
+
+                    // Send OTP via email
+                    try {
+                        await sendOTPByEmail(user.email, otp);
+                        // Log successful OTP sending
+                        await logActivity(username, true, "OTP successfully sent to user");
+                    } catch (sendOTPError) {
+                        // Log unsuccessful OTP sending
+                        await logActivity(username, false, "OTP failed to send to user");
+                        console.error("Error sending OTP:", sendOTPError);
+                        res.status(500).send("Internal Server Error");
+                        return;
+                    }
+
+                    // Render OTP input page
+                    res.render("otp", { error: null, username: user.username, csrfToken: req.session.csrfToken });
+                } else {
+                    // Log unsuccessful login attempt
+                    await logActivity(username, false, "Incorrect password");
+                    res.render("login", { error: "Invalid username or password", csrfToken: req.session.csrfToken });
+                }
+            } else {
+                // Log unsuccessful login attempt
+                await logActivity(username, false, "User not found");
+                res.render("login", { error: "Invalid username or password", csrfToken: req.session.csrfToken });
+            }
+        });
+    } catch (error) {
+        console.error("Error in login route:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+// OTP verification route
+app.post("/verify-otp", [
+    body('otp').escape().trim().isLength({ min: 1 }).withMessage('OTP must not be empty'),
+    body('csrf_token').escape().trim().isLength({ min: 1 }).withMessage('CSRF token must not be empty'),
+],
+async (req, res) => {
+    try {
+        const errors = validationResult(req);
+
+        // Validate CSRF token
+        if (req.body.csrf_token !== req.session.csrfToken) {
+            return res.status(403).send("Invalid CSRF token");
+        }
+
+        if (!errors.isEmpty()) {
+            // Handle validation errors, e.g., return an error message to the client
+            return res.render('otp', { error: 'Invalid OTP. Please try again.', username: req.body.username, csrfToken: req.session.csrfToken });
+        }
+
+        const enteredOTP = req.body.otp;
+
+        if (enteredOTP === req.session.otp) {
+            // Log successful OTP entry and login
+            if (req.body.username) {
+                await logActivity(req.body.username, true, "OTP entered correctly. Successful login");
+            }
+
+            // Correct OTP, generate a session token
+            const sessionToken = crypto.randomBytes(32).toString('hex');
+
+            // Store the session token in the session
+            req.session.authenticated = true;
+            req.session.username = req.body.username;
+            req.session.sessionToken = sessionToken;
+			res.locals.csrfToken = req.session.csrfToken;
+	        console.log(`Server-side CSRF Token: ${req.session.csrfToken}`);
+            console.log(`Generated Session Token: ${sessionToken}`);
+
+            // Redirect to home page with session token
+            res.redirect("/home");
+        } else {
+            // Log unsuccessful OTP entry
+            if (req.body.username) {
+                await logActivity(req.body.username, false, "Incorrect OTP entered");
+            }
+
+            // Incorrect OTP, render login page with error
+            res.render("login", { error: "Incorrect OTP. Please try again.", csrfToken: req.session.csrfToken });
+        }
+    } catch (error) {
+        console.error("Error in OTP verification route:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
   
   app.get("/logout", (req, res) => {
 	try {
