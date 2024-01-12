@@ -1,6 +1,5 @@
 
 
-
 $(document).ready(function () {
   $('#resetPasswordLink').on('click', function () {
     $('#resetPasswordFormContainer').show();
@@ -428,6 +427,8 @@ $('#resetPasswordForm').on('submit', function (e) {
       }
     });
 });
+
+
 
   
 
