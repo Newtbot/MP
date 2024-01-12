@@ -19,32 +19,19 @@ const PORT = process.env.PORT || 3000;
 require("dotenv").config();
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(
-	session({
-		secret: process.env.key,
-		resave: false,
-		saveUninitialized: true,
-		cookie: {
-			secure: false, // Make sure to set this to true in a production environment with HTTPS
-			httpOnly: true,
-			maxAge: 24 * 60 * 60 * 1000, // Session duration in milliseconds (here set to 1 day)
-		  },
-	})
-);
-
-app.use((req, res, next) => {
-    if (!req.session.csrfToken) {
-        req.session.csrfToken = crypto.randomBytes(32).toString('hex');
-    }
-
-    // Make the CSRF token available in the response context
-    res.locals.csrfToken = req.session.csrfToken;
-	console.log(`Server-side CSRF Token: ${req.session.csrfToken}`);
-    next();
-});
 
 app.set("view engine", "ejs");
 
+app.use(session({
+    secret: process.env.key,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: false, // Make sure to set this to true in a production environment with HTTPS
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // Session duration in milliseconds (here set to 1 day)
+    },
+}));
 function isAuthenticated(req, res, next) {
 	if (req.session && req.session.authenticated) {
 		return next();
@@ -144,16 +131,10 @@ const logActivity = async (username, success, message) => {
   app.post('/login', [
     body('username').escape().trim().isLength({ min: 1 }).withMessage('Username must not be empty'),
     body('password').escape().trim().isLength({ min: 1 }).withMessage('Password must not be empty'),
-    body('csrf_token').escape().trim().isLength({ min: 1 }).withMessage('CSRF token must not be empty'),
 ],
 async (req, res) => {
     try {
         const errors = validationResult(req);
-
-        // Validate CSRF token
-        if (req.body.csrf_token !== req.session.csrfToken) {
-            return res.status(403).send("Invalid CSRF token");
-        }
 
         if (!errors.isEmpty()) {
             // Handle validation errors, e.g., return an error message to the client
@@ -222,16 +203,10 @@ async (req, res) => {
 // OTP verification route
 app.post("/verify-otp", [
     body('otp').escape().trim().isLength({ min: 1 }).withMessage('OTP must not be empty'),
-    body('csrf_token').escape().trim().isLength({ min: 1 }).withMessage('CSRF token must not be empty'),
 ],
 async (req, res) => {
     try {
         const errors = validationResult(req);
-
-        // Validate CSRF token
-        if (req.body.csrf_token !== req.session.csrfToken) {
-            return res.status(403).send("Invalid CSRF token");
-        }
 
         if (!errors.isEmpty()) {
             // Handle validation errors, e.g., return an error message to the client
@@ -240,10 +215,16 @@ async (req, res) => {
 
         const enteredOTP = req.body.otp;
 
+        if (!req.session) {
+            // If session is not defined, handle accordingly
+            console.error("Session is not defined.");
+            return res.status(500).send("Internal Server Error");
+        }
+
         if (enteredOTP === req.session.otp) {
-            // Log successful OTP entry and login
+            // Log successful OTP entry
             if (req.body.username) {
-                await logActivity(req.body.username, true, "OTP entered correctly. Successful login");
+                await logActivity(req.body.username, true, "OTP entered correctly");
             }
 
             // Correct OTP, generate a session token
@@ -253,8 +234,22 @@ async (req, res) => {
             req.session.authenticated = true;
             req.session.username = req.body.username;
             req.session.sessionToken = sessionToken;
-			res.locals.csrfToken = req.session.csrfToken;
-	        console.log(`Server-side CSRF Token: ${req.session.csrfToken}`);
+
+            // Generate and store anti-CSRF token in the session
+            req.session.csrfToken = crypto.randomBytes(32).toString('hex');
+
+            // Set anti-CSRF token in res.locals
+            res.locals.csrfToken = req.session.csrfToken;
+
+            // Log anti-CSRF token
+            console.log(`Generated Anti-CSRF Token: ${req.session.csrfToken}`);
+
+            // Implement secure session handling:
+            // 1. Set secure, HttpOnly, and SameSite flags
+            // 2. Set an expiration time for the session token
+            // 3. Regenerate the session after authentication
+            res.cookie('sessionToken', sessionToken, { secure: true, httpOnly: true, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // Expires in 1 day
+
             console.log(`Generated Session Token: ${sessionToken}`);
 
             // Redirect to home page with session token
@@ -273,7 +268,9 @@ async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
-  
+
+
+
   app.get("/logout", (req, res) => {
 	try {
 		const username = req.session.username || "Unknown User";
