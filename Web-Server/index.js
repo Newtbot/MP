@@ -3,11 +3,9 @@ const client   = require("./modules/mqtt");
 const { validateData } = require("./functions/validateData.js");
 const { insertData } = require("./functions/database.js");
 /*
-1) validate data from IoT sensor
-2) upload data to database
-3) add more routes to api
-4) add swagger documentation
-5) add middleware for authentication
+1) on data received, validate data
+2) websocket to another server
+
 */
 
 // Event handlers
@@ -22,6 +20,8 @@ client.on('connect', () => {
     if (validateData(data)) {
       //upload to db logic here
         insertData(data);
+
+      //websocket logic here??
       
     }
     else {

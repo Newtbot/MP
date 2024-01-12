@@ -842,5 +842,4 @@ module.exports = {
 	getSensorDataById,
 	getData,
 	getDatabyRange,
-	getAverage,
 };
