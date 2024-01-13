@@ -243,7 +243,8 @@ async (req, res) => {
 
             // Log anti-CSRF token
             console.log(`Generated Anti-CSRF Token: ${req.session.csrfToken}`);
-
+			// Set CSRF token as a cookie
+          
             // Implement secure session handling:
             // 1. Set secure, HttpOnly, and SameSite flags
             // 2. Set an expiration time for the session token
@@ -269,7 +270,12 @@ async (req, res) => {
     }
 });
 
+function setCSRFToken(req, res, next) {
+	res.locals.csrfToken = req.session.csrfToken;
+    next();
+}
 
+app.use(setCSRFToken);
 
   app.get("/logout", (req, res) => {
 	try {
@@ -342,7 +348,7 @@ app.get("/inusers", isAuthenticated, (req, res) => {
 		}
 
 		// Render the inusers page with JSON data
-		res.render("inusers", { allUsers });
+		res.render("inusers", { allUsers ,csrfToken: req.session.csrfToken });
 	});
 });
 function isStrongPassword(password) {
@@ -399,201 +405,144 @@ const logUserCreationActivity = async (creatorUsername, success, message) => {
 };
 
 app.post(
-	'/createUser',
-	[
-	  body('name').trim().isLength({ min: 1 }).withMessage('Name must not be empty').escape(),
-	  body('username').trim().isLength({ min: 1 }).withMessage('Username must not be empty').escape(),
-	  body('email').isEmail().withMessage('Invalid email address').normalizeEmail(),
-	  body('password').custom((value) => {
-		if (!isStrongPassword(value)) {
-		  throw new Error('Password does not meet complexity requirements');
-		}
-		return true;
-	  }),
-	  body('jobTitle').trim().isLength({ min: 1 }).withMessage('Job title must not be empty').escape(),
-	],
-	async (req, res) => {
-	  try {
-		const errors = validationResult(req);
-  
-		if (!errors.isEmpty()) {
-		  return res.status(400).json({ errors: errors.array() });
-		}
-  
-		const { name, username, email, password, jobTitle } = req.body;
-        console.log("Sanitized Input:", {
-			name,
-			username,
-			email,
-			password: "*****", // Avoid logging passwords
-			jobTitle,
-		  });
-		// Extract the username of the user creating a new user
-		const creatorUsername = req.session.username; // Adjust this based on how you store the creator's username in your session
-  
-		// Validate password complexity (additional check)
-		if (!isStrongPassword(password)) {
-		  return res
-			.status(400)
-			.json({ error: "Password does not meet complexity requirements" });
-		}
-  
-		// Check if the username is already taken
-		const checkUsernameQuery = "SELECT * FROM users WHERE username = ?";
-		connection.query(
-		  checkUsernameQuery,
-		  [username],
-		  (usernameQueryErr, usernameResults) => {
-			if (usernameQueryErr) {
-			  console.error("Error checking username:", usernameQueryErr);
-			  return res.status(500).json({ error: "Internal Server Error" });
-			}
-  
-			if (usernameResults.length > 0) {
-			  // Log unsuccessful user creation due to username taken
-			  logUserCreationActivity(creatorUsername, false, "username taken");
-			  return res
-				.status(400)
-				.json({
-				  error: "Username is already taken",
-				  message: "Username is already taken. Please choose a different username.",
-				});
-			}
-  
-			// Check if the email is already taken
-			const checkEmailQuery = "SELECT * FROM users WHERE email = ?";
-			connection.query(
-			  checkEmailQuery,
-			  [email],
-			  (emailQueryErr, emailResults) => {
-				if (emailQueryErr) {
-				  console.error("Error checking email:", emailQueryErr);
-				  return res.status(500).json({ error: "Internal Server Error" });
-				}
-  
-				if (emailResults.length > 0) {
-				  // Log unsuccessful user creation due to email taken
-				  logUserCreationActivity(creatorUsername, false, "email taken");
-				  return res
-					.status(400)
-					.json({
-					  error: "Email is already in use",
-					  message: "Email is already in use. Please choose another email.",
-					});
-				}
-  
-				// Hash the password before storing it in the database
-				bcrypt.hash(password, 10, (hashError, hashedPassword) => {
-				  if (hashError) {
-					console.error("Error hashing password:", hashError);
-					return res.status(500).json({ error: "Internal Server Error" });
-				  }
-  
-				  // Start a transaction
-				  connection.beginTransaction((transactionErr) => {
-					if (transactionErr) {
-					  console.error("Error starting transaction:", transactionErr);
-					  return res
-						.status(500)
-						.json({ error: "Internal Server Error" });
-					}
-  
-					// Define the insert query
-					const insertUserQuery =
-					  "INSERT INTO users (name, username, email, password, lastLogin, jobTitle) VALUES (?, ?, ?, ?, NULL, ?)";
-  
-					// Log the query and its parameters
-					console.log("Insert Query:", insertUserQuery);
-					console.log("Query Parameters:", [
-					  name,
-					  username,
-					  email,
-					  hashedPassword,
-					  jobTitle,
-					]);
-  
-					// Execute the query with user data
-					connection.query(
-					  insertUserQuery,
-					  [name, username, email, hashedPassword, jobTitle],
-					  (queryErr, results) => {
-						if (queryErr) {
-						  console.error("Error executing query:", queryErr);
-  
-						  // Rollback the transaction in case of an error
-						  connection.rollback((rollbackErr) => {
-							if (rollbackErr) {
-							  console.error(
-								"Error rolling back transaction:",
-								rollbackErr
-							  );
-							}
-							// Log unsuccessful user creation due to an error
-							logUserCreationActivity(
-							  creatorUsername,
-							  false,
-							  "internal error"
-							);
-							return res
-							  .status(500)
-							  .json({ error: "Internal Server Error" });
-						  });
-						  return;
-						}
-  
-						// Commit the transaction
-						connection.commit((commitErr) => {
-						  if (commitErr) {
-							console.error(
-							  "Error committing transaction:",
-							  commitErr
-							);
-							// Log unsuccessful user creation due to an error
-							logUserCreationActivity(
-							  creatorUsername,
-							  false,
-							  "internal error"
-							);
-							return res
-							  .status(500)
-							  .json({ error: "Internal Server Error" });
-						  }
-  
-						  // Log successful user creation
-						  logUserCreationActivity(
-							creatorUsername,
-							true,
-							"user created successfully"
-						  );
-  
-						  // Log the results of the query
-						  console.log("Query Results:", results);
-  
-						  // Respond with a success message
-						  res
-							.status(201)
-							.json({ message: "User created successfully" });
-						});
-					  }
-					);
-				  });
-				});
-			  }
-			);
-		  }
-		);
-	  } catch (error) {
-		console.error("Error creating user:", error);
-		// Log unsuccessful user creation due to an error
-		logUserCreationActivity(req.session.username, false, "internal error"); // Adjust this based on how you store the creator's username in your session
-		res.status(500).json({ error: "Internal Server Error" });
-	  }
-	}
-  );
+    '/createUser',
+    [
+        body('name').trim().isLength({ min: 1 }).withMessage('Name must not be empty').escape(),
+        body('username').trim().isLength({ min: 1 }).withMessage('Username must not be empty').escape(),
+        body('email').isEmail().withMessage('Invalid email address').normalizeEmail(),
+        body('password').custom((value) => {
+            if (!isStrongPassword(value)) { throw new Error('Password does not meet complexity requirements'); } return true;
+        }),
+        body('jobTitle').trim().isLength({ min: 1 }).withMessage('Job title must not be empty').escape(),
+    ],
+    async (req, res) => {
+        try {
+            const errors = validationResult(req);
 
-app.get("/forgot-password", (req, res) => {
-	res.render("forgot-password"); // Assuming you have an EJS template for this
-});
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            }
+
+            // Validate the anti-CSRF token
+            const submittedCSRFToken = req.body.csrf_token;
+
+            if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
+                return res.status(403).json({ error: 'CSRF token mismatch' });
+            }
+
+            // Extract user input
+            const { name, username, email, password, jobTitle } = req.body;
+
+            // Extract the username of the user creating a new user
+            const creatorUsername = req.session.username; // Adjust this based on how you store the creator's username in your session
+
+            // Additional password complexity check
+            if (!isStrongPassword(password)) {
+                return res.status(400).json({ error: "Password does not meet complexity requirements" });
+            }
+
+            // Check if the username is already taken
+            const checkUsernameQuery = "SELECT * FROM users WHERE username = ?";
+            connection.query(checkUsernameQuery, [username], (usernameQueryErr, usernameResults) => {
+                if (usernameQueryErr) {
+                    console.error("Error checking username:", usernameQueryErr);
+                    return res.status(500).json({ error: "Internal Server Error" });
+                }
+
+                if (usernameResults.length > 0) {
+                    // Log unsuccessful user creation due to username taken
+                    logUserCreationActivity(creatorUsername, false, "username taken");
+                    return res.status(400).json({
+                        error: "Username is already taken",
+                        message: "Username is already taken. Please choose a different username."
+                    });
+                }
+
+                // Check if the email is already taken
+                const checkEmailQuery = "SELECT * FROM users WHERE email = ?";
+                connection.query(checkEmailQuery, [email], (emailQueryErr, emailResults) => {
+                    if (emailQueryErr) {
+                        console.error("Error checking email:", emailQueryErr);
+                        return res.status(500).json({ error: "Internal Server Error" });
+                    }
+
+                    if (emailResults.length > 0) {
+                        // Log unsuccessful user creation due to email taken
+                        logUserCreationActivity(creatorUsername, false, "email taken");
+                        return res.status(400).json({
+                            error: "Email is already in use",
+                            message: "Email is already in use. Please choose another email."
+                        });
+                    }
+
+                    // Hash the password before storing it in the database
+                    bcrypt.hash(password, 10, (hashError, hashedPassword) => {
+                        if (hashError) {
+                            console.error("Error hashing password:", hashError);
+                            return res.status(500).json({ error: "Internal Server Error" });
+                        }
+
+                        // Start a transaction
+                        connection.beginTransaction((transactionErr) => {
+                            if (transactionErr) {
+                                console.error("Error starting transaction:", transactionErr);
+                                return res.status(500).json({ error: "Internal Server Error" });
+                            }
+
+                            // Define the insert query
+                            const insertUserQuery =
+                                "INSERT INTO users (name, username, email, password, lastLogin, jobTitle) VALUES (?, ?, ?, ?, NULL, ?)";
+
+                            // Log the query and its parameters
+                            console.log("Insert Query:", insertUserQuery);
+                            console.log("Query Parameters:", [name, username, email, hashedPassword, jobTitle]);
+
+                            // Execute the query with user data
+                            connection.query(insertUserQuery, [name, username, email, hashedPassword, jobTitle], (queryErr, results) => {
+                                if (queryErr) {
+                                    console.error("Error executing query:", queryErr);
+
+                                    // Rollback the transaction in case of an error
+                                    connection.rollback((rollbackErr) => {
+                                        if (rollbackErr) {
+                                            console.error("Error rolling back transaction:", rollbackErr);
+                                        }
+                                        // Log unsuccessful user creation due to an error
+                                        logUserCreationActivity(creatorUsername, false, "internal error");
+                                        return res.status(500).json({ error: "Internal Server Error" });
+                                    });
+                                    return;
+                                }
+
+                                // Commit the transaction
+                                connection.commit((commitErr) => {
+                                    if (commitErr) {
+                                        console.error("Error committing transaction:", commitErr);
+                                        // Log unsuccessful user creation due to an error
+                                        logUserCreationActivity(creatorUsername, false, "internal error");
+                                        return res.status(500).json({ error: "Internal Server Error" });
+                                    }
+
+                                    // Log successful user creation
+                                    logUserCreationActivity(creatorUsername, true, "user created successfully");
+
+                                    // Redirect to "/inusers"
+                                    res.redirect('/inusers');
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        } catch (error) {
+            console.error("Error creating user:", error);
+            // Log unsuccessful user creation due to an error
+            logUserCreationActivity(req.session.username, false, "internal error"); // Adjust this based on how you store the creator's username in your session
+            res.status(500).json({ error: "Internal Server Error" });
+        }
+    }
+);
+
 
 app.get("/forgot-password", (req, res) => {
 	res.render("forgot-password", { error: null, success: null });
@@ -777,8 +726,14 @@ app.get("/reset-password/:token", (req, res) => {
 	});
 });
 app.post("/reset-password", async (req, res) => {
-    const { username, password, confirmPassword } = req.body;
+	
+    const { username, password, confirmPassword, csrf_token } = req.body;
     const creatorUsername = req.session.username;
+	const submittedCSRFToken = req.body.csrf_token;
+
+	if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
+		return res.status(403).json({ error: 'CSRF token mismatch' });
+	}
 
     // Sanitize the inputs
     const sanitizedUsername = validator.escape(username);
@@ -899,13 +854,20 @@ app.get('/api/users', (req, res) => {
 	});
   });
   
-  // Route to delete a user by username
-  
   app.delete('/api/deleteUser/:username', async (req, res) => {
 	const { username } = req.params;
 	const query = 'DELETE FROM users WHERE username = ?';
 	const creatorUsername = req.session.username;
+  
 	try {
+	  // Extract CSRF token from the request body
+	  const { csrfToken } = req.body;
+  
+	  // Compare CSRF token with the one stored in the session
+	  if (csrfToken !== req.session.csrfToken) {
+		return res.status(403).json({ success: false, error: 'CSRF token mismatch' });
+	  }
+  
 	  // Log deletion activity to USER_LOGS
 	  const deletionActivity = `User ${username} has been successfully deleted`;
 	  const logQuery = 'INSERT INTO USER_LOGS (USERNAME, ACTIVITY, TIMESTAMP) VALUES (?, ?, CURRENT_TIMESTAMP)';
@@ -924,6 +886,7 @@ app.get('/api/users', (req, res) => {
 	  res.status(500).json({ success: false, error: 'Internal Server Error', details: error.message });
 	}
   });
+  
   
   async function executeQuery(sql, values) {
 	return new Promise((resolve, reject) => {

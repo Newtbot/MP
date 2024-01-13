@@ -122,6 +122,7 @@
                 <input type="password" name="confirmPassword" id="resetConfirmPassword" placeholder="Confirm new password" required>
               </div>
             </div>
+            <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
             <div class="button">
               <input type="submit" value="Reset Password">
             </div>
@@ -129,6 +130,7 @@
         </div>
       </div>
     </div>
+  </div>
     <div id="deleteUserContainer" style="display: none;">
       <h3>Delete User</h3>
       <div class="search-container">
@@ -137,7 +139,9 @@
       </div>
       <div id="searchResultsContainer" style="display: none;">
         <h4>Search Results</h4>
-        <ul id="searchResultsList"></ul>
+        <ul id="searchResultsList">
+          <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+        </ul>
       </div>
     </div>
 
