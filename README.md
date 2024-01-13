@@ -9,6 +9,6 @@ i repeat DO NOT USE CREDS IN CODE! Please use .env files (https://www.npmjs.com/
 1) Ti Seng
 * Webserver Microservices 
 * IoT sensor
-
+* All Database / Backend Functions
 2) Sean
 Admin Website Microservice
