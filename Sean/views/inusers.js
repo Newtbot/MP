@@ -1,5 +1,3 @@
-
-
 $(document).ready(function () {
   $('#resetPasswordLink').on('click', function () {
     $('#resetPasswordFormContainer').show();
@@ -177,13 +175,22 @@ function displaySearchResults(users) {
     $('#searchResultsContainer').hide();
   }
 }
+
 // Event listener for delete user button in search results
 $('#searchResultsList').on('click', '.deleteUserButton', function () {
   const usernameToDelete = $(this).data('username');
+  const csrfToken = $('[name="csrf_token"]').val(); // Access the CSRF token by name
+
+  console.log(csrfToken);
   console.log('Before fetch for user deletion');
-  // Make a fetch request to delete the user
+
+  // Make a fetch request to delete the user with CSRF token in headers
   fetch(`/api/deleteUser/${usernameToDelete}`, {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ csrfToken }), // Include CSRF token in the request body
   })
   .then(response => {
     console.log('Inside fetch response handler');
@@ -277,8 +284,7 @@ function resetFormFields() {
         $('#confirmPassword').val('');
         $('#jobTitle').val('');
       }
-
-
+      const csrf_token = $('#userForm input[name="csrf_token"]').val();
       $('#userForm').on('submit', function (e) {
       e.preventDefault();
 
@@ -298,38 +304,40 @@ function resetFormFields() {
         alert('Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.');
         return;
       }
-
+    
       fetch('/createUser', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
+            
         },
         body: JSON.stringify({
-          name: name,
-          username: username,
-          email: email,
-          password: password,
-          jobTitle: jobTitle,
+            name: name,
+            username: username,
+            email: email,
+            password: password,
+            jobTitle: jobTitle,
+            csrf_token: csrf_token, // Include the CSRF token in the body
         }),
-      })
+    })
         .then(response => {
-          if (response.status === 201) {
-            // Status 201 indicates successful creation
-            return response.json();
-          } else {
-            return response.json().then(data => {
-              throw new Error(data.error || `HTTP error! Status: ${response.status}`);
-            });
-          }
+            if (response.status === 201) {
+                // Status 201 indicates successful creation
+                return response.json();
+            } else {
+                return response.json().then(data => {
+                    throw new Error(data.error || `HTTP error! Status: ${response.status}`);
+                });
+            }
         })
         .then(data => {
-          console.log('User registration success:', data);
-          alert('User registered successfully!');
-          resetFormFields();
+            console.log('User registration success:', data);
+            alert('User registered successfully!');
+            resetFormFields();
         })
         .catch(error => {
-          console.error('User registration error:', error);
-          handleRegistrationError(error);
+            console.error('User registration error:', error);
+            handleRegistrationError(error);
         });
     });
 
@@ -368,7 +376,7 @@ $('#resetPasswordForm').on('submit', function (e) {
   const username = $('#resetUsername').val();
   const password = $('#resetPassword').val();
   const confirmPassword = $('#resetConfirmPassword').val();
-
+  const csrf_token = $('#userForm input[name="csrf_token"]').val();
   console.log('Username:', username);
   console.log('New Password:', password);
 
@@ -384,8 +392,7 @@ $('#resetPasswordForm').on('submit', function (e) {
     return;
   }
 
-  // Make a fetch request
-  fetch('/reset-password', {
+ fetch('/reset-password', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -394,6 +401,7 @@ $('#resetPasswordForm').on('submit', function (e) {
         username: username,
         password: password,
         confirmPassword: confirmPassword,
+        csrf_token: csrf_token
       }),
     })
     .then(response => {
@@ -431,4 +439,3 @@ $('#resetPasswordForm').on('submit', function (e) {
 
 
   
-
