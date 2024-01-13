@@ -231,6 +231,7 @@ buildQuery = {
 					queryString.month
 				);
 			} else {
+				queryString.month = getMonthFromString(queryString.month)
 				whereClause.month = sequelize.where(
 					sequelize.fn("MONTH", sequelize.col("createdAt")),
 					queryString.month

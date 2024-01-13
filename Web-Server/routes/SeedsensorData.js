@@ -43,7 +43,6 @@ function firstDataRow(startDate, sensorId, locationId) {
 		sensorid: sensorId,
 		locationid: locationId,
 		measurement: {
-			//console.log(Math.floor(Math.random() * 30) + 5)
 			psi: Math.floor(Math.random() * 30) + 5,
 			humidity: Math.floor(Math.random() * (90 - 80 + 1) + 80),
 			o3: Math.floor(Math.random() * (100 - 20 + 1) + 30),
@@ -77,17 +76,19 @@ function nextDataRow(currentRow, interval) {
 }
 
 function numberWithinPercent(inputNumber) {
-	//random percent with max of 1 and min of -1
-	const percent = Math.random() * 1 - Math.random();
-
-    const range = inputNumber * percent;
-
-    const randomOffset = Math.random() * range;
-
-    const newNumber = inputNumber + randomOffset;
-
-    return Math.floor(newNumber);
-}
+	// Define a reasonable range for the random offset
+	const maxOffset = 5;
+	const minOffset = -5;
+  
+	// Add a random offset within the defined range
+	const randomOffset = Math.random() * (maxOffset - minOffset) + minOffset;
+	
+	// Calculate the new number with the offset
+	const newNumber = inputNumber + randomOffset;
+  
+	// Ensure the new number is within a reasonable range
+	return Math.max(5, Math.min(100, Math.floor(newNumber)));
+  }
 
 //add seed
 router.post("/new", async (req, res, next) => {

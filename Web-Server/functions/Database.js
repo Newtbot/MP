@@ -1,5 +1,6 @@
 const { sequelize }  = require("../../Database/mySql.js");
 const { api_log_Model } = require("../../Database/model/apiLogModel.js"); 
+const { sensorDataModel } = require("../../Database/model/sensorDataModel.js");
 
 async function insertLogData(log){
     try{
@@ -18,10 +19,23 @@ async function insertLogData(log){
     (error){
         console.error(error);
     }
+}
+
+async function insertDatatoDB(data) {
+    try {
+        sensorDataModel.create({
+            sensorid: data.sensorid,
+            locationid: data.locationid,
+            measurement: data.measurement,
+        });
+    }
+    catch (error) {
+        console.error(error);
+    }
 
 }
 
-module.exports = { insertLogData };
+module.exports = { insertLogData , insertDatatoDB};
 
 
 
