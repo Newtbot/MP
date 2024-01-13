@@ -4,3 +4,10 @@ How to get started with this project?
 
 Security in GIT repo.
 i repeat DO NOT USE CREDS IN CODE! Please use .env files (https://www.npmjs.com/package/dotenv)
+
+## Workload
+1) Ti Seng
+Webserver Microservices 
+IoT sensor
+2) Sean
+Admin Website Microservice
