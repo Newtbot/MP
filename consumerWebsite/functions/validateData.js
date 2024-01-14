@@ -23,11 +23,8 @@ function isJson(value) {
 }
 
 module.exports = {
-	validateData,
-	isValidDateString,
 	isAlphaNumericwithSpaces,
 	isAlphaNumericWithSpacesAndDash,
-	isMacAddress,
 	isJson,
 };
 

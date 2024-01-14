@@ -18,7 +18,7 @@ client.on("connect", () => {
 
 client.on("end", () => {
 	console.log("Disconnected from MQTT broker");
-	client.reconnect = true;
+	client.reconnect();
 });
 
 client.on("error", (err) => {
@@ -30,5 +30,9 @@ client.on("error", (err) => {
 setInterval(publishData, 900000);
 //every 1 minute
 //setInterval(publishData, 60000);
+
+
+
+
 
 
