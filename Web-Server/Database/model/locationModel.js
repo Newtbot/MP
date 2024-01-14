@@ -1,7 +1,7 @@
 "use strict";
 const { Sequelize, DataTypes } = require("sequelize");
 const { sequelize } = require("../mySQL");
-const { isAlphaNumericwithSpaces } = require('../../Web-Server/functions/validateData')
+const { isAlphaNumericwithSpaces } = require('../../functions/validateData')
 
 //sequelize.sync();
 const locationModel = sequelize.define(

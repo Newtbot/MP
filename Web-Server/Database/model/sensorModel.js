@@ -6,7 +6,7 @@ const {
 	isAlphaNumericwithSpaces,
 	isAlphaNumericWithSpacesAndDash,
 	isMacAddress,
-} = require("../../Web-Server/functions/validateData");
+} = require('../../functions/validateData');
 
 //sequelize.sync();
 const sensorModel = sequelize.define(

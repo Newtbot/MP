@@ -1,6 +1,6 @@
-const { sequelize } = require("../../Database/mySql.js");
-const { locationModel } = require("../../Database/model/locationModel.js");
-const { sensorModel } = require("../../Database/model/sensorModel.js");
+const { sequelize } = require("../Database/mySql.js");
+const { locationModel } = require("../Database/model/locationModel.js");
+const { sensorModel } = require("../Database/model/sensorModel.js");
 
 const express = require("express");
 const router = express.Router();

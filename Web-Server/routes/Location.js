@@ -1,5 +1,3 @@
-const { sequelize } = require("../../Database/mySql.js");
-const { locationModel } = require("../../Database/model/locationModel.js");
 const {
 	addLocation,
 	getLocation,

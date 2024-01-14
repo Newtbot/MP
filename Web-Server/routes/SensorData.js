@@ -1,5 +1,3 @@
-const { sequelize } = require("../../Database/mySql.js");
-const { sensorDataModel } = require("../../Database/model/sensorDataModel.js");
 const {
 	getSensorData,
 	addSensorData,

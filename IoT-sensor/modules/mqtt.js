@@ -1,7 +1,7 @@
 const mqtt = require('mqtt');
 const fs = require('fs');
 const path = require('path')
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') })
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
 
 const brokerUrl = 'mqtt://mqtt.teeseng.uk';
 const options = {
@@ -9,8 +9,8 @@ const options = {
   username: process.env.MQTT_USER, 
   password: process.env.MQTT_PASS, 
   protocol: 'mqtts', 
-    key: fs.readFileSync(path.resolve(__dirname, '../../cert/privkey.pem')),
-    cert: fs.readFileSync(path.resolve(__dirname, '../../cert/cert.pem')), 
+    key: fs.readFileSync(path.resolve(__dirname, '../cert/privkey.pem')),
+    cert: fs.readFileSync(path.resolve(__dirname, '../cert/cert.pem')), 
 
 };
 

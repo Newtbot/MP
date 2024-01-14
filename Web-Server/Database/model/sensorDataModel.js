@@ -3,7 +3,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 const { sequelize } = require("../mySQL");
 const { locationModel } = require("./locationModel");
 const { sensorModel } = require("./sensorModel");
-const { isJson } = require("../../Web-Server/functions/validateData");
+const { isJson } = require('../../functions/validateData');
 
 sequelize.sync();
 const sensorDataModel = sequelize.define(
