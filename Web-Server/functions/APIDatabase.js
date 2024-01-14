@@ -1,7 +1,7 @@
-const { sequelize } = require("../../Database/mySql.js");
-const { locationModel } = require("../../Database/model/locationModel.js");
-const { sensorModel } = require("../../Database/model/sensorModel.js");
-const { sensorDataModel } = require("../../Database/model/sensorDataModel.js");
+const { sequelize }  = require("../Database/mySql.js");
+const { locationModel } = require("../Database/model/locationModel.js");
+const { sensorModel } = require("../Database/model/sensorModel.js");
+const { sensorDataModel } = require("../Database/model/sensorDataModel.js");
 const { Op, Sequelize } = require("sequelize");
 
 //helper function to convert month name to month number
