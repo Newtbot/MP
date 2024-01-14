@@ -9,7 +9,7 @@ function isAlphaNumericWithSpacesAndDash(value) {
 	const alphanumeric = /^[a-zA-Z0-9]+$/;
 	const valid = value
 		.split("")
-		.every((char) => alphanumeric.test(char) || char === " " || char === "-");
+		.every((char) => alphanumeric.test(char) || char === " " || char === "-" || char === "_");
 	return valid;
 }
 
@@ -22,9 +22,25 @@ function isJson(value) {
 
 }
 
+/*
+//https://stackoverflow.com/questions/35145838/regex-for-singapore-addresses
+2 Orchard Turn #B4-47 ION ORCHARD Singapore 238801
+
+68 Marine Parade Road #03-26B parkway Parade 449269
+
+Nanyang Polytechnic 180 Ang Mo Kio Avenue 8 Singapore 569830
+*/
+function isAddress(value){
+	//  (\d{1,3}.)?.+\s(\d{6})$
+	const addressRegex = /^(\d{1,3}.)?.+\s(\d{6})$/;
+	//return true if it matches
+	return addressRegex.test(value);
+}
+
 module.exports = {
 	isAlphaNumericwithSpaces,
 	isAlphaNumericWithSpacesAndDash,
 	isJson,
+	isAddress
 };
 
