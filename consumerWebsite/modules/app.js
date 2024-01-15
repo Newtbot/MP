@@ -12,16 +12,11 @@ app.disable("x-powered-by");
 app.use(express.json());
 app.set("json spaces", 2);
 
-
 //middleware logic ( called by next() )
-
-//app.use('/api/v0', require('../middleware/ApiKey.js'));
-a//pp.use('/api/v0', APIlogger, require('../routes/api_route.js'));
+//app.use('/api/v0', APIlogger, require('../routes/api_route.js'));
 
 //route logic
-//app.use("/api/v0", require("../routes/api_route.js"));
-
-
+app.use("/api/v0", require("../routes/api_routes")); //consumerWebsite\routes\api_routes.js
 
 // Catch 404 and forward to error handler. If none of the above routes are
 // used, this is what will be called.

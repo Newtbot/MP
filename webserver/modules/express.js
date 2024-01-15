@@ -2,6 +2,7 @@ const express = require("express");
 const helmet = require("helmet");
 const { rateLimit } = require("express-rate-limit");
 const { APIlogger } = require('../middleware/apiLogger.js');
+const { apikeyCheck } = require('../middleware/apiKey.js');
 
 const app = express();
 app.use(helmet());
@@ -30,14 +31,10 @@ app.set("json spaces", 2);
 /*
 middleware logic ( called by next() )
 */
-//app.use('/api/v0', require('../middleware/ApiKey.js'));
-app.use('/api/v0', APIlogger, require('../routes/api_route.js'));
+app.use("/api/seed/v0", [ apikeyCheck , APIlogger] ,require("../routes/seed_route.js"));
+app.use('/api/v0', [apikeyCheck, APIlogger] ,require("../routes/api_route.js")); //webserver\routes\api_route.js
 
-//route logic
-app.use("/api/v0", require("../routes/api_route.js"));
 
-//seed logic
-app.use("/api/seed/v0", require("../routes/seed_route.js"));
 
 // Catch 404 and forward to error handler. If none of the above routes are
 // used, this is what will be called.
