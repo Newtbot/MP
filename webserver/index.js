@@ -62,5 +62,5 @@ client.on("error", (err) => {
 
 client.on("end", () => {
 	console.log("Disconnected from MQTT broker");
-	client.reconnect = true;
+	client.reconnect();
 });
