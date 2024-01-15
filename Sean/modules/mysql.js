@@ -40,14 +40,8 @@ const connection = mysql.createConnection({
 	timezone: "Z", // Set the timezone to UTC
   });
 
-  const connection2 = mysql.createConnection({
-	host: process.env.host,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: "eco_saver",
-	timezone: "Z", // Set the timezone to UTC
-  });  
-module.exports = { connection,connection2 };
+ 
+module.exports = { connection, };
 
 
   
