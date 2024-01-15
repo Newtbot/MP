@@ -11,7 +11,7 @@ const validator = require('validator');
 
 const { transporter } = require("./modules/nodeMailer");
 const { connection } = require("./modules/mysql"); 
-const { connection2 } = require("./modules/mysql"); 
+
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -302,39 +302,14 @@ app.use(setCSRFToken);
   });
   
 
- 
-  
-  
-
   app.get("/home", isAuthenticated, (req, res) => {
-	
-	// Retrieve the last 10 sensor data records from the sensordata table
-	const sensorDataQuery =
-	  "SELECT locationid, measurement, createdAt FROM sensordata ORDER BY createdAt DESC LIMIT 10";
-  
-	connection2.query(sensorDataQuery, (error, sensorDataResults) => {
-	  if (error) {
-		console.error("Error executing sensor data query:", error);
-		res.status(500).send("Internal Server Error");
-		return;
-	  }
 	  // Render the home page with sensor data
 	  res.render("home", {
 		username: req.session.username,
-		sensorData: sensorDataResults,
 	  });
 	});
-  });
- app.get('/api/locations', (req, res) => {
-  connection2.query('SELECT `id`, `name` FROM `locations`', (error, results) => {
-    if (error) {
-      console.error('Error fetching locations:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-      return;
-    }
-    res.json(results);
-  });
-});
+
+
   
 app.get("/inusers", isAuthenticated, (req, res) => {
 	// Fetch all user data from the database
