@@ -21,7 +21,7 @@ router.get("/", async (req, res, next) => {
 		next(error);
 	}
 });
-/*
+
 router.post("/new", async (req, res, next) => {
 	try {
 		const { id, id_sensor, id_location, sensordata } = req.body;
@@ -54,7 +54,6 @@ router.delete("/delete", async (req, res, next) => {
 		next(error);
 	}
 });
-*/
 router.get("/data", async (req, res, next) => {
     try {
 		console.log(req.query);

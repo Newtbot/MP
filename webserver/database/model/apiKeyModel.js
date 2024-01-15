@@ -3,7 +3,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 const { sequelize } = require("../mySQL");
 const { userModel } = require("./userModel");
 
-sequelize.sync();
+//sequelize.sync();
 const apikeyModel = sequelize.define(
 	"apikey",
 	{

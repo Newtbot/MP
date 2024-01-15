@@ -1,6 +1,7 @@
 const { sequelize }  = require("../Database/mySql.js");
 const { api_log_Model } = require("../Database/model/apiLogModel.js"); 
 const { sensorDataModel } = require("../Database/model/sensorDataModel.js");
+const { apikeyModel } = require("../Database/model/apiKeyModel.js");
 
 async function insertLogData(log){
     try{
@@ -32,10 +33,19 @@ async function insertDatatoDB(data) {
     catch (error) {
         console.error(error);
     }
+}
+
+async function checkAPikey(unverified){
+    const apikey = apikeyModel.findOne({
+        where: {
+            apikey: unverified
+        }
+    });
+    return apikey;
 
 }
 
-module.exports = { insertLogData , insertDatatoDB};
+module.exports = { insertLogData , insertDatatoDB , checkAPikey};
 
 
 

@@ -1,6 +1,8 @@
 //location
 //get all
 curl localhost/api/v0/location
+curl localhost/api/v0/location -H "Authorization: ${1a3eabe1-e1b2-46df-b846-585540c68368}"
+
 
 //get id
 curl http://localhost/api/v0/location/3
@@ -159,3 +161,13 @@ http://localhost/api/v0/sensor-data/filter?windspeed=highest&limit=1
 
 //pagination
 http://localhost/api/v0/sensor-data/data?week=1&sensorid=1&locationid=1&page=2&pagesize=10
+
+
+
+
+
+curl localhost/api/v0/user/new -H "Content-Type: application/json" -X POST -d '{"username": "testuser", "password": "thisisthesystemuserpasswordnoob", "email": "testuser@ecosaver.com", "address": "Nanyang Polytechnic 180 Ang Mo Kio Avenue 8 Singapore 569830", "phone": "12345678"}'
+
+
+
+curl localhost/api/v0/apikey/new -H "Content-Type: application/json" -X POST -d '{"userid": 1, "permission": "canWrite"'
