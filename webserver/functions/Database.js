@@ -2,7 +2,7 @@ const { sequelize } = require("../Database/mySql.js");
 const { api_log_Model } = require("../Database/model/apiLogModel.js");
 const { sensorDataModel } = require("../Database/model/sensorDataModel.js");
 const { apikeyModel } = require("../Database/model/apiKeyModel.js");
-const { compareAPIKey } = require("../functions/bcrypt.js");
+const { compareAPIKey } = require("./bcrypt.js");
 
 async function insertLogData(log) {
 	try {
