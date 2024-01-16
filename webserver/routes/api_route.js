@@ -26,6 +26,9 @@ router.use('/sensor', require('./sensor'))
 //sensor data route
 router.use('/sensor-data', require('./sensorData'));
 
+//log route
+//router.use('/log', require('./logLog'));
+
 
 
 
