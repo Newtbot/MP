@@ -6,7 +6,7 @@ const {
 	isAddress,
 } = require("../../functions/validateData");
 
-sequelize.sync();
+//sequelize.sync();
 const userModel = sequelize.define(
 	"user",
 	{
