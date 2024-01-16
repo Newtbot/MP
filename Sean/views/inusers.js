@@ -59,81 +59,7 @@ $('#logsLink').on('click', function () {
 
   fetchLogs();
 });
-function fetchLogs() {
-  // Make a fetch request to your server endpoint for logs
-  fetch('/api/getLogs')
-    .then(response => response.json())
-    .then(logs => {
-      // Process and display logs in the logs container
-      displayLogs(logs);
-    })
-    .catch(error => {
-      console.error('Error fetching logs:', error);
-      // Handle errors, e.g., display an alert
-    });
-}
 
-// Update the displayLogs function to generate a table
-function displayLogs(logs) {
-  const logsContainer = $('#logsContainer');
-
-  // Clear previous logs
-  logsContainer.empty();
-
-  if (logs && logs.length > 0) {
-    // Create the table and header row
-    const table = $('<table>').addClass('logs-table');
-    const headerRow = '<tr><th>ID</th><th>Username</th><th>Activity</th><th>Timestamp</th></tr>';
-    table.append(headerRow);
-
-    // Add each log as a row in the table
-    logs.forEach(log => {
-      const row = `<tr><td>${log.id}</td><td>${log.username}</td><td>${log.activity}</td><td>${log.timestamp}</td></tr>`;
-      table.append(row);
-    });
-
-    // Append the table to the logsContainer
-    logsContainer.append(table);
-
-    // Add a download button at the top with the current date and time in the file name
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split('T')[0];
-    const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '-');
-    const downloadButton = $('<button>').text('Download Log').on('click', function () {
-      downloadLogs(logs, `log_${formattedDate}_${formattedTime}.csv`);
-    });
-
-    // Prepend the download button to the logsContainer
-    logsContainer.prepend(downloadButton);
-  } else {
-    // Display a message if no logs are available
-    logsContainer.html('<p>No logs available.</p>');
-  }
-}
-
-function downloadLogs(logs, filename) {
-  if (logs && logs.length > 0) {
-    const csvContent = 'data:text/csv;charset=utf-8,';
-    const header = 'ID,Username,Activity,Timestamp\n';
-    const rows = logs.map(log => `${log.id},${log.username},${log.activity},"${log.timestamp}"`).join('\n');
-    const data = header + rows;
-    const encodedData = encodeURI(csvContent + data);
-
-    // Create a hidden anchor element to trigger the download
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedData);
-    link.setAttribute('download', 'logs.csv');
-    document.body.appendChild(link);
-
-    // Trigger the download
-    link.click();
-
-    // Remove the link from the DOM
-    document.body.removeChild(link);
-  } else {
-    console.error('No logs available for download.');
-  }
-}
 });
 
 function searchUser(username) {
@@ -321,7 +247,7 @@ function resetFormFields() {
         }),
     })
         .then(response => {
-            if (response.status === 201) {
+            if (response.ok) {
                 // Status 201 indicates successful creation
                 return response.json();
             } else {
@@ -436,6 +362,158 @@ $('#resetPasswordForm').on('submit', function (e) {
     });
 });
 
+// Declare a variable to store fetched logs
+let logs = [];
+
+// Function to fetch logs from the server
+function fetchLogs() {
+  // Make a fetch request to your server endpoint for logs
+  fetch('/api/getLogs')
+    .then(response => response.json())
+    .then(data => {
+      // Assign the logs to the variable
+      logs = data;
+
+      // Process and display logs in the logs container
+      displayLogs(logs);
+    })
+    .catch(error => {
+      console.error('Error fetching logs:', error);
+      // Handle errors, e.g., display an alert
+    });
+}
+
+// Update the displayLogs function to generate a table
+function displayLogs(logs) {
+  const logsContainer = $('#logsContainer');
+
+  // Clear previous logs and date filter elements
+  logsContainer.empty();
+
+  if (logs && logs.length > 0) {
+    // Add date filter elements
+    logsContainer.append(`
+      <label for="datePicker">Filter by Date:</label>
+      <input type="text" id="datePicker">
+      <button onclick="applyDateFilter()">Apply Filter</button>
+    `);
+
+    // Create the table and header row
+    const table = $('<table>').addClass('logs-table');
+    const headerRow = '<tr><th>ID</th><th>Username</th><th>Activity</th><th>Timestamp</th></tr>';
+    table.append(headerRow);
+
+    // Add each log as a row in the table
+    logs.forEach(log => {
+      const row = `<tr><td>${log.id}</td><td>${log.username}</td><td>${log.activity}</td><td>${log.timestamp}</td></tr>`;
+      table.append(row);
+    });
+
+    // Append the table to the logsContainer
+    logsContainer.append(table);
+
+    // Add a download button at the top with the current date and time in the file name
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '-');
+    const downloadButton = $('<button>').text('Download Log').on('click', function () {
+      downloadLogs(logs, `log_${formattedDate}_${formattedTime}.csv`);
+    });
+
+    // Prepend the download button to the logsContainer
+    logsContainer.prepend(downloadButton);
+  } else {
+    // Display a message if no logs are available
+    logsContainer.html('<p>No logs available.</p>');
+  }
+
+  // Initialize Flatpickr for the date picker
+  flatpickr("#datePicker", {
+    dateFormat: "m/d/Y, h:i:S K", // Adjust the format to match your logs timestamp format
+  });
+}
+
+// Function to apply date filter
+function applyDateFilter() {
+  const selectedDate = $("#datePicker").val();
+
+  const formattedSelectedDate = new Date(selectedDate).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
+  const filteredLogs = logs.filter(log => {
+    const formattedLogDate = new Date(log.timestamp).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    return formattedLogDate === formattedSelectedDate;
+  });
 
 
-  
+  displayLogs(filteredLogs);
+}
+
+function downloadLogs(logs, filename) {
+  if (logs && logs.length > 0) {
+    const csvContent = 'data:text/csv;charset=utf-8,';
+    const header = 'ID,Username,Activity,Timestamp\n';
+    const rows = logs.map(log => `${log.id},${log.username},${log.activity},"${log.timestamp}"`).join('\n');
+    const data = header + rows;
+    const encodedData = encodeURI(csvContent + data);
+
+    // Create a hidden anchor element to trigger the download
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedData);
+    link.setAttribute('download', 'logs.csv');
+    document.body.appendChild(link);
+
+    // Trigger the download
+    link.click();
+
+    // Remove the link from the DOM
+    document.body.removeChild(link);
+  } else {
+    console.error('No logs available for download.');
+  }
+}
+fetchLogs();
+
+
+
+// Assuming EJS is properly configured to evaluate expressions
+
+
+// Assuming allUsers is an array containing user information
+const user = allUsers.find(user => user.username === currentUsername);
+const userRole = user?.jobTitle;
+console.log('All Users:', allUsers);
+console.log('Current Username:', currentUsername);
+
+// Log the user role to the console
+console.log('User Role:', userRole);
+
+// Function to enable/disable actions based on user role
+function handleUserRoleAccess() {
+  // Disable user creation, deletion, and password reset for non-admin users
+  if (userRole !== 'admin') {
+    document.getElementById('addUserLink').style.display = 'none';
+    document.getElementById('deleteUserLink').style.display = 'none';
+    document.getElementById('resetPasswordLink').style.display = 'none';
+    
+  }
+
+  // Allow admin users to view logs
+  if (userRole === 'admin') {
+    document.getElementById('logsLink').classList.remove('hidden');
+  }
+}
+
+// Call the function to handle user role access when the page loads
+handleUserRoleAccess();
