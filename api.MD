@@ -1,7 +1,8 @@
 //location
 //get all
 curl localhost/api/v0/location
-curl localhost/api/v0/location -H "Authorization: ${1a3eabe1-e1b2-46df-b846-585540c68368}"
+curl localhost/api/v0/location -H "Authorization: 1-1ec4ce9d-bcff-46c4-a023-c34171b9ca51"
+curl localhost/api/v0/location -H "Authorization: 2-eb0c08b0-250a-4249-8a87-11141e2ff8fb"
 
 
 //get id
@@ -10,18 +11,23 @@ curl http://localhost/api/v0/location/3
 //post
 curl localhost/api/v0/location/new -H "Content-Type: application/json" -X POST -d '{"name": "SAMPLE", "added_by": "system" , "description": "test"}'
 
+curl localhost/api/v0/location/new -H "Content-Type: application/json" -H "Authorization: 1-1ec4ce9d-bcff-46c4-a023-c34171b9ca51" -X POST -d '{"name": "SAMPLE", "added_by": "system", "description": "test"}'
+
+curl localhost/api/v0/location/new -H "Content-Type: application/json" -H "Authorization: 2-eb0c08b0-250a-4249-8a87-11141e2ff8fb" -X POST -d '{"name": "SAMPLE", "added_by": "system", "description": "test"}'
+
 status: 200
 added_name allowed: system , admin
 name allowed: shld contain alphanumeric only
 
 //put
-curl localhost/api/v0/location/update -X PUT -H "Content-Type: application/json" -d '{"id": "2" , "name": "test", "added_by": "noot", "description": "test12344444444"}'
+curl localhost/api/v0/location/update -X PUT -H "Content-Type: application/json" -H "Authorization: 1-1ec4ce9d-bcff-46c4-a023-c34171b9ca51" -d '{"id": "7", "name": "test", "added_by": "system", "description": "test12344444444"}'
 
 status: 200
 "message": "Location 13 updated"
 
 //delete
-curl localhost/api/v0/location/delete -X DELETE -H "Content-Type: application/json" -d '{"id": "6" }'
+curl localhost/api/v0/location/delete -X DELETE -H "Content-Type: application/json" -H "Authorization: 1-1ec4ce9d-bcff-46c4-a023-c34171b9ca51" -d '{"id": "7"}'
+
 status: 200
 {
 "message": "Location 13 deleted"
@@ -166,8 +172,9 @@ http://localhost/api/v0/sensor-data/data?week=1&sensorid=1&locationid=1&page=2&p
 
 
 
+curl localhost/api/v0/user/new -H "Content-Type: application/json" -X POST -d '{"username": "system", "password": "thisisthesystemuserpasswordnoob", "email": "system@ecosaver.com", "address": "Nanyang Polytechnic 180 Ang Mo Kio Avenue 8 Singapore 569830", "phone": "12345678"}'
+
 curl localhost/api/v0/user/new -H "Content-Type: application/json" -X POST -d '{"username": "testuser", "password": "thisisthesystemuserpasswordnoob", "email": "testuser@ecosaver.com", "address": "Nanyang Polytechnic 180 Ang Mo Kio Avenue 8 Singapore 569830", "phone": "12345678"}'
 
 
-
-curl localhost/api/v0/apikey/new -H "Content-Type: application/json" -X POST -d '{"userid": 1, "permission": "canWrite"'
+curl localhost/api/v0/apikey/new -H "Content-Type: application/json" -X POST -d '{"userid": "2", "permission": "canRead"}'
