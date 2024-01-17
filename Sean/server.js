@@ -1,5 +1,6 @@
 const express = require("express");
 const session = require("express-session");
+const rateLimit = require('express-rate-limit');
 const mysql2 = require('mysql2');
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
@@ -127,6 +128,14 @@ const logActivity = async (username, success, message) => {
 	  // Handle error (you may want to log it or take other appropriate actions)
 	}
   };
+
+
+  const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	max: 5, // limit each IP to 3 requests per windowMs
+	message: 'Too many login attempts from this IP, please try again later.',
+  });
+  app.use('/login', limiter);
   
   app.post('/login', [
     body('username').escape().trim().isLength({ min: 1 }).withMessage('Username must not be empty'),
