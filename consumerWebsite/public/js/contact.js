@@ -1,4 +1,5 @@
 const newAccessKey = '7f7ce777-6a56-4e5e-bfac-3b83c6453e65';
+//const newAccessKey = process.env.ACCESS_KEY;
 
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('form');
