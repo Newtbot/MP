@@ -32,7 +32,7 @@ app.set("json spaces", 2);
 middleware logic ( called by next() )
 */
 app.use("/api/seed/v0", [ apikeyCheck , APIlogger] ,require("../routes/seed_route.js"));
-app.use('/api/v0', [apikeyCheck, APIlogger] ,require("../routes/api_route.js")); //webserver\routes\api_route.js
+app.use('/api/v0', [apikeyCheck, APIlogger] ,require("../routes/api_route.js")); 
 
 
 

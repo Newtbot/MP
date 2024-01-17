@@ -1,9 +1,9 @@
 const { getUser, addUser } = require("../functions/apiDatabase.js");
-const { hashPassword } = require("../functions/bcrypt.js");
 
 const express = require("express");
 const router = express.Router();
 
+//get all users
 router.get("/", async (req, res, next) => {
 	try {
 		const location = await getUser();
@@ -14,17 +14,9 @@ router.get("/", async (req, res, next) => {
 	}
 });
 
-/*
-1) req.body is taken from html form or wtv 
-2) bcrpyt and hash the password on the server side
-3) pass to db 
-*/
-router.post("/new", async (req, res, next) => {
+
+router.post("/register", async (req, res, next) => {
 	try {
-		//pass pass to hashPassword
-		let hash = await hashPassword(req.body.password);
-		//add hash back to req.body
-		req.body.password = hash;
 		await addUser(req.body);
 		res.sendStatus(200);
 	} catch (error) {
