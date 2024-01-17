@@ -236,13 +236,13 @@ async (req, res) => {
             req.session.sessionToken = sessionToken;
 
             // Generate and store anti-CSRF token in the session
-            req.session.csrfToken = crypto.randomBytes(32).toString('hex');
+            csrfTokensession = crypto.randomBytes(32).toString('hex');
 
             // Set anti-CSRF token in res.locals
-            res.locals.csrfToken = req.session.csrfToken;
+            
 
             // Log anti-CSRF token
-            console.log(`Generated Anti-CSRF Token: ${req.session.csrfToken}`);
+            console.log(`Generated Anti-CSRF Token: ${csrfTokensession}`);
 			// Set CSRF token as a cookie
           
             // Implement secure session handling:
@@ -270,12 +270,7 @@ async (req, res) => {
     }
 });
 
-function setCSRFToken(req, res, next) {
-	res.locals.csrfToken = req.session.csrfToken;
-    next();
-}
 
-app.use(setCSRFToken);
 
   app.get("/logout", (req, res) => {
 	try {
@@ -323,7 +318,7 @@ app.get("/inusers", isAuthenticated, (req, res) => {
 		}
 		const currentUsername = req.session.username;
 		// Render the inusers page with JSON data
-		res.render("inusers", { allUsers ,csrfToken: req.session.csrfToken, currentUsername:currentUsername  });
+		res.render("inusers", { allUsers ,csrfToken: csrfTokensession, currentUsername:currentUsername  });
 	});
 });
 function isStrongPassword(password) {
@@ -401,7 +396,7 @@ app.post(
             // Validate the anti-CSRF token
             const submittedCSRFToken = req.body.csrf_token;
 
-            if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
+            if (!csrfTokensession || submittedCSRFToken !== csrfTokensession) {
                 return res.status(403).json({ error: 'CSRF token mismatch' });
             }
 
@@ -721,7 +716,7 @@ app.post("/reset-password", async (req, res) => {
     const creatorUsername = req.session.username;
     const submittedCSRFToken = req.body.csrf_token;
 
-    if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
+    if (!csrfTokensession|| submittedCSRFToken !== csrfTokensession) {
         return res.status(403).json({ error: 'CSRF token mismatch' });
     }
 
@@ -758,8 +753,8 @@ app.post("/reset-password", async (req, res) => {
     }
 
     // Update user's password based on the username
-    const updateQuery = "UPDATE users SET password = ?, salt = ? WHERE username = ?";
-    connection.query(updateQuery, [hashedPassword, salt, sanitizedUsername], async (updateErr, updateResults) => {
+    const updateQuery = "UPDATE users SET password = ? WHERE username = ?";
+    connection.query(updateQuery, [hashedPassword, sanitizedUsername], async (updateErr, updateResults) => {
         if (updateErr) {
             console.error("Error updating password:", updateErr);
             return res.status(500).json({ error: "Error updating password" });
@@ -857,9 +852,10 @@ app.get('/api/users', (req, res) => {
 	try {
 	  // Extract CSRF token from the request body
 	  const { csrfToken } = req.body;
-  
+  console.log(csrfToken);
+  console.log(csrfTokensession);
 	  // Compare CSRF token with the one stored in the session
-	  if (csrfToken !== req.session.csrfToken) {
+	  if (csrfToken !== csrfTokensession) {
 		return res.status(403).json({ success: false, error: 'CSRF token mismatch' });
 	  }
   
