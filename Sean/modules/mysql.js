@@ -21,17 +21,18 @@ connection.connect((err) => {
 });
 */
 
-/*
 const connection = mysql.createConnection({
 	host: process.env.host,
 	user: process.env.DB_USER,
 	password: process.env.DB_PASS,
-	database: "database",
+	database: "adminusers",
+	timezone: "Z", // Set the timezone to UTC
 	ssl: {
 		ca: fs.readFileSync(path.resolve(__dirname, '../../cert/DigiCertGlobalRootCA.crt.pem')),
+		
 	}
   });
-*/
+/*
 const connection = mysql.createConnection({
     host: process.env.host,
     user: process.env.DB_USER,
@@ -39,9 +40,9 @@ const connection = mysql.createConnection({
     database: "adminusers",
 	timezone: "Z", // Set the timezone to UTC
   });
-
+*/
  
-module.exports = { connection, };
+module.exports = { connection };
 
 
   

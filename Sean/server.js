@@ -288,7 +288,7 @@ app.use(setCSRFToken);
 		} else {
 		  
 		  console.log(`Session destroyed.`);
-		  
+		  res.clearCookie('sessionToken');
 		  // Log the logout activity using a separate async function
 		  await logLogoutActivity(username, true, "User logged out. Session destroyed.");
 		}
@@ -321,9 +321,9 @@ app.get("/inusers", isAuthenticated, (req, res) => {
 			res.status(500).send("Internal Server Error");
 			return;
 		}
-
+		const currentUsername = req.session.username;
 		// Render the inusers page with JSON data
-		res.render("inusers", { allUsers ,csrfToken: req.session.csrfToken });
+		res.render("inusers", { allUsers ,csrfToken: req.session.csrfToken, currentUsername:currentUsername  });
 	});
 });
 function isStrongPassword(password) {
@@ -407,7 +407,7 @@ app.post(
 
             // Extract user input
             const { name, username, email, password, jobTitle } = req.body;
-
+            console.log(submittedCSRFToken);
             // Extract the username of the user creating a new user
             const creatorUsername = req.session.username; // Adjust this based on how you store the creator's username in your session
 
@@ -449,20 +449,23 @@ app.post(
                             message: "Email is already in use. Please choose another email."
                         });
                     }
-
-                    // Hash the password before storing it in the database
-                    bcrypt.hash(password, 10, (hashError, hashedPassword) => {
-                        if (hashError) {
-                            console.error("Error hashing password:", hashError);
-                            return res.status(500).json({ error: "Internal Server Error" });
-                        }
-
-                        // Start a transaction
-                        connection.beginTransaction((transactionErr) => {
-                            if (transactionErr) {
-                                console.error("Error starting transaction:", transactionErr);
-                                return res.status(500).json({ error: "Internal Server Error" });
-                            }
+					bcrypt.genSalt(10, (saltError, salt) => {
+						if (saltError) {
+							console.error("Error generating salt:", saltError);
+							return res.status(500).json({ error: "Internal Server Error" });
+						}
+		
+						bcrypt.hash(req.body.password, salt, (hashError, hashedPassword) => {
+							if (hashError) {
+								console.error("Error hashing password:", hashError);
+								return res.status(500).json({ error: "Internal Server Error" });
+							}
+		
+							connection.beginTransaction((transactionErr) => {
+								if (transactionErr) {
+									console.error("Error starting transaction:", transactionErr);
+									return res.status(500).json({ error: "Internal Server Error" });
+								}
 
                             // Define the insert query
                             const insertUserQuery =
@@ -491,32 +494,28 @@ app.post(
 
                                 // Commit the transaction
                                 connection.commit((commitErr) => {
-                                    if (commitErr) {
-                                        console.error("Error committing transaction:", commitErr);
-                                        // Log unsuccessful user creation due to an error
-                                        logUserCreationActivity(creatorUsername, false, "internal error");
-                                        return res.status(500).json({ error: "Internal Server Error" });
-                                    }
+									if (commitErr) {
+										console.error("Error committing transaction:", commitErr);
+										return res.status(500).json({ error: "Internal Server Error" });
+									}
+		
+									res.status(200).json({ message: "User created successfully" });
+									logUserCreationActivity(creatorUsername, true, "user created successfully");
 
-                                    // Log successful user creation
-                                    logUserCreationActivity(creatorUsername, true, "user created successfully");
-
-                                    // Redirect to "/inusers"
-                                    res.redirect('/inusers');
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        } catch (error) {
-            console.error("Error creating user:", error);
-            // Log unsuccessful user creation due to an error
-            logUserCreationActivity(req.session.username, false, "internal error"); // Adjust this based on how you store the creator's username in your session
-            res.status(500).json({ error: "Internal Server Error" });
-        }
-    }
-);
+                                    
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+				} catch (error) {
+					console.error("Error creating user:", error);
+					return res.status(500).json({ error: "Internal Server Error" });
+				}
+			}
+		);
 
 
 app.get("/forgot-password", (req, res) => {
@@ -655,13 +654,30 @@ app.post("/reset-password/:token", async (req, res) => {
 	  }
   
 	  // Hash the new password
-	  const hashedPassword = await bcrypt.hash(sanitizedPassword, 10);
+	  const hashedPassword = await new Promise((resolve, reject) => {
+		bcrypt.genSalt(10, (saltError, salt) => {
+			if (saltError) {
+				console.error("Error generating salt:", saltError);
+				reject("Internal Server Error");
+			}
+	
+			// Use the generated salt to hash the password
+			bcrypt.hash(sanitizedPassword, salt, (hashError, hashed) => {
+				if (hashError) {
+					console.error("Error hashing password:", hashError);
+					reject("Internal Server Error");
+				}
+	
+				resolve(hashed);
+			});
+		});
+	});
   
 	  // Update user's password and clear reset token
 	  const updateQuery =
-		"UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE reset_token = ?";
-	  connection.query(updateQuery, [hashedPassword, sanitizedToken], async (updateErr, updateResults) => {
-		if (updateErr) {
+    "UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE reset_token = ?";
+connection.query(updateQuery, [hashedPassword, sanitizedToken], async (updateErr, updateResults) => {
+ if (updateErr) {
 		  console.error("Error updating password:", updateErr);
 		  // Pass the error to the template when rendering the reset-password page
 		  res.render("reset-password", {
@@ -701,14 +717,13 @@ app.get("/reset-password/:token", (req, res) => {
 	});
 });
 app.post("/reset-password", async (req, res) => {
-	
     const { username, password, confirmPassword, csrf_token } = req.body;
     const creatorUsername = req.session.username;
-	const submittedCSRFToken = req.body.csrf_token;
+    const submittedCSRFToken = req.body.csrf_token;
 
-	if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
-		return res.status(403).json({ error: 'CSRF token mismatch' });
-	}
+    if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
+        return res.status(403).json({ error: 'CSRF token mismatch' });
+    }
 
     // Sanitize the inputs
     const sanitizedUsername = validator.escape(username);
@@ -728,8 +743,12 @@ app.post("/reset-password", async (req, res) => {
         });
     }
 
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(sanitizedPassword, 10);
+    // Generate a random salt
+    const saltRounds = 10; // You can adjust the number of rounds based on your security requirements
+    const salt = await bcrypt.genSalt(saltRounds);
+
+    // Hash the new password with the generated salt
+    const hashedPassword = await bcrypt.hash(sanitizedPassword, salt);
 
     // Check if the user exists in the database before updating the password
     const userExists = await checkIfUserExists(sanitizedUsername);
@@ -739,8 +758,8 @@ app.post("/reset-password", async (req, res) => {
     }
 
     // Update user's password based on the username
-    const updateQuery = "UPDATE users SET password = ? WHERE username = ?";
-    connection.query(updateQuery, [hashedPassword, sanitizedUsername], async (updateErr, updateResults) => {
+    const updateQuery = "UPDATE users SET password = ?, salt = ? WHERE username = ?";
+    connection.query(updateQuery, [hashedPassword, salt, sanitizedUsername], async (updateErr, updateResults) => {
         if (updateErr) {
             console.error("Error updating password:", updateErr);
             return res.status(500).json({ error: "Error updating password" });
@@ -767,6 +786,7 @@ app.post("/reset-password", async (req, res) => {
         }
     });
 });
+
 
 async function checkIfUserExists(username) {
     return new Promise((resolve, reject) => {
