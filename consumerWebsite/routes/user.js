@@ -14,19 +14,12 @@ router.get("/", async (req, res, next) => {
 	}
 });
 
-/*
-1) req.body is taken from html form or wtv 
-2) bcrpyt and hash the password on the server side
-3) pass to db 
-*/
-router.post("/new", async (req, res, next) => {
+// /user/register
+router.post("/register", async (req, res, next) => {
 	try {
-		//pass pass to hashPassword
-		let hash = await hashPassword(req.body.password);
-		//add hash back to req.body
-		req.body.password = hash;
-		await addUser(req.body);
-		res.sendStatus(200);
+		console.log(req.body);
+		//await addUser(req.body);
+		//res.sendStatus(200);
 	} catch (error) {
 		console.error(error);
 		next(error);
