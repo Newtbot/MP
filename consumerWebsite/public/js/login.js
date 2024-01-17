@@ -1,14 +1,13 @@
-function validateForm() {
-    var username = document.getElementById('email').value;
+function validateFormLogin() {
+    var email = document.getElementById('email').value;
     var password = document.getElementById('password').value;
-
+    
     // Perform basic validation
     if (!email || !password) {
         alert('Please enter both email and password');
         return;
     }
 
-    // If validation passes, send data to the server
     sendDataToServer(email, password);
 }
 
