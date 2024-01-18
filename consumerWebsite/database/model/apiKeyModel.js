@@ -45,7 +45,7 @@ const apikeyModel = sequelize.define(
 			validate: {
 				notEmpty: true,
 				len: [1, 255],
-				isIn: [["canRead", "canWrite"]],
+				isIn: [["canRead", "canWrite" , "auto-generated"]],
 			},
 		},
 		createdAt: {
@@ -63,3 +63,46 @@ const apikeyModel = sequelize.define(
 );
 
 module.exports = { apikeyModel };
+
+
+/*
+  class AuthToken extends Model {
+    check(){
+      // check expires_on date
+      return this.is_valid;
+    }
+  }
+  AuthToken.init({
+    token:{
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+      primaryKey: true
+    },
+    expires_on: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      validate:{
+        isDate:true
+      }
+    },
+    username: {
+      type: DataTypes.STRING,
+      ldapModel: 'User',
+      allowNull: false,
+      validate:{
+        notNull: true,
+      },
+    },
+    is_valid: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    }
+  }, {
+    sequelize,
+    modelName: 'AuthToken',
+  });
+
+
+
+*/

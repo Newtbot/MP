@@ -1,6 +1,6 @@
 var app = {};
 
-/*
+
 app.api = (function(app){
 	var baseURL = '/api/v0/'
 
@@ -85,7 +85,6 @@ app.api = (function(app){
 
 	return {post: post, get: get, put: put, delete: remove}
 })(app)
-*/
 
 app.auth = (function(app) {
 	var user = {}
