@@ -15,9 +15,10 @@ router.get("/", async (req, res, next) => {
 });
 
 
+// /user/register
 router.post("/register", async (req, res, next) => {
 	try {
-		await addUser(req.body);
+		//await addUser(req.body);
 		res.sendStatus(200);
 	} catch (error) {
 		console.error(error);
