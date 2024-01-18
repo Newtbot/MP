@@ -1,11 +1,11 @@
-const newAccessKey = '7f7ce777-6a56-4e5e-bfac-3b83c6453e65';
-//const newAccessKey = process.env.ACCESS_KEY;
+require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') }) 
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('form');
 
     // Set the new value for the access_key input field
-    form.querySelector('input[name="access_key"]').value = newAccessKey;
+    form.querySelector('input[name="access_key"]').value = process.env.emailKey;
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault(); // Prevent default form submission
@@ -41,3 +41,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
