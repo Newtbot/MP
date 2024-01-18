@@ -2,45 +2,47 @@ const mysql = require("mysql2");
 const path = require("path");
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
 const fs = require('fs');
-/*
-const mysqlConfig = {
-	host: process.env.host,
-	user: process.env.user,
-	password: process.env.password,
-	database: process.env.database,
-	timezone: "Z", // Set the timezone to UTC
-};
+const UserModel = require('../models/User');// Adjust the path based on your project structure
+const { Sequelize } = require('sequelize');
 
-const connection = mysql.createConnection(mysqlConfig);
-connection.connect((err) => {
-	if (err) {
-		console.error("Error connecting to MySQL:", err);
-		return;
-	}
-	console.log("Connected to MySQL");
-});
-*/
 
-/*
-const connection = mysql.createConnection({
-	host: process.env.host,
-	user: process.env.DB_USER,
-	password: process.env.DB_PASS,
-	database: "database",
-	ssl: {
-		ca: fs.readFileSync(path.resolve(__dirname, '../../cert/DigiCertGlobalRootCA.crt.pem')),
-	}
-  });
-*/
-const connection = mysql.createConnection({
-    host: process.env.host,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: "adminusers",
-	timezone: "Z", // Set the timezone to UTC
-  });
 
+  const sequelize = new Sequelize(
+	"adminusers",
+	process.env.DB_USER,
+	process.env.DB_PASS,
+	{
+	  host: "mpsqldatabasean.mysql.database.azure.com",
+	   dialect: 'mysql',
+	   //  attributeBehavior?: 'escape' | 'throw' | 'unsafe-legacy';
+	   attributeBehavior: 'escape',
+	   dialectOptions: {
+		 ssl: {
+			ca: fs.readFileSync(path.resolve(__dirname, '../../cert/DigiCertGlobalRootCA.crt.pem')),
+		
+		 },
+   
+	   },
+	  },
+   
+	  
+   );
+   
+   sequelize.authenticate().then(() => {
+	  console.log('Connection has been established successfully.');
+   }).catch((error) => {
+	  console.error('Unable to connect to the database: ', error);
+   });
+   
+
+  const User = UserModel(sequelize);
+
+  // Synchronize the models with the database
+  sequelize.sync();
   
-module.exports = { connection };
+  module.exports = {
+	sequelize,
+	User,
+  };
 
   

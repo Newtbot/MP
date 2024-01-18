@@ -1,6 +1,3 @@
-
-
-
 $(document).ready(function () {
   $('#resetPasswordLink').on('click', function () {
     $('#resetPasswordFormContainer').show();
@@ -30,9 +27,10 @@ $(document).ready(function () {
   });
 
   $('#searchUserButton').on('click', function () {
-  console.log('Search button clicked');
+  
   const searchUsername = $('#searchUserInput').val();
   // Call the function to search for the user
+  
   searchUser(searchUsername);
 });
 
@@ -62,81 +60,7 @@ $('#logsLink').on('click', function () {
 
   fetchLogs();
 });
-function fetchLogs() {
-  // Make a fetch request to your server endpoint for logs
-  fetch('/api/getLogs')
-    .then(response => response.json())
-    .then(logs => {
-      // Process and display logs in the logs container
-      displayLogs(logs);
-    })
-    .catch(error => {
-      console.error('Error fetching logs:', error);
-      // Handle errors, e.g., display an alert
-    });
-}
 
-// Update the displayLogs function to generate a table
-function displayLogs(logs) {
-  const logsContainer = $('#logsContainer');
-
-  // Clear previous logs
-  logsContainer.empty();
-
-  if (logs && logs.length > 0) {
-    // Create the table and header row
-    const table = $('<table>').addClass('logs-table');
-    const headerRow = '<tr><th>ID</th><th>Username</th><th>Activity</th><th>Timestamp</th></tr>';
-    table.append(headerRow);
-
-    // Add each log as a row in the table
-    logs.forEach(log => {
-      const row = `<tr><td>${log.id}</td><td>${log.username}</td><td>${log.activity}</td><td>${log.timestamp}</td></tr>`;
-      table.append(row);
-    });
-
-    // Append the table to the logsContainer
-    logsContainer.append(table);
-
-    // Add a download button at the top with the current date and time in the file name
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split('T')[0];
-    const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '-');
-    const downloadButton = $('<button>').text('Download Log').on('click', function () {
-      downloadLogs(logs, `log_${formattedDate}_${formattedTime}.csv`);
-    });
-
-    // Prepend the download button to the logsContainer
-    logsContainer.prepend(downloadButton);
-  } else {
-    // Display a message if no logs are available
-    logsContainer.html('<p>No logs available.</p>');
-  }
-}
-
-function downloadLogs(logs, filename) {
-  if (logs && logs.length > 0) {
-    const csvContent = 'data:text/csv;charset=utf-8,';
-    const header = 'ID,Username,Activity,Timestamp\n';
-    const rows = logs.map(log => `${log.id},${log.username},${log.activity},"${log.timestamp}"`).join('\n');
-    const data = header + rows;
-    const encodedData = encodeURI(csvContent + data);
-
-    // Create a hidden anchor element to trigger the download
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedData);
-    link.setAttribute('download', 'logs.csv');
-    document.body.appendChild(link);
-
-    // Trigger the download
-    link.click();
-
-    // Remove the link from the DOM
-    document.body.removeChild(link);
-  } else {
-    console.error('No logs available for download.');
-  }
-}
 });
 
 function searchUser(username) {
@@ -148,9 +72,9 @@ function searchUser(username) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
     })
-    .then(users => {
+    .then(user => {
       // Display search results
-      displaySearchResults(users);
+      displaySearchResults(user);
     })
     .catch(error => {
       console.error('Search error:', error);
@@ -160,31 +84,33 @@ function searchUser(username) {
 
 // Function to display search results
 function displaySearchResults(users) {
+  
   const searchResultsList = $('#searchResultsList');
 
   // Clear previous results
   searchResultsList.empty();
 
-  if (users && users.length > 0) {
-    users.forEach(user => {
-      const listItem = `<li>${user.username} - <button class="deleteUserButton" data-username="${user.username}">Delete</button></li>`;
+      const listItem = `<li>${users.username} - <button class="deleteUserButton" data-username="${users.username}">Delete</button></li>`;
       searchResultsList.append(listItem);
-    });
-
     // Show the search results container
     $('#searchResultsContainer').show();
-  } else {
-    // Hide the search results container if no results
-    $('#searchResultsContainer').hide();
-  }
-}
+  } 
+
 // Event listener for delete user button in search results
 $('#searchResultsList').on('click', '.deleteUserButton', function () {
   const usernameToDelete = $(this).data('username');
+  const csrfToken = $('[name="csrf_token"]').val(); // Access the CSRF token by name
+
+  console.log(csrfToken);
   console.log('Before fetch for user deletion');
-  // Make a fetch request to delete the user
+
+  // Make a fetch request to delete the user with CSRF token in headers
   fetch(`/api/deleteUser/${usernameToDelete}`, {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ csrfToken }), // Include CSRF token in the request body
   })
   .then(response => {
     console.log('Inside fetch response handler');
@@ -278,8 +204,7 @@ function resetFormFields() {
         $('#confirmPassword').val('');
         $('#jobTitle').val('');
       }
-
-
+      const csrf_token = $('#userForm input[name="csrf_token"]').val();
       $('#userForm').on('submit', function (e) {
       e.preventDefault();
 
@@ -299,38 +224,40 @@ function resetFormFields() {
         alert('Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.');
         return;
       }
-
+    
       fetch('/createUser', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
+            
         },
         body: JSON.stringify({
-          name: name,
-          username: username,
-          email: email,
-          password: password,
-          jobTitle: jobTitle,
+            name: name,
+            username: username,
+            email: email,
+            password: password,
+            jobTitle: jobTitle,
+            csrf_token: csrf_token, // Include the CSRF token in the body
         }),
-      })
+    })
         .then(response => {
-          if (response.status === 201) {
-            // Status 201 indicates successful creation
-            return response.json();
-          } else {
-            return response.json().then(data => {
-              throw new Error(data.error || `HTTP error! Status: ${response.status}`);
-            });
-          }
+            if (response.ok) {
+                // Status 201 indicates successful creation
+                return response.json();
+            } else {
+                return response.json().then(data => {
+                    throw new Error(data.error || `HTTP error! Status: ${response.status}`);
+                });
+            }
         })
         .then(data => {
-          console.log('User registration success:', data);
-          alert('User registered successfully!');
-          resetFormFields();
+            console.log('User registration success:', data);
+            alert('User registered successfully!');
+            resetFormFields();
         })
         .catch(error => {
-          console.error('User registration error:', error);
-          handleRegistrationError(error);
+            console.error('User registration error:', error);
+            handleRegistrationError(error);
         });
     });
 
@@ -369,9 +296,8 @@ $('#resetPasswordForm').on('submit', function (e) {
   const username = $('#resetUsername').val();
   const password = $('#resetPassword').val();
   const confirmPassword = $('#resetConfirmPassword').val();
-
-  console.log('Username:', username);
-  console.log('New Password:', password);
+  const csrf_token = $('#userForm input[name="csrf_token"]').val();
+  
 
   // Validate passwords
   if (password !== confirmPassword) {
@@ -385,8 +311,7 @@ $('#resetPasswordForm').on('submit', function (e) {
     return;
   }
 
-  // Make a fetch request
-  fetch('/reset-password', {
+ fetch('/reset-password', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -395,6 +320,7 @@ $('#resetPasswordForm').on('submit', function (e) {
         username: username,
         password: password,
         confirmPassword: confirmPassword,
+        csrf_token: csrf_token
       }),
     })
     .then(response => {
@@ -429,5 +355,154 @@ $('#resetPasswordForm').on('submit', function (e) {
     });
 });
 
-  
+// Declare a variable to store fetched logs
+let logs = [];
 
+// Function to fetch logs from the server
+function fetchLogs() {
+  // Make a fetch request to your server endpoint for logs
+  fetch('/api/getLogs')
+    .then(response => response.json())
+    .then(data => {
+      // Assign the logs to the variable
+      logs = data;
+
+      // Process and display logs in the logs container
+      displayLogs(logs);
+    })
+    .catch(error => {
+      console.error('Error fetching logs:', error);
+      // Handle errors, e.g., display an alert
+    });
+}
+
+// Update the displayLogs function to generate a table
+function displayLogs(logs) {
+  const logsContainer = $('#logsContainer');
+
+  // Clear previous logs and date filter elements
+  logsContainer.empty();
+
+  if (logs && logs.length > 0) {
+    // Add date filter elements
+    logsContainer.append(`
+      <label for="datePicker">Filter by Date:</label>
+      <input type="text" id="datePicker">
+      <button onclick="applyDateFilter()">Apply Filter</button>
+    `);
+
+    // Create the table and header row
+    const table = $('<table>').addClass('logs-table');
+    const headerRow = '<tr><th>ID</th><th>Username</th><th>Activity</th><th>Timestamp</th></tr>';
+    table.append(headerRow);
+
+    // Add each log as a row in the table
+    logs.forEach(log => {
+      const row = `<tr><td>${log.id}</td><td>${log.username}</td><td>${log.activity}</td><td>${log.timestamp}</td></tr>`;
+      table.append(row);
+    });
+
+    // Append the table to the logsContainer
+    logsContainer.append(table);
+
+    // Add a download button at the top with the current date and time in the file name
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '-');
+    const downloadButton = $('<button>').text('Download Log').on('click', function () {
+      downloadLogs(logs, `log_${formattedDate}_${formattedTime}.csv`);
+    });
+
+    // Prepend the download button to the logsContainer
+    logsContainer.prepend(downloadButton);
+  } else {
+    // Display a message if no logs are available
+    logsContainer.html('<p>No logs available.</p>');
+  }
+
+  // Initialize Flatpickr for the date picker
+  flatpickr("#datePicker", {
+    dateFormat: "m/d/Y, h:i:S K", // Adjust the format to match your logs timestamp format
+  });
+}
+
+// Function to apply date filter
+function applyDateFilter() {
+  const selectedDate = $("#datePicker").val();
+
+  const formattedSelectedDate = new Date(selectedDate).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
+  const filteredLogs = logs.filter(log => {
+    const formattedLogDate = new Date(log.timestamp).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    return formattedLogDate === formattedSelectedDate;
+  });
+
+
+  displayLogs(filteredLogs);
+}
+
+function downloadLogs(logs, filename) {
+  if (logs && logs.length > 0) {
+    const csvContent = 'data:text/csv;charset=utf-8,';
+    const header = 'ID,Username,Activity,Timestamp\n';
+    const rows = logs.map(log => `${log.id},${log.username},${log.activity},"${log.timestamp}"`).join('\n');
+    const data = header + rows;
+    const encodedData = encodeURI(csvContent + data);
+
+    // Create a hidden anchor element to trigger the download
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedData);
+    link.setAttribute('download', 'logs.csv');
+    document.body.appendChild(link);
+
+    // Trigger the download
+    link.click();
+
+    // Remove the link from the DOM
+    document.body.removeChild(link);
+  } else {
+    console.error('No logs available for download.');
+  }
+}
+fetchLogs();
+
+
+
+// Assuming EJS is properly configured to evaluate expressions
+
+
+// Assuming allUsers is an array containing user information
+const user = allUsers.find(user => user.username === currentUsername);
+const userRole = user?.jobTitle;
+
+
+// Function to enable/disable actions based on user role
+function handleUserRoleAccess() {
+  // Disable user creation, deletion, and password reset for non-admin users
+  if (userRole !== 'admin') {
+    document.getElementById('addUserLink').style.display = 'none';
+    document.getElementById('deleteUserLink').style.display = 'none';
+    document.getElementById('resetPasswordLink').style.display = 'none';
+    
+  }
+
+  // Allow admin users to view logs
+  if (userRole === 'admin') {
+    document.getElementById('logsLink').classList.remove('hidden');
+  }
+}
+
+// Call the function to handle user role access when the page loads
+handleUserRoleAccess();

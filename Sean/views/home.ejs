@@ -8,7 +8,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+    .chart-container {
+    width: 400px;
+    height: 250px;
+    margin: 20px;
+    border: 1px solid #ddd;
+    display: inline-block;
+  }
     body {
       margin: 0;
       font-family: 'Arial', sans-serif;
@@ -45,64 +53,23 @@
       text-align: center;
     }
 
-    table {
-      border-collapse: collapse;
-      width: 80%;
-      margin: 20px auto;
-      font-size: 16px;
-    }
-
-    th, td {
-      border: 1px solid #dddddd;
-      text-align: left;
-      padding: 12px;
-    }
-
-    th {
-      background-color: #f2f2f2;
-    }
-
-    tr:hover {
-      background-color: #f5f5f5;
-    }
-
-    td {
-      white-space: nowrap;
-    }
   </style>
 </head>
 
 <body>
+  
 
   <div id="navbar">
     <h1>Eco Saver</h1>
     <a href="/inusers">In-House Users</a>
     <a href="#">Users</a>
-    <a href="#">Data Analysis</a>
-    <a href="#">Logout</a>
+    <a href="#">Sensors</a>
+    <a href="/logout">Logout</a>
   </div>
 
   <div id="content">
     <h2>Welcome to the Home Page, <%= username %>!</h2>
-    <h3>Last 10 Logins:</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th>Last Login Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% loginLogs.forEach(log => { %>
-          <tr>
-            <td><%= log.username %></td>
-            <td><%= new Date(log.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) %></td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
-  </div>
-
+    
 </body>
 
 </html>

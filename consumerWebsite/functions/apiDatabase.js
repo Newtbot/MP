@@ -4,15 +4,31 @@ const { userModel } = require("../database/model/userModel.js");
 const { Op, Sequelize } = require("sequelize");
 const { hashAPIKey } = require("../functions/bcrypt.js");
 const { generateUUID } = require("../functions/generateUUID.js");
+const { hashPassword } = require("../functions/bcrypt.js");
 
 async function getUser() {
 	const user = await userModel.findAll();
 	return user;
 }
+//api/v0/user/register
 
+/* Registering new user 
+1) req.body is taken from html form or wtv 
+2) bcrpyt and hash the password on the server side
+3) pass to db 
+*/
 async function addUser(user) {
-	//console.log(user);
-	await userModel.create(user);
+	console.log(user);
+	//hash password
+	let hash = await hashPassword(user.password);
+
+	await userModel.create({
+		username: user.username,
+		password: hash,
+		email: user.email,
+		address: user.address,
+		phone: user.phone,
+	});
 }
 
 async function getAPIKey() {
@@ -46,7 +62,6 @@ async function addAPIKey(userId, permission) {
 
 
     //user token with - 
-    //"apikey": "1-9beba05f-1bf1-4d8a-9ee8-9f61e1428e20"
 	return usertoken;
 }
 
