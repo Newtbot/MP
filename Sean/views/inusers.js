@@ -27,9 +27,10 @@ $(document).ready(function () {
   });
 
   $('#searchUserButton').on('click', function () {
-  console.log('Search button clicked');
+  
   const searchUsername = $('#searchUserInput').val();
   // Call the function to search for the user
+  
   searchUser(searchUsername);
 });
 
@@ -71,9 +72,9 @@ function searchUser(username) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
     })
-    .then(users => {
+    .then(user => {
       // Display search results
-      displaySearchResults(users);
+      displaySearchResults(user);
     })
     .catch(error => {
       console.error('Search error:', error);
@@ -83,24 +84,17 @@ function searchUser(username) {
 
 // Function to display search results
 function displaySearchResults(users) {
+  
   const searchResultsList = $('#searchResultsList');
 
   // Clear previous results
   searchResultsList.empty();
 
-  if (users && users.length > 0) {
-    users.forEach(user => {
-      const listItem = `<li>${user.username} - <button class="deleteUserButton" data-username="${user.username}">Delete</button></li>`;
+      const listItem = `<li>${users.username} - <button class="deleteUserButton" data-username="${users.username}">Delete</button></li>`;
       searchResultsList.append(listItem);
-    });
-
     // Show the search results container
     $('#searchResultsContainer').show();
-  } else {
-    // Hide the search results container if no results
-    $('#searchResultsContainer').hide();
-  }
-}
+  } 
 
 // Event listener for delete user button in search results
 $('#searchResultsList').on('click', '.deleteUserButton', function () {
@@ -303,8 +297,7 @@ $('#resetPasswordForm').on('submit', function (e) {
   const password = $('#resetPassword').val();
   const confirmPassword = $('#resetConfirmPassword').val();
   const csrf_token = $('#userForm input[name="csrf_token"]').val();
-  console.log('Username:', username);
-  console.log('New Password:', password);
+  
 
   // Validate passwords
   if (password !== confirmPassword) {
@@ -493,11 +486,7 @@ fetchLogs();
 // Assuming allUsers is an array containing user information
 const user = allUsers.find(user => user.username === currentUsername);
 const userRole = user?.jobTitle;
-console.log('All Users:', allUsers);
-console.log('Current Username:', currentUsername);
 
-// Log the user role to the console
-console.log('User Role:', userRole);
 
 // Function to enable/disable actions based on user role
 function handleUserRoleAccess() {
