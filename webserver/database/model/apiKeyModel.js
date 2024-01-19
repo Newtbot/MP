@@ -45,7 +45,7 @@ const apikeyModel = sequelize.define(
 			validate: {
 				notEmpty: true,
 				len: [1, 255],
-				isIn: [["canRead", "canWrite"]],
+				isIn: [["canRead", "canWrite" , "auto-generated"]],
 			},
 		},
 		createdAt: {

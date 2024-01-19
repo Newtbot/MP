@@ -1,20 +1,19 @@
 const express = require("express");
-const helmet = require("helmet");
 const path = require("path");
 const app = express();
-const port = 80;
+const port = 3000;
+const ejs = require("ejs");
 
-const bodyParser = require('body-parser'); // Middleware 
 
-app.use(bodyParser.urlencoded({ extended: false }));
-
-app.use(helmet());
-//disable x-powered-by header for security reasons
-app.disable("x-powered-by");
 app.use(express.json());
 app.set("json spaces", 2);
 
-//public folder with path to static files
+// Set up the templating engine to build HTML for the front end.
+app.set("views", path.join(__dirname, "../views"));
+app.set("view engine", "ejs");
+
+// Have express server static content( images, CSS, browser JS) from the public
+// local folder.
 app.use(express.static(path.join(__dirname, "../public")));
 
 //middleware logic ( called by next() )
@@ -22,6 +21,9 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 //route logic
 app.use("/api/v0", require("../routes/api_routes")); //consumerWebsite\routes\api_routes.js
+
+//render logic
+app.use("/", require("../routes/render")); //consumerWebsite\routes\render.js
 
 // Catch 404 and forward to error handler. If none of the above routes are
 // used, this is what will be called.

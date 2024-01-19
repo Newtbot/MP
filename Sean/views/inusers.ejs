@@ -41,7 +41,6 @@
             <th>Name</th>
             <th>Username</th>
             <th>Email</th>
-            <th>Last Login</th>
             <th>Job Title</th>
           </tr>
         </thead>
@@ -52,7 +51,6 @@
                 <td><%- user.name %></td>
                 <td><%- user.username %></td>
                 <td><%- user.email %></td>
-                <td><%- new Date(user.lastLogin).toLocaleString('en-US', { timeZone: 'Asia/Singapore' }) %></td>
                 <td><%- user.jobTitle %></td>                
               </tr>
             <% }); %>
