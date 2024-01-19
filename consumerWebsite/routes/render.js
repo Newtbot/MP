@@ -51,6 +51,11 @@ router.get('/news', function(req, res, next) {
     res.render('news'); 
 });
 
+//login / register page
+router.get('/login', function(req, res, next) {
+    res.render('signuplogin'); 
+});
+
 //404  page
 router.get('*', function(req, res, next) {
     res.render('404'); 
