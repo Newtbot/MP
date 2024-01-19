@@ -4,12 +4,9 @@ const { userModel } = require("../database/model/userModel.js");
 const { Op, Sequelize } = require("sequelize");
 const { hashAPIKey } = require("../functions/bcrypt.js");
 const { generateUUID } = require("../functions/generateUUID.js");
-const { hashPassword } = require("../functions/bcrypt.js");
+const { hashPassword , comparePassword , hashAPIKey } = require("../functions/bcrypt.js");
 
-async function getUser() {
-	const user = await userModel.findAll();
-	return user;
-}
+
 //api/v0/user/register
 
 /* Registering new user 
@@ -44,8 +41,6 @@ async function getAPIKey() {
 5) you give the user rowid-uuidv4
 6) store in database
 */
-
-
 async function addAPIKey(userId, permission) {
 	let token = await generateUUID();
     let usertoken = userId + "-" + token;
@@ -66,8 +61,7 @@ async function addAPIKey(userId, permission) {
 }
 
 module.exports = {
-	getUser,
 	addUser,
-	getAPIKey,
+	loginUser,
 	addAPIKey,
 };

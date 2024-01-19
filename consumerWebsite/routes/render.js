@@ -51,7 +51,7 @@ router.get('/news', function(req, res, next) {
     res.render('news'); 
 });
 
-//login / register page
+//login | register page
 router.get('/login', function(req, res, next) {
     res.render('signuplogin'); 
 });

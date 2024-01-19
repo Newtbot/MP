@@ -153,6 +153,14 @@ app.auth = (function (app) {
 		localStorage.setItem("APIToken", token);
 	}
 
+	function setUserId(userId) {
+		localStorage.setItem("userId", userId);
+	}
+
+	function setUsername(username) {
+		localStorage.setItem("username", username);
+	}
+
 	function getToken() {
 		return localStorage.getItem("APIToken");
 	}
@@ -167,7 +175,7 @@ app.auth = (function (app) {
 			callback(null, false);
 		}
 	}
-
+	/*
 	function logIn(args, callback) {
 		app.api.post("auth/login", args, function (error, data) {
 			if (data.login) {
@@ -176,9 +184,14 @@ app.auth = (function (app) {
 			callback(error, !!data.token);
 		});
 	}
+	*/
 
 	function logOut(callback) {
 		localStorage.removeItem("APIToken");
+		localStorage.removeItem("userId");
+		localStorage.removeItem("username");
+
+		//remove token from db NOT the api key.
 		callback();
 	}
 
@@ -196,17 +209,24 @@ app.auth = (function (app) {
 
 	function logInRedirect() {
 		window.location.href =
+			//window.location.href = location.href.replace(location.origin+'/login', '') || '/'
 			location.href.replace(location.replace(`/login`)) || "/";
+	}
+
+	function homeRedirect(){
+		window.location.href = 
+		location.href.replace(location.replace(`/`)) || "/";
 	}
 
 	return {
 		getToken: getToken,
 		setToken: setToken,
 		isLoggedIn: isLoggedIn,
-		logIn: logIn,
+		//logIn: logIn,
 		logOut: logOut,
 		forceLogin,
 		logInRedirect,
+		homeRedirect,
 	};
 })(app);
 

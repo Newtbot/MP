@@ -5,11 +5,8 @@
         <div class="form signup" >
             <!--<div class="form signup card" -->
             <header>Signup</header>
-            <!-- Return message from api -->
-            <div class="actionMessage" style="display:none"></div>
             <!-- localhost/api/v0/user/register -->
-
-            <!-- evalAjax Fires when status is returned  -->
+            <!-- evalAjax Fires when status 200 is returned  -->
             <form action="user/register" onsubmit="formAJAX(this)" evalAJAX="app.auth.logInRedirect();">
                 <input type="text" name="username" placeholder="Username" required />
                 <input type="text" name="email" placeholder="Email" required />
@@ -23,11 +20,12 @@
 
         <div class="form login">
             <header>Login</header>
-            <!-- Return message from api -->
-            <div class="actionMessage" style="display:none"></div>
-            <form action="user/login" onsubmit="formAJAX(this)" evalAJAX="app.auth.logInRedirect();">
-                <input type="text" id="email" placeholder="Email address" required />
-                <input type="password" id="password" placeholder="Password" required />
+            <!-- evalAjax Fires when status 200 is returned  -->
+            <form action="user/login" onsubmit="formAJAX(this)" 
+            evalAJAX="app.auth.homeRedirect();"
+            >
+                <input type="text" name="userInfo" placeholder="Email address | Username" required />
+                <input type="password" name="password" placeholder="Password" required />
                 <a href="/resetPassword">Forgot password?</a>
                 <input type="submit" value="Login" />
             </form>

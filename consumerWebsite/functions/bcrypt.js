@@ -29,9 +29,14 @@ async function hashAPIKey(apikey) {
     return await bcrypt.hash(apikey, saltRounds);
 }
 
+async function comparePassword(password, hash) {
+    return await bcrypt.compare(password, hash);
+}
+
 
 
 module.exports = { 
     hashPassword,
     hashAPIKey,
+    comparePassword
 };
