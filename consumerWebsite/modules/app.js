@@ -4,10 +4,6 @@ const app = express();
 const port = 3000;
 const ejs = require("ejs");
 
-const bodyParser = require("body-parser"); // Middleware
-
-app.use(bodyParser.urlencoded({ extended: false }));
-
 
 app.use(express.json());
 app.set("json spaces", 2);
