@@ -4,7 +4,7 @@ const { userModel } = require("../database/model/userModel.js");
 const { Op, Sequelize } = require("sequelize");
 const { hashAPIKey } = require("../functions/bcrypt.js");
 const { generateUUID } = require("../functions/generateUUID.js");
-const { hashPassword } = require("../functions/bcrypt.js");
+const { hashPassword , hashAPIKey } = require("../functions/bcrypt.js");
 
 async function getUser() {
 	const user = await userModel.findAll();
@@ -31,10 +31,6 @@ async function addUser(user) {
 	});
 }
 
-async function getAPIKey() {
-	const apikey = await apikeyModel.findAll();
-	return apikey;
-}
 
 /*
 1) take userid 
