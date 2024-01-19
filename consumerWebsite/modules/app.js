@@ -28,11 +28,18 @@ app.use("/", require("../routes/render")); //consumerWebsite\routes\render.js
 // Catch 404 and forward to error handler. If none of the above routes are
 // used, this is what will be called.
 app.use(function (req, res, next) {
+	if (req.is("application/json")) {
 	var err = new Error("Not Found");
 	err.message = "Page not found";
 	err.status = 404;
 	next(err);
+	}
+	else{
+		res.status(404).render("404");
+	}
 });
+
+
 
 // Error handler. This is where `next()` will go on error
 app.use(function (err, req, res, next) {

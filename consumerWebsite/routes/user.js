@@ -1,15 +1,23 @@
-const { addUser , loginUser } = require("../functions/apiDatabase.js");
+const { addUser, loginUser } = require("../functions/apiDatabase.js");
 
 const express = require("express");
 const router = express.Router();
 
-
 // /user/register
 router.post("/register", async (req, res, next) => {
 	try {
-		console.log("this is " , req.body);
-		await addUser(req.body);
-		res.status(200).json({ register: true });
+		let Res = await addUser(req.body);
+		if (Res == false) {
+			let error = new Error("UserRegFailed");
+			error.message = "The user failed to be craated";
+			error.status = 400;
+			return next(error);
+		}
+    else{
+      return res.json({
+        message: "User created successfully",
+      });
+    }
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -19,11 +27,23 @@ router.post("/register", async (req, res, next) => {
 //login
 router.post("/login", async (req, res, next) => {
 	try {
-		console.log("this is " , req.body);
-		let res = await loginUser(req.body);
-		if (res == false){
-			console.log("user not found");
+		let Res = await loginUser(req.body);
+		if (Res == false) {
+      let error = new Error("User Login Failed");
+			error.status = 400;
+			return next(error);
 		}
+    else{
+      //pass res back to form to be set in local storage
+      console.log(Res);
+      return res.json({
+        message: "User login successfully",
+        token: Res.token,
+        userId: Res.userid,
+        username: Res.username,
+      }); 
+
+    }
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -34,7 +54,6 @@ router.post("/login", async (req, res, next) => {
 //getbyid
 
 module.exports = router;
-
 
 /*
 
