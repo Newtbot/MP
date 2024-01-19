@@ -56,7 +56,9 @@ router.get('/login', function(req, res, next) {
     res.render('signuplogin'); 
 });
 
-
-
+//contact page
+router.get('/contact', function(req, res, next) {
+  res.render('contact'); 
+});
 
 module.exports = router;
