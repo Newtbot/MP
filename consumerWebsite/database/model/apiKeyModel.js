@@ -64,7 +64,6 @@ const apikeyModel = sequelize.define(
 
 module.exports = { apikeyModel };
 
-
 /*
   class AuthToken extends Model {
     check(){

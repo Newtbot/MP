@@ -1,18 +1,7 @@
-const { getUser, addUser } = require("../functions/apiDatabase.js");
+const { addUser , loginUser } = require("../functions/apiDatabase.js");
 
 const express = require("express");
 const router = express.Router();
-
-//get all users
-router.get("/", async (req, res, next) => {
-	try {
-		const location = await getUser();
-		res.status(200).json(location);
-	} catch (error) {
-		console.error(error);
-		next(error);
-	}
-});
 
 
 // /user/register
@@ -27,8 +16,19 @@ router.post("/register", async (req, res, next) => {
 	}
 });
 
-
 //login
+router.post("/login", async (req, res, next) => {
+	try {
+		console.log("this is " , req.body);
+		let res = await loginUser(req.body);
+		if (res == false){
+			console.log("user not found");
+		}
+	} catch (error) {
+		console.error(error);
+		next(error);
+	}
+});
 //update
 //delete
 //getbyid
