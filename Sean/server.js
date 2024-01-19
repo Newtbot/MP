@@ -1,7 +1,7 @@
 const express = require("express");
 const session = require("express-session");
 const rateLimit = require('express-rate-limit');
-const mysql2 = require('mysql2');
+
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
@@ -13,7 +13,7 @@ const { format } = require('date-fns');
 
 const { Sequelize } = require('sequelize');
 const { transporter } = require("./modules/nodeMailer");
-const { connection } = require("./modules/mysql"); 
+
 const { sequelize, User } = require("./modules/mysql");
 const userLogs= require('./models/userLogs')(sequelize); // Adjust the path based on your project structure
 const app = express();
@@ -80,15 +80,13 @@ app.get("/login", (req, res) => {
 	res.render("login", { error: null });
 });
 
-
-
   const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
 	max: 5, // limit each IP to 3 requests per windowMs
 	message: 'Too many login attempts from this IP, please try again later.',
   });
 
-  app.use('/login', limiter);
+app.use('/login', limiter);
   
 
 app.post('/login', [
@@ -168,7 +166,7 @@ app.post("/verify-otp", [
 	  const errors = validationResult(req);
   
 	  if (!errors.isEmpty()) {
-		return res.render('otp', { error: 'Invalid OTP. Please try again.', username: req.body.username, csrfToken: req.session.csrfToken });
+		return res.render('otp', { error: 'Invalid OTP. Please try again.'});
 	  }
   
 	  const enteredOTP = req.body.otp;
@@ -223,12 +221,7 @@ app.post("/verify-otp", [
   
   app.get("/logout", async (req, res) => {
 	try {
-	  const username = req.session.username || "Unknown User";
-  
-	  // Log the logout activity using Sequelize
-	  await userLogs.create({ username, activity: "User logged out. Session destroyed." });
-
-  
+	  const username = req.session.username ;
 	  // Log the user out by clearing the session
 	  req.session.destroy(async (err) => {
 		if (err) {
@@ -238,7 +231,8 @@ app.post("/verify-otp", [
 		  await userLogs.create({ username, activity: "User logged out unsuccessfully. Session not destroyed." });
 		} else {
 		  console.log("Session destroyed.");
-  
+    // Log the logout activity using Sequelize
+	      await userLogs.create({ username, activity: "User logged out. Session destroyed." });
 		  // Clear the session token cookie
 		  res.clearCookie('sessionToken');
 		}
