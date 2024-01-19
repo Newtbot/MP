@@ -56,10 +56,7 @@ router.get('/login', function(req, res, next) {
     res.render('signuplogin'); 
 });
 
-//404  page
-router.get('*', function(req, res, next) {
-    res.render('404'); 
-});
+
 
 
 module.exports = router;

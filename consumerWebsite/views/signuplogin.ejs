@@ -2,7 +2,7 @@
 
 <body>
     <section class="wrapper">
-        <div class="form signup" >
+        <div class="form signup iot-card">
             <!--<div class="form signup card" -->
             <header>Signup</header>
             <!-- localhost/api/v0/user/register -->
@@ -18,12 +18,17 @@
             </form>
         </div>
 
-        <div class="form login">
+        <div class="form login iot-card">
             <header>Login</header>
+            <div class="card-header shadow actionMessage" style="display:none"></div>
             <!-- evalAjax Fires when status 200 is returned  -->
             <form action="user/login" onsubmit="formAJAX(this)" 
-            evalAJAX="app.auth.homeRedirect();"
-            >
+            evalAJAX="app.auth.homeRedirect();
+            app.auth.setToken(data.token);
+            app.auth.setUserId(data.userId);
+            app.auth.setUsername(data.username);
+            ">
+            
                 <input type="text" name="userInfo" placeholder="Email address | Username" required />
                 <input type="password" name="password" placeholder="Password" required />
                 <a href="/resetPassword">Forgot password?</a>
