@@ -2,14 +2,11 @@
 
 <body>
     <section class="wrapper">
-        <div class="form signup" >
+        <div class="form signup iot-card">
             <!--<div class="form signup card" -->
             <header>Signup</header>
-            <!-- Return message from api -->
-            <div class="actionMessage" style="display:none"></div>
             <!-- localhost/api/v0/user/register -->
-
-            <!-- evalAjax Fires when status is returned  -->
+            <!-- evalAjax Fires when status 200 is returned  -->
             <form action="user/register" onsubmit="formAJAX(this)" evalAJAX="app.auth.logInRedirect();">
                 <input type="text" name="username" placeholder="Username" required />
                 <input type="text" name="email" placeholder="Email" required />
@@ -21,7 +18,7 @@
             </form>
         </div>
 
-        <div class="form login">
+        <div class="form login iot-card">
             <header>Login</header>
             <div class="card-header shadow actionMessage" style="display:none"></div>
             <!-- evalAjax Fires when status 200 is returned  -->
@@ -34,7 +31,7 @@
             
                 <input type="text" name="userInfo" placeholder="Email address | Username" required />
                 <input type="password" name="password" placeholder="Password" required />
-                <a href="/forgotPassword">Forgot password?</a>
+                <a href="/resetPassword">Forgot password?</a>
                 <input type="submit" value="Login" />
             </form>
         </div>

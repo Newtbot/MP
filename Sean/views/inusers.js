@@ -1,3 +1,4 @@
+
 $(document).ready(function () {
   $('#resetPasswordLink').on('click', function () {
     $('#resetPasswordFormContainer').show();
@@ -6,15 +7,21 @@ $(document).ready(function () {
     $('#downloadButtonContainer').hide();
     $('#deleteUserContainer').hide();
     $('#logsContainer').hide();
+    $('#additional-text').hide();
+    $('#additional-text2').show();
+    $('#additional-text3').hide();
   });
 
   $('#addUserLink').on('click', function () {
     $('#resetPasswordFormContainer').hide();
     $('#createUserForm').show();
+    $('#additional-text').show();
     $('#userDataContainer').hide();
     $('#downloadButtonContainer').hide();
     $('#deleteUserContainer').hide();
     $('#logsContainer').hide();
+    $('#additional-text2').hide();
+    $('#additional-text3').hide();
   });
 
   $('#userDataLink').on('click', function () {
@@ -24,6 +31,9 @@ $(document).ready(function () {
     $('#downloadButtonContainer').show();
     $('#deleteUserContainer').hide();
     $('#logsContainer').hide();
+    $('#additional-text').hide();
+    $('#additional-text2').hide();
+    $('#additional-text2').hide();
   });
 
   $('#searchUserButton').on('click', function () {
@@ -41,6 +51,9 @@ $('#deleteUserContainer').show();
     $('#userDataContainer').hide();
     $('#downloadButtonContainer').hide();
     $('#logsContainer').hide();
+    $('#additional-text').hide();
+    $('#additional-text2').hide();
+    $('#additional-text3').show();
 });
 
 $('#downloadButton').on('click', function () {
@@ -54,10 +67,10 @@ $('#logsLink').on('click', function () {
   $('#userDataContainer').hide();
   $('#downloadButtonContainer').hide();
   $('#deleteUserContainer').hide();
-
-  // Show logs container
+  $('#additional-text').hide();
   $('#logsContainer').show();
-
+  $('#additional-text2').hide();
+  $('#additional-text3').hide();
   fetchLogs();
 });
 
@@ -69,6 +82,7 @@ function searchUser(username) {
       if (response.ok) {
         return response.json();
       } else {
+        alert('No user found with the given username.');
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
     })
@@ -393,12 +407,12 @@ function displayLogs(logs) {
 
     // Create the table and header row
     const table = $('<table>').addClass('logs-table');
-    const headerRow = '<tr><th>ID</th><th>Username</th><th>Activity</th><th>Timestamp</th></tr>';
+    const headerRow = '<thead><tr><th>ID</th><th>Username</th><th>Activity</th><th>Timestamp</th></tr></thead>';
     table.append(headerRow);
 
     // Add each log as a row in the table
     logs.forEach(log => {
-      const row = `<tr><td>${log.id}</td><td>${log.username}</td><td>${log.activity}</td><td>${log.timestamp}</td></tr>`;
+      const row = `<tbody><tr><td>${log.id}</td><td>${log.username}</td><td>${log.activity}</td><td>${log.timestamp}</td></tr></tbody>`;
       table.append(row);
     });
 

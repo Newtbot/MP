@@ -12,7 +12,7 @@ app.util = (function (app) {
 
 	function actionMessage(message, $target, type, callback) {
 		message = message || "";
-		$target = $target.closest("div.card").find(".actionMessage");
+		$target = $target.closest("div.iot-card").find(".actionMessage");
 		type = type || "info";
 		callback = callback || function () {};
 
@@ -29,9 +29,6 @@ app.util = (function (app) {
 			});
 		} else {
 			if (type) $target.addClass("bg-" + type);
-			message =
-				'<button class="action-close btn btn-sm btn-outline-dark float-right"><i class="fa-solid fa-xmark"></i></button>' +
-				message;
 			$target.html(message).slideDown("fast");
 		}
 		setTimeout(callback, 10);
@@ -137,6 +134,7 @@ app.api = (function (app) {
 			complete: function (res, text) {
 				callback(
 					text !== "success" ? res.statusText : null,
+					//console.log(res.responseText),
 					JSON.parse(res.responseText),
 					res.status
 				);
@@ -153,6 +151,14 @@ app.auth = (function (app) {
 		localStorage.setItem("APIToken", token);
 	}
 
+	function setUserId(userId) {
+		localStorage.setItem("userId", userId);
+	}
+
+	function setUsername(username) {
+		localStorage.setItem("username", username);
+	}
+
 	function getToken() {
 		return localStorage.getItem("APIToken");
 	}
@@ -167,7 +173,7 @@ app.auth = (function (app) {
 			callback(null, false);
 		}
 	}
-
+	/*
 	function logIn(args, callback) {
 		app.api.post("auth/login", args, function (error, data) {
 			if (data.login) {
@@ -176,9 +182,14 @@ app.auth = (function (app) {
 			callback(error, !!data.token);
 		});
 	}
+	*/
 
 	function logOut(callback) {
 		localStorage.removeItem("APIToken");
+		localStorage.removeItem("userId");
+		localStorage.removeItem("username");
+
+		//remove token from db NOT the api key.
 		callback();
 	}
 
@@ -196,46 +207,50 @@ app.auth = (function (app) {
 
 	function logInRedirect() {
 		window.location.href =
+			//window.location.href = location.href.replace(location.origin+'/login', '') || '/'
 			location.href.replace(location.replace(`/login`)) || "/";
+	}
+
+	function homeRedirect() {
+		window.location.href = location.href.replace(location.replace(`/`)) || "/";
 	}
 
 	return {
 		getToken: getToken,
 		setToken: setToken,
+		setUserId: setUserId,
+		setUsername: setUsername,
 		isLoggedIn: isLoggedIn,
-		logIn: logIn,
+		//logIn: logIn,
 		logOut: logOut,
 		forceLogin,
 		logInRedirect,
+		homeRedirect,
 	};
 })(app);
 
 //ajax form submit
-function formAJAX( btn, del ) {
-    event.preventDefault(); // avoid to execute the actual submit of the form.
-    var $form = $(btn).closest( '[action]' ); // gets the 'form' parent
-    var formData = $form.find( '[name]' ).serializeObject(); // builds query formDataing
-    var method = $form.attr('method') || 'post';
+function formAJAX(btn, del) {
+	event.preventDefault(); // avoid to execute the actual submit of the form.
+	var $form = $(btn).closest("[action]"); // gets the 'form' parent
+	var formData = $form.find("[name]").serializeObject(); // builds query formDataing
+	var method = $form.attr("method") || "post";
 
-    // if( !$form.validate()) {
-    //     app.util.actionMessage('Please fix the form errors.', $form, 'danger')
-    //     return false;
-    // }
-    
-    app.util.actionMessage( 
-        '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>',
-        $form,
-        'info'
-    );
+	// if( !$form.validate()) {
+	//     app.util.actionMessage('Please fix the form errors.', $form, 'danger')
+	//     return false;
+	// }
 
-        //console.log('Data being sent to', $form.attr('action'), formData)
+	app.util.actionMessage("Loading...", $form, "info");
 
-    app.api[method]($form.attr('action'), formData, function(error, data){
-                //console.log('Data back from the server', error, data)
-        app.util.actionMessage(data.message, $form, error ? 'danger' : 'success'); //re-populate table
-        if(!error){
-            $form.trigger("reset");
-            eval($form.attr('evalAJAX')); //gets JS to run after completion
-        }
-    });
+	//console.log('Data being sent to', $form.attr('action'), formData)
+
+	app.api[method]($form.attr("action"), formData, function (error, data) {
+		//console.log('Data back from the server', error, data)
+		app.util.actionMessage(data.message, $form, error ? "danger" : "success"); //re-populate table
+		if (!error) {
+			$form.trigger("reset");
+			eval($form.attr("evalAJAX")); //gets JS to run after completion
+		}
+	});
 }

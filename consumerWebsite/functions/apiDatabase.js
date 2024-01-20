@@ -2,14 +2,12 @@ const { sequelize } = require("../database/mySql.js");
 const { apikeyModel } = require("../database/model/apikeyModel.js");
 const { userModel } = require("../database/model/userModel.js");
 const { Op, Sequelize } = require("sequelize");
-const { hashAPIKey } = require("../functions/bcrypt.js");
 const { generateUUID } = require("../functions/generateUUID.js");
-const { hashPassword } = require("../functions/bcrypt.js");
+const { hashPassword , comparePassword , hashAPIKey } = require("../functions/bcrypt.js");
 
-async function getUser() {
-	const user = await userModel.findAll();
-	return user;
-}
+//helper function
+
+
 //api/v0/user/register
 
 /* Registering new user 
@@ -22,14 +20,75 @@ async function addUser(user) {
 	//hash password
 	let hash = await hashPassword(user.password);
 
-	await userModel.create({
+    const addRes = await userModel.create({
 		username: user.username,
 		password: hash,
 		email: user.email,
 		address: user.address,
 		phone: user.phone,
 	});
+    if (addRes){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
+
+//add token to db 
+async function addToken(userid , token) {
+    console.log(userid);
+    console.log(token);
+
+}
+
+async function loginUser(user) {
+    //look up username or email in db
+    const userRes = await userModel.findOne({
+        where: {
+            [Op.or]: [
+                {
+                    username: user.userInfo,
+                },
+                {
+                    email: user.userInfo,
+                },
+            ],
+        },
+        })
+	//if user exists
+    if (userRes){
+        //compare password
+        let match = await comparePassword(user.password, userRes.password);
+        if (match){
+            console.log(userRes.id);
+            console.log(userRes.username);
+
+			//generate token
+			let token = await generateUUID();
+
+            //add to db 
+            addToken(userRes.id, token);
+			
+
+            //sucessful login
+            /*
+            1) generate token
+            2) store in db and localstorage (maybe hash it?)
+            3) return userid and username and token and store in localstorage
+            */
+			return { token: token, userid: userRes.id, username: userRes.username };
+		}		
+		else {
+			return false;
+		}
+    }
+
+    else{
+        return false;
+    }
+}
+
 
 async function getAPIKey() {
 	const apikey = await apikeyModel.findAll();
@@ -44,8 +103,6 @@ async function getAPIKey() {
 5) you give the user rowid-uuidv4
 6) store in database
 */
-
-
 async function addAPIKey(userId, permission) {
 	let token = await generateUUID();
     let usertoken = userId + "-" + token;
@@ -66,8 +123,7 @@ async function addAPIKey(userId, permission) {
 }
 
 module.exports = {
-	getUser,
 	addUser,
-	getAPIKey,
+	loginUser,
 	addAPIKey,
 };
