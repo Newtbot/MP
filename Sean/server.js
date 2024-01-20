@@ -370,14 +370,15 @@ app.post(
             }
 
             // Hash the password
-            const hashedPassword = await bcrypt.hash(password, 10);
+			const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
 
             // Start a transaction
             const t = await sequelize.transaction();
 
             try {
                 // Create the user
-                const newUser = await User.create({
+                await User.create({
                     name,
                     username,
                     email,
@@ -535,8 +536,9 @@ app.post("/forgot-password", async (req, res) => {
 		});
 	  }
   
-	  // Hash the new password
-	  const hashedPassword = await bcrypt.hash(sanitizedPassword, 10);
+	  // Hash the new password 
+	  const saltRounds = 10;
+	  const hashedPassword = await bcrypt.hash(sanitizedPassword, saltRounds);
   
 	  // Update user's password and clear reset token
 	  const updateQuery = {

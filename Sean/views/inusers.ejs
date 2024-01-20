@@ -7,35 +7,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>In-House Users</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="/user-creation.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-
-  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap">
 </head>
 
 <body>
-
-  <div id="navbar">
-    <h1>Eco Saver</h1>
+  <header>
+    <h1>ECOSAVER MANAGEMENT</h1>
+</header>
+  <nav>
     <a href="#" id="userDataLink">User Data</a>
     <a href="#" id="addUserLink">Add User</a>
     <a href="#" id="deleteUserLink">Delete User</a>
     <a href="#" id="resetPasswordLink">Reset Password</a>
     <a href="#" id="logsLink">Logs</a>
     <a href="/home" id="homeLink">Home</a>
-  </div>
+  </nav>
 
-  <div id="content">
+    <main>
     <h2>Welcome to the In-House Users Page</h2>
+   </main>
     <div id="downloadButtonContainer">
       <button id="downloadButton">Download as Excel</button>
     </div>
+
+
     <div id="userDataContainer">
-      <h3>All Users</h3>
-      <table>
+      <table class="nice-table">
         <thead>
           <tr>
             <th>Name</th>
@@ -63,7 +62,7 @@
       </table>
     </div>
     <div id="createUserForm" class="user-creation-container" style="display: none;">
-      <div class="title">Registration</div>
+      <h3>Registration</h3>
       <div class="content">
         <form action="/createUser" id="userForm" method="post">
           <div class="user-details">
@@ -102,9 +101,21 @@
         </form>
       </div>
     </div>
+ 
+    <div id="additional-text" style="display: none;">
+      <div class="condition">
+        <span>Conditions for creating a user:</span>
+        <ul>
+          <li class="error">Username has to be different.</li>
+          <li class="error">Email has to be different.</li>
+          <li class="error">Password must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.</li>
+        </ul>
+      </div>
+    </div>
+
     <div id="resetPasswordFormContainer" style="display: none;">
+      <h3>Reset Password</h3>
       <div id="resetPasswordForm" class="user-creation-container">
-        <div class="title">Reset Password</div>
         <div class="content">
           <form id="resetPasswordForm">
             <div class="user-details">
@@ -130,6 +141,15 @@
       </div>
     </div>
   </div>
+  <div id="additional-text2" style="display: none;">
+    <div class="condition">
+      <span>Please remind user to reset their password again for safety reason</span>
+      <span>Conditions for Reseting user Password:</span>
+      <ul>
+        <li class="error">Password must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.</li>
+      </ul>
+    </div>
+  </div>
     <div id="deleteUserContainer" style="display: none;">
       <h3>Delete User</h3>
       <div class="search-container">
@@ -143,7 +163,11 @@
         </ul>
       </div>
     </div>
-
+    <div id="additional-text3" style="display: none;">
+      <div class="condition">
+        <span>Please ensure correct user is being deleted user cannot be retived again upon deletion</span>
+      </div>
+    </div>
     <div id="logsContainer" style="display: none;">
       <!-- Content for logs will be added here -->
       
@@ -152,8 +176,7 @@
     <script>
       const allUsers = <%- JSON.stringify(allUsers) %>;
       const currentUsername = '<%= currentUsername %>';
-      
-  </script>
+    </script>
  
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
@@ -163,8 +186,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
   <script src="inusers.js"></script>
-
-  </div>
+ 
 
 </body>
 
