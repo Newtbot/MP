@@ -3801,3 +3801,15 @@
 .fas {
   font-family: 'Font Awesome 5 Free';
   font-weight: 900; }
+
+  .contact-right p {
+    /* Your CSS styles here */
+    color: #4e3914;
+    font-size: 16px;
+    /* Add any other styles you need */
+}
+
+
+.card-text {
+    color: #000000;
+}

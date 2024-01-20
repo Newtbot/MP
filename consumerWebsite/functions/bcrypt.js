@@ -21,6 +21,8 @@ bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
 });
 
 */
+
+//hash for pass or token lol doesnt matter
 async function hashPassword(password) {
     return await bcrypt.hash(password, saltRounds);
 }
@@ -29,6 +31,7 @@ async function hashAPIKey(apikey) {
     return await bcrypt.hash(apikey, saltRounds);
 }
 
+//can be used to compare password or token
 async function comparePassword(password, hash) {
     return await bcrypt.compare(password, hash);
 }

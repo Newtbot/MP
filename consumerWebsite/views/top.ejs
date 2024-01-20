@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta http-equiv="cleartype" content="on">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -18,6 +20,12 @@
     <link href="css/learnmore.css" rel="stylesheet">
 
 
+    <link href="css/contact.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/api.css" media="all">
+    <!-- weird api page cdn -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;1,300&family=Source+Code+Pro:wght@300&display=swap" rel="stylesheet"> 
 
 
     <!-- jQuery library -->
@@ -27,32 +35,40 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
-
-
+    <!-- weird api page cdn -->
+    <!-- https://github.com/floriannicolas/API-Documentation-HTML-Template/tree/master -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+    <!-- https://github.com/floriannicolas/API-Documentation-HTML-Template/tree/master -->
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
     <!-- jquery app.js -->
     <script src="js/app.js"></script>
 
 </head>
-
-<body>
-
     <!-- javascript function to check if user is auth -->
-    <!-- wait for DOC to be ready -->
     <script>
+        //make document ready
         $(document).ready(function () {
+            //check if user is logged in
             app.auth.isLoggedIn(function (error, data) {
                 if (data) {
-                    $('#cl-logout-button').show();
-                    $('#cl-profile-button').show();
-                    $('#cl-login-button').hide();
+                    $('#cl-logout-button').show('fast');
+                    $('#cl-profile-button').show('fast');
+                    $('#cl-login-button').hide('fast');
                 } else {
-                    $('#cl-login-button').show();
+                    $('#cl-login-button').show('fast');
                 }
+                $('body').show('fast')
+
             });
         });
-    </script>
+
+</script>
 
 
+
+<body>
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-light top-nav fixed-top">
         <div class="container">
             <a class="navbar-brand" href="/">
@@ -73,22 +89,24 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/contact">Contact</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/api">API Doc</a>
+                    </li>
                     <!-- profile button -->
                     <div class="form-inline mt-2 mt-md-0">
-                        <a id="cl-profile-button" class="btn btn-outline-danger my-2 my-sm-0" href="/profile"
-                            style="display: none;">
-                            <i class="fas fa-sign-out"></i>
-                            Profile
+                        <!-- Profile Button -->
+                        <a id="cl-profile-button" class="btn btn-outline-info btn-sm my-2 my-sm-0" href="/profile" style="display: none;">
+                            <i class="fas fa-sign-out"></i> Profile
                         </a>
-                        <a id="cl-login-button" class="btn btn-outline-danger my-2 my-sm-0"
-                            onclick="app.auth.forceLogin()" style="display: none;">
-                            <i class="fas fa-sign-out"></i>
-                            Login
+                    
+                        <!-- Login Button -->
+                        <a id="cl-login-button" class="btn btn-outline-danger btn-sm my-2 my-sm-0" onclick="app.auth.forceLogin()" style="display: none;">
+                            <i class="fas fa-sign-out"></i> Login
                         </a>
-                        <button id="cl-logout-button" class="btn btn-outline-danger my-2 my-sm-0"
-                            onclick="app.auth.logOut(e => window.location.href='/')" style="display: none;">
-                            <i class="fas fa-sign-out"></i>
-                            Log Out
+                    
+                        <!-- Logout Button -->
+                        <button id="cl-logout-button" class="btn btn-outline-danger btn-sm my-2 my-sm-0" href="/" onclick="app.auth.logOut(e => window.location.href='/')" style="display: none;">
+                            <i class="fas fa-sign-out"></i> Logut
                         </button>
                     </div>
                 </ul>
@@ -98,35 +116,3 @@
 </body>
 
 </html>
-
-<!--
-<ul class="navbar-nav ms-auto">
-    <li class="nav-item">
-        <a class="nav-link active" href="/">Home</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/news">News</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/contact">Contact</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/profile">Profile</a>
-    </li>
-    <li class="nav-item">
-        <div class="form-inline mt-2 mt-md-0">
-            <a id="cl-login-button" class="btn btn-outline-danger my-2 my-sm-0"
-                onclick="app.auth.forceLogin()" style="display: none;">
-                <i class="fas fa-sign-out"></i>
-                Login
-            </a>
-            <button id="cl-logout-button" class="btn btn-outline-danger my-2 my-sm-0"
-                onclick="app.auth.logOut(e => window.location.href='/')" style="display: none;">
-                <i class="fas fa-sign-out"></i>
-                Log Out
-            </button>
-        </div>
-    </li>
-</ul>
-
--->

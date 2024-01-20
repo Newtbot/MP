@@ -14,6 +14,7 @@
 
     <!-- Custom styles for this template -->
     <link rel="stylesheet" href="css/sp.css" />
+    <!--     <link rel="stylesheet" href="css/contact.css" /> -->
 
     <!-- jQuery library -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -35,18 +36,23 @@
     <!-- wait for DOC to be ready -->
 
     <script>
+        //make document ready
         $(document).ready(function () {
+            //check if user is logged in
             app.auth.isLoggedIn(function (error, data) {
                 if (data) {
-                    $('#cl-logout-button').show();
-                    $('#cl-profile-button').show();
-                    $('#cl-login-button').hide();
+                    $('#cl-logout-button').show('fast');
+                    $('#cl-profile-button').show('fast');
+                    $('#cl-login-button').hide('fast');
                 } else {
-                    $('#cl-login-button').show();
+                    $('#cl-login-button').show('fast');
                 }
+                $('body').show('fast')
+
             });
         });
-    </script>
+
+</script>
 
 
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-light top-nav fixed-top">
@@ -69,6 +75,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/contact">Contact</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/api">API Doc</a>
+                    </li>
                     <!-- profile button -->
                     <div class="form-inline mt-2 mt-md-0">
                         <a id="cl-profile-button" class="btn btn-outline-danger my-2 my-sm-0" href="/profile"
@@ -84,7 +93,7 @@
                         <button id="cl-logout-button" class="btn btn-outline-danger my-2 my-sm-0"
                             onclick="app.auth.logOut(e => window.location.href='/')" style="display: none;">
                             <i class="fas fa-sign-out"></i>
-                            Log Out
+                            Logout
                         </button>
                     </div>
                 </ul>

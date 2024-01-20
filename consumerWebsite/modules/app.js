@@ -13,17 +13,17 @@ app.set("views", path.join(__dirname, "../views"));
 app.set("view engine", "ejs");
 
 // Have express server static content( images, CSS, browser JS) from the public
-// local folder.
 app.use(express.static(path.join(__dirname, "../public")));
 
 //middleware logic ( called by next() )
-//add token middeware upon login to validate routes that require token
+const auth = require("../middleware/authChecker"); 
+
 
 //route logic
-app.use("/api/v0", require("../routes/api_routes")); //consumerWebsite\routes\api_routes.js
+app.use("/api/v0", require("../routes/api_routes")); 
 
 //render logic
-app.use("/", require("../routes/render")); //consumerWebsite\routes\render.js
+app.use("/", require("../routes/render"));
 
 // Catch 404 and forward to error handler. If none of the above routes are
 // used, this is what will be called.

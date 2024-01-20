@@ -134,7 +134,6 @@ app.api = (function (app) {
 			complete: function (res, text) {
 				callback(
 					text !== "success" ? res.statusText : null,
-					//console.log(res.responseText),
 					JSON.parse(res.responseText),
 					res.status
 				);
@@ -151,8 +150,9 @@ app.auth = (function (app) {
 		localStorage.setItem("APIToken", token);
 	}
 
-	function setUserId(userId) {
-		localStorage.setItem("userId", userId);
+	function setUserId(userid) {
+		console.log("userid", userid);
+		localStorage.setItem("userid", userid);
 	}
 
 	function setUsername(username) {
@@ -185,25 +185,39 @@ app.auth = (function (app) {
 	*/
 
 	function logOut(callback) {
-		localStorage.removeItem("APIToken");
-		localStorage.removeItem("userId");
-		localStorage.removeItem("username");
+		//call logout route
+		$.ajax({
+			type: "DELETE",
+			url: "/api/v0/user/logout",
+			headers: {
+				"auth-token": app.auth.getToken(),
+			},
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			complete: function (res, text) {
+				callback(
+					text !== "success" ? res.statusText : null,
+					JSON.parse(res.responseText),
+					res.status
+				);
+			},
+		});
 
-		//remove token from db NOT the api key.
+		localStorage.removeItem("APIToken");
+		localStorage.removeItem("userid");
+		localStorage.removeItem("username");
 		callback();
 	}
 
 	function forceLogin() {
-		$.holdReady(true);
-		app.auth.isLoggedIn(function (error, isLoggedIn) {
-			if (error || !isLoggedIn) {
-				app.auth.logOut(function () {});
-				location.replace(`/login`);
-			} else {
-				$.holdReady(false);
-			}
-		});
-	}
+        app.auth.isLoggedIn(function (error, isLoggedIn) {
+            if (error || !isLoggedIn) {
+                app.auth.logOut(function () {
+                    location.replace(`/login`);
+                });
+            }
+        });
+    }
 
 	function logInRedirect() {
 		window.location.href =
@@ -213,6 +227,18 @@ app.auth = (function (app) {
 
 	function homeRedirect() {
 		window.location.href = location.href.replace(location.replace(`/`)) || "/";
+	}
+
+	//if isLoggedin is true, redirect user away from login / register page
+	function redirectIfLoggedIn() {
+		$.holdReady(true);
+		app.auth.isLoggedIn(function (error, isLoggedIn) {
+			if (error || isLoggedIn) {
+				location.replace(`/`);
+			} else {
+				$.holdReady(false);
+			}
+		});
 	}
 
 	return {
@@ -226,6 +252,7 @@ app.auth = (function (app) {
 		forceLogin,
 		logInRedirect,
 		homeRedirect,
+		redirectIfLoggedIn,
 	};
 })(app);
 
