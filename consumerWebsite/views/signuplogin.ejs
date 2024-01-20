@@ -23,12 +23,27 @@
 
         <div class="form login">
             <header>Login</header>
+<<<<<<< Updated upstream
             <!-- Return message from api -->
             <div class="actionMessage" style="display:none"></div>
             <form action="user/login" onsubmit="formAJAX(this)" evalAJAX="app.auth.logInRedirect();">
                 <input type="text" id="email" placeholder="Email address" required />
                 <input type="password" id="password" placeholder="Password" required />
                 <a href="/resetPassword">Forgot password?</a>
+=======
+            <div class="card-header shadow actionMessage" style="display:none"></div>
+            <!-- evalAjax Fires when status 200 is returned  -->
+            <form action="user/login" onsubmit="formAJAX(this)" 
+            evalAJAX="app.auth.homeRedirect();
+            app.auth.setToken(data.token);
+            app.auth.setUserId(data.userId);
+            app.auth.setUsername(data.username);
+            ">
+            
+                <input type="text" name="userInfo" placeholder="Email address | Username" required />
+                <input type="password" name="password" placeholder="Password" required />
+                <a href="/forgotPassword">Forgot password?</a>
+>>>>>>> Stashed changes
                 <input type="submit" value="Login" />
             </form>
         </div>

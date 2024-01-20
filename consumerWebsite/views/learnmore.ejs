@@ -1,0 +1,41 @@
+<%- include('top') %>
+
+<br>
+<br>
+
+<div id="map-container">
+    <img src="images/map.png" alt="Singapore Map" id="map">
+
+    <!-- Information boxes for each region -->
+    <div class="info-box" id="north">
+        <h3>North</h3>
+        <p>Air Quality Index: 15 <span id="north-aqi"></span></p>
+    </div>
+
+    <div class="info-box" id="south">
+        <h3>South</h3>
+        <p>Air Quality Index: 16 <span id="south-aqi"></span></p>
+    </div>
+
+    <div class="info-box" id="east">
+        <h3>East</h3>
+        <p>Air Quality Index: 16 <span id="east-aqi"></span></p>
+    </div>
+
+    <div class="info-box" id="west">
+        <h3>West</h3>
+        <p>Air Quality Index: 18 <span id="west-aqi"></span></p>
+    </div>
+
+    <div class="info-box" id="central">
+        <h3>Central</h3>
+        <p>Air Quality Index: 17 <span id="central-aqi"></span></p>
+    </div>
+
+</div>
+<div id="additional-info"></div>
+
+<br>
+<br>
+
+<%- include('bot') %>
