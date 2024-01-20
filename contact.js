@@ -1,4 +1,5 @@
-require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') }) 
+//import('dotenv').config({ path: path.resolve(__dirname, '../../../.env') }) 
+
 
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -61,6 +61,7 @@ const apikeyModel = sequelize.define(
 		timestamps: true,
 	}
 );
+apikeyModel.belongsTo(userModel);
 
 module.exports = { apikeyModel };
 

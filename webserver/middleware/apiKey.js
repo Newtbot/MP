@@ -42,7 +42,7 @@ module.exports = { apikeyCheck };
 //web server microservice
 1) take user supplied rowid-apikey
 2) split the string by -
-3) get the rowid
+3) get the rowid or table id
 4) get the apikey
 5) compare the apikey with the one in database
 6) if match, return true

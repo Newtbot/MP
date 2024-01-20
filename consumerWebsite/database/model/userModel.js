@@ -19,6 +19,26 @@ const userModel = sequelize.define(
 				isNumeric: true,
 			},
 		},
+		firstname: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			length: 60,
+			validate: {
+				notEmpty: true,
+				len: [1, 60],
+				isAlpha: true, // will only allow letters				
+				},
+			},
+		lastname: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			length: 60,
+			validate: {
+				notEmpty: true,
+				len: [1, 60],
+				isAlpha: true, // will only allow letters				
+				},
+		},
 		username: {
 			type: DataTypes.STRING,
 			allowNull: false,
