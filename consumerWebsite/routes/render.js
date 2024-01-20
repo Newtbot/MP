@@ -66,6 +66,16 @@ router.get('/api', function(req, res, next) {
   res.render('api'); 
 });
 
+//forget password page
+router.get('/forgotPassword', function(req, res, next) {
+  res.render('forgotPassword'); 
+});
+
+//learn more page
+router.get('/forgotPassword', function(req, res, next) {
+  res.render('forgotPassword'); 
+});
+
 //profile page
 router.get('/profile', function(req, res, next) {
   res.render('profile'); 
