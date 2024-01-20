@@ -256,7 +256,7 @@ app.auth = (function (app) {
 	};
 })(app);
 
-//ajax form submit
+//ajax form submit and pass to api
 function formAJAX(btn, del) {
 	event.preventDefault(); // avoid to execute the actual submit of the form.
 	var $form = $(btn).closest("[action]"); // gets the 'form' parent
