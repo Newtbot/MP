@@ -77,4 +77,14 @@ router.get('/contact', function(req, res, next) {
   res.render('contact'); 
 });
 
+//api doc
+router.get('/api', function(req, res, next) {
+  res.render('api'); 
+});
+
+//profile page
+router.get('/profile', function(req, res, next) {
+  res.render('profile'); 
+});
+
 module.exports = router;

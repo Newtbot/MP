@@ -1,4 +1,7 @@
 <%- include('logintop') %>
+<script type="text/javascript">
+    app.auth.redirectIfLoggedIn();
+</script>
 
 <body>
     <section class="wrapper">
@@ -7,7 +10,9 @@
             <header>Signup</header>
             <!-- localhost/api/v0/user/register -->
             <!-- evalAjax Fires when status 200 is returned  -->
-            <form action="user/register" onsubmit="formAJAX(this)" evalAJAX="app.auth.logInRedirect();">
+            <form action="auth/register" onsubmit="formAJAX(this)" evalAJAX="app.auth.logInRedirect();">
+                <input type="text" name="firstname" placeholder="First Name" required />
+                <input type="text" name="lastname" placeholder="Last Name" required />
                 <input type="text" name="username" placeholder="Username" required />
                 <input type="text" name="email" placeholder="Email" required />
                 <input type="text" name="address" placeholder="Address" required />
@@ -22,10 +27,10 @@
             <header>Login</header>
             <div class="card-header shadow actionMessage" style="display:none"></div>
             <!-- evalAjax Fires when status 200 is returned  -->
-            <form action="user/login" onsubmit="formAJAX(this)" 
+            <form action="auth/login" onsubmit="formAJAX(this)" 
             evalAJAX="app.auth.homeRedirect();
             app.auth.setToken(data.token);
-            app.auth.setUserId(data.userId);
+            app.auth.setUserId(data.userid);
             app.auth.setUsername(data.username);
             ">
             
