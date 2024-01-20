@@ -24,17 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             // Handle the API response
-            //console.log(result);
+            console.log(result);
 
             if (result.success) {
                 // Form submitted successfully, display notification
                 alert('Form submitted successfully!');
                 location.reload()
-                // You can replace the alert with your custom notification logic
             } else {
                 // Form submission failed, display error notification
                 alert('Form submission failed. Please try again.');
-                // You can replace the alert with your custom error notification logic
             }
 
         } catch (error) {
