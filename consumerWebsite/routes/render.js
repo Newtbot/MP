@@ -51,23 +51,16 @@ router.get('/news', function(req, res, next) {
     res.render('news'); 
 });
 
-<<<<<<< Updated upstream
-//login / register page
-=======
 //learn more page
 router.get('/learnmore', function(req, res, next) {
   res.render('learnmore'); 
 });
 
 //login | register page
->>>>>>> Stashed changes
 router.get('/login', function(req, res, next) {
     res.render('signuplogin'); 
 });
 
-<<<<<<< Updated upstream
-//login / register page
-=======
 //profile page
 router.get('/profile', function(req, res, next) {
   res.render('profile'); 
@@ -80,7 +73,6 @@ router.get('/forgotPassword', function(req, res, next) {
 
 
 //contact page
->>>>>>> Stashed changes
 router.get('/contact', function(req, res, next) {
   res.render('contact'); 
 });
