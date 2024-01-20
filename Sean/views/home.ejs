@@ -7,69 +7,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    .chart-container {
-    width: 400px;
-    height: 250px;
-    margin: 20px;
-    border: 1px solid #ddd;
-    display: inline-block;
-  }
-    body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-    }
-
-    #navbar {
-      background-color: #333;
-      overflow: hidden;
-      text-align: center;
-    }
-
-    #navbar h1 {
-      color: white;
-      padding: 14px 16px;
-      margin: 0;
-      font-size: 24px;
-    }
-
-    #navbar a {
-      display: inline-block;
-      color: white;
-      text-align: center;
-      padding: 14px 16px;
-      text-decoration: none;
-      font-size: 18px;
-    }
-
-    #navbar a:hover {
-      background-color: #555;
-    }
-
-    #content {
-      padding: 16px;
-      text-align: center;
-    }
-
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap">
 </head>
 
 <body>
   
+  <header>
+    <h1>ECOSAVER MANAGEMENT</h1>
+</header>
 
-  <div id="navbar">
-    <h1>Eco Saver</h1>
+  <nav>
     <a href="/inusers">In-House Users</a>
     <a href="#">Users</a>
     <a href="#">Sensors</a>
     <a href="/logout">Logout</a>
-  </div>
+  </nav>
 
-  <div id="content">
+  <main>
     <h2>Welcome to the Home Page, <%= username %>!</h2>
-    
+  </main>
+  <footer>
+    Any Issue faced, Please contact the administrator at 11111111 or ecosaverAdmin@gmail.com
+</footer>
 </body>
 
 </html>
