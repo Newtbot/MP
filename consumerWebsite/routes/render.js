@@ -51,9 +51,25 @@ router.get('/news', function(req, res, next) {
     res.render('news'); 
 });
 
+//learn more page
+router.get('/learnmore', function(req, res, next) {
+  res.render('learnmore'); 
+});
+
 //login | register page
 router.get('/login', function(req, res, next) {
     res.render('signuplogin'); 
+});
+
+//profile page
+router.get('/profile', function(req, res, next) {
+  res.render('profile'); 
+});
+
+//forgot password page
+router.get('/forgotPassword', function(req, res, next) {
+  res.render('forgotPassword'); 
+
 });
 
 //contact page
