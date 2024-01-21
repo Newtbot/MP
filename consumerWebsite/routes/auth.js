@@ -6,7 +6,6 @@ const router = express.Router();
 // /user/register
 router.post("/register", async (req, res, next) => {
 	try {
-    console.log(req.body);
 		let Res = await addUser(req.body);
 		if (Res == false) {
 			let error = new Error("UserRegFailed");
@@ -36,7 +35,6 @@ router.post("/login", async (req, res, next) => {
 		}
     else{
       //pass res back to form to be set in local storage
-      console.log("my res" , Res);
       return res.json({
         message: "User login successfully",
         token: Res.token,
@@ -51,6 +49,12 @@ router.post("/login", async (req, res, next) => {
 	}
 });
 
+//contact
+//auth/contact
+
+router.post("/contact", async (req, res, next) => {
+
+});
 
 module.exports = router;
 

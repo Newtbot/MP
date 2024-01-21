@@ -149,42 +149,33 @@ app.auth = (function (app) {
 	function setToken(token) {
 		localStorage.setItem("APIToken", token);
 	}
-	/*
-	function setUserId(userid) {
-		console.log("userid", userid);
-		localStorage.setItem("userid", userid);
-	}
-
-	function setUsername(username) {
-		localStorage.setItem("username", username);
-	}
-	*/
 
 	function getToken() {
 		return localStorage.getItem("APIToken");
 	}
 
+
 	function isLoggedIn(callback) {
 		if (getToken()) {
 			return app.api.get("user/me", function (error, data) {
 				if (!error) app.auth.user = data;
-				$.scope.getUsername.push(data.username);
+				//$.scope.getUsername.push(data);
 				return callback(error, data);
 			});
 		} else {
 			callback(null, false);
 		}
 	}
-	/*
-	function logIn(args, callback) {
-		app.api.post("auth/login", args, function (error, data) {
-			if (data.login) {
-				setToken(data.token);
-			}
-			callback(error, !!data.token);
+
+	function showUser(){
+		app.api.get("user/me", function (error, data) {
+			if (!error) app.auth.user = data;
+			$.scope.getUsername.push(data);
 		});
 	}
-	*/
+
+
+	
 
 	function logOut(callback) {
 		//call logout route
@@ -210,14 +201,14 @@ app.auth = (function (app) {
 	}
 
 	function forceLogin() {
-        app.auth.isLoggedIn(function (error, isLoggedIn) {
-            if (error || !isLoggedIn) {
-                app.auth.logOut(function () {
-                    location.replace(`/login`);
-                });
-            }
-        });
-    }
+		app.auth.isLoggedIn(function (error, isLoggedIn) {
+			if (error || !isLoggedIn) {
+				app.auth.logOut(function () {
+					location.replace(`/login`);
+				});
+			}
+		});
+	}
 
 	function logInRedirect() {
 		window.location.href =
@@ -228,29 +219,28 @@ app.auth = (function (app) {
 	function homeRedirect() {
 		window.location.href = location.href.replace(location.replace(`/`)) || "/";
 	}
-
-	//if isLoggedin is true, redirect user away from login / register page
+	/*
 	function redirectIfLoggedIn() {
-		$.holdReady(true);
-		app.auth.isLoggedIn(function (error, isLoggedIn) {
-			if (error || isLoggedIn) {
-				location.replace(`/`);
-			} else {
-				$.holdReady(false);
-			}
-		});
+		if (getToken()){
+			homeRedirect();
+		}
+		logInRedirect();
+
 	}
+	*/
+
+
 
 	return {
 		getToken: getToken,
 		setToken: setToken,
 		isLoggedIn: isLoggedIn,
-		//logIn: logIn,
 		logOut: logOut,
 		forceLogin,
 		logInRedirect,
 		homeRedirect,
-		redirectIfLoggedIn,
+		showUser,
+		//redirectIfLoggedIn,
 	};
 })(app);
 

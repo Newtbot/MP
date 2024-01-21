@@ -37,6 +37,9 @@ function isAddress(value){
 	return addressRegex.test(value);
 }
 
+//generate me an regex for alpha 
+//https://stackoverflow.com/questions/11522529/regexp-for-alphabets-with-spaces
+
 module.exports = {
 	isAlphaNumericwithSpaces,
 	isAlphaNumericWithSpacesAndDash,
