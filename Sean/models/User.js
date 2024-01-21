@@ -37,6 +37,9 @@ module.exports = (sequelize) => {
     reset_token_expiry: {
       type: DataTypes.DATE,
     },
+    sessionid: {
+      type: DataTypes.STRING,
+    },
   }, {
     hooks: {
       beforeCreate: async (user) => {

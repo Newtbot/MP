@@ -1,7 +1,7 @@
 const express = require("express");
 const session = require("express-session");
 const rateLimit = require('express-rate-limit');
-
+const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
@@ -10,21 +10,37 @@ const otpGenerator = require('otp-generator');
 const { body, validationResult } = require('express-validator');
 const validator = require('validator');
 const { format } = require('date-fns');
-
+const helmet = require('helmet');
 const { Sequelize } = require('sequelize');
 const { transporter } = require("./modules/nodeMailer");
-
 const { sequelize, User } = require("./modules/mysql");
 const userLogs= require('./models/userLogs')(sequelize); // Adjust the path based on your project structure
 const app = express();
+
+const nonce = crypto.randomBytes(16).toString('base64');
+  
+console.log('Nonce:', nonce);
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 const PORT = process.env.PORT || 3000;
 require("dotenv").config();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
+app.use(
+	helmet.contentSecurityPolicy({
+	  directives: {
+		defaultSrc: ["'self'",`'nonce-${nonce}'`],
+		scriptSrc: ["'self'",`'nonce-${nonce}'`,"'strict-dynamic'", 'cdn.jsdelivr.net', 'fonts.googleapis.com', 'stackpath.bootstrapcdn.com', 'code.jquery.com', 'cdnjs.cloudflare.com'],
+		styleSrc: ["'self'",`'nonce-${nonce}'`, 'cdn.jsdelivr.net', 'fonts.googleapis.com'],
+		imgSrc: ["'self'"],
+		fontSrc: ["'self'", 'fonts.gstatic.com'],
+	  },
+	})
+  );
 
 app.use(session({
     secret: process.env.key,
@@ -189,7 +205,20 @@ app.post("/verify-otp", [
 		}
   
 		const sessionToken = crypto.randomBytes(32).toString('hex');
-  
+		const username = req.body.username; // Replace with the actual username
+
+		User.update({ sessionid: sessionToken }, { where: { username } })
+		.then(([rowsUpdated]) => {
+		  if (rowsUpdated > 0) {
+			console.log(`SessionId updated for user: ${username}`);
+		  } else {
+			console.error('User not found.');
+		  }
+		})
+		.catch(error => {
+		  console.error('Error updating sessionId:', error);
+		});
+		
 		req.session.authenticated = true;
 		req.session.username = req.body.username;
 		req.session.sessionToken = sessionToken;
@@ -200,7 +229,6 @@ app.post("/verify-otp", [
 		// Log anti-CSRF token
 		console.log(`Generated Anti-CSRF Token: ${csrfTokenSession}`);
   
-		// Set CSRF token as a cookie
 		res.cookie('sessionToken', sessionToken, { secure: true, httpOnly: true, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // Expires in 1 day
   
 		console.log(`Generated Session Token: ${sessionToken}`);
@@ -232,6 +260,7 @@ app.post("/verify-otp", [
 		} else {
 		  console.log("Session destroyed.");
     // Log the logout activity using Sequelize
+	await User.update({ sessionid: null }, { where: { username } })
 	      await userLogs.create({ username, activity: "User logged out. Session destroyed." });
 		  // Clear the session token cookie
 		  res.clearCookie('sessionToken');
@@ -267,7 +296,7 @@ app.post("/verify-otp", [
 			const currentUsername = req.session.username;
 	
 			// Render the inusers page with JSON data
-			res.render("inusers", { allUsers, csrfToken: csrfTokenSession, currentUsername });
+			res.render("inusers", { nonce: nonce, allUsers, csrfToken: csrfTokenSession, currentUsername });
 		} catch (error) {
 			console.error("Error fetching all users:", error);
 			res.status(500).send("Internal Server Error");
@@ -324,6 +353,14 @@ app.post(
                 return res.status(400).json({ errors: errors.array() });
             }
 
+			const sessionTokencookie = req.cookies['sessionToken'];
+
+            // Verify sessionToken with the one stored in the database
+            const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
+
+            if (!user) {
+                return res.status(403).json({ error: 'Invalid sessionToken' });
+            }
             // Validate the anti-CSRF token
             const submittedCSRFToken = req.body.csrf_token;
 
@@ -595,7 +632,14 @@ app.post("/reset-password", async (req, res) => {
     if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
         return res.status(403).json({ error: 'CSRF token mismatch' });
     }
+	const sessionTokencookie = req.cookies['sessionToken'];
 
+            // Verify sessionToken with the one stored in the database
+            const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
+
+            if (!user) {
+                return res.status(403).json({ error: 'Invalid sessionToken' });
+            }
     // Sanitize the inputs
     const sanitizedUsername = validator.escape(username);
     const sanitizedPassword = validator.escape(password);
@@ -686,7 +730,6 @@ app.get('/api/users', async (req, res) => {
   
 app.get('/api/searchUser', async (req, res) => {
     const { username } = req.query;
-	console.log(username);
     try {
         // Find the user in the database by username
         const user = await User.findOne({ where: { username } });
@@ -709,13 +752,22 @@ app.delete('/api/deleteUser/:username', async (req, res) => {
     const { username } = req.params;
     const creatorUsername = req.session.username;
 
-    try {
-        // Extract CSRF token from the request body
+	try {
+        // Retrieve sessionToken from cookies
+        const sessionTokencoookie = req.cookies['sessionToken'];
+        // Retrieve CSRF token from the request body
         const { csrfToken } = req.body;
-
+        console.log(csrfToken);
         // Compare CSRF token with the one stored in the session
         if (csrfToken !== csrfTokenSession) {
             return res.status(403).json({ success: false, error: 'CSRF token mismatch' });
+		}
+
+        // Verify sessionToken with the one stored in the database
+        const user = await User.findOne({ where: { sessionid: sessionTokencoookie  } });
+
+        if (!user) {
+            return res.status(403).json({ success: false, error: 'Invalid sessionToken or user not found' });
         }
 
         // Log deletion activity to UserLogs model
