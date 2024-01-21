@@ -56,15 +56,16 @@ async function addUser(user) {
 
 //api/v0/auth/login
 async function loginUser(user) {
+    //console.log(user);
     //look up username or email in db
     const userRes = await userModel.findOne({
         where: {
             [Op.or]: [
                 {
-                    username: user.userInfo,
+                    username: user.username,
                 },
                 {
-                    email: user.userInfo,
+                    email: user.username,
                 },
             ],
         },

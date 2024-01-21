@@ -7,8 +7,6 @@ const router = express.Router();
 //getbyid
 router.get("/me", async function (req, res, next) {
     try {
-
-        //console.log(req.user);
         let user = await getUserID(req.user);
         if (!user) {
             let error = new Error("User not found");
@@ -23,6 +21,7 @@ router.get("/me", async function (req, res, next) {
         next(error);
     }
 });
+
 
 //logout 
 router.delete('/logout', async function(req, res, next){

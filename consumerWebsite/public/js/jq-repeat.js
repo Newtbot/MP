@@ -283,9 +283,6 @@
 		};
 	
 		$( document ).ready( function(){
-			console.log('jq-repeat', $.scope)
-			//$.jqrepeat = $.scope
-
 			$( '[jq-repeat]' ).each(function(key, value){
 				make(value);
 			});
