@@ -149,7 +149,7 @@ app.auth = (function (app) {
 	function setToken(token) {
 		localStorage.setItem("APIToken", token);
 	}
-
+	/*
 	function setUserId(userid) {
 		console.log("userid", userid);
 		localStorage.setItem("userid", userid);
@@ -158,6 +158,7 @@ app.auth = (function (app) {
 	function setUsername(username) {
 		localStorage.setItem("username", username);
 	}
+	*/
 
 	function getToken() {
 		return localStorage.getItem("APIToken");
@@ -167,6 +168,7 @@ app.auth = (function (app) {
 		if (getToken()) {
 			return app.api.get("user/me", function (error, data) {
 				if (!error) app.auth.user = data;
+				$.scope.getUsername.push(data.username);
 				return callback(error, data);
 			});
 		} else {
@@ -204,8 +206,6 @@ app.auth = (function (app) {
 		});
 
 		localStorage.removeItem("APIToken");
-		localStorage.removeItem("userid");
-		localStorage.removeItem("username");
 		callback();
 	}
 
@@ -244,8 +244,6 @@ app.auth = (function (app) {
 	return {
 		getToken: getToken,
 		setToken: setToken,
-		setUserId: setUserId,
-		setUsername: setUsername,
 		isLoggedIn: isLoggedIn,
 		//logIn: logIn,
 		logOut: logOut,
