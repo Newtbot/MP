@@ -71,9 +71,15 @@ router.get('/forgotPassword', function(req, res, next) {
   res.render('forgotPassword'); 
 });
 
+//resetted password page
+router.get('/resetpassword', function(req, res, next) {
+  res.render('resetpassword'); 
+});
+
+
 //learn more page
-router.get('/forgotPassword', function(req, res, next) {
-  res.render('forgotPassword'); 
+router.get('/learnmore', function(req, res, next) {
+  res.render('learnmore'); 
 });
 
 //profile page
