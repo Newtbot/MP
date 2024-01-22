@@ -524,3 +524,26 @@ body.one-content-column-version .content thead {
 .cf:before, .cf:after { content: ""; display: block; }
 .cf:after { clear: both; }
 .ie6 .cf { zoom: 1 }
+
+
+
+.generate-key-button {
+    float: right; /* Align the button to the right */
+    margin-right: 85%;
+    margin-top: -40px; /* Adjust the margin-top value based on your layout */
+    /* Add any additional styling you want for the button */
+}
+
+#content-get-api .generate-key-button {
+    background-color: #4caf50; /* Green background color */
+    color: white; /* White text color */
+    padding: 5px 11px; /* Padding for the button */
+    border: none; /* Remove button border */
+    border-radius: 5px; /* Add border-radius for rounded corners */
+    cursor: pointer; /* Add pointer cursor on hover */
+    font-size: 14px; /* Font size */
+}
+
+#content-get-api .generate-key-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}

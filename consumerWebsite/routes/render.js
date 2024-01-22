@@ -66,9 +66,15 @@ router.get("/profile", function (req, res, next) {
 	res.render("profile");
 });
 
+
 //forgot password page
 router.get("/forgotpassword", function (req, res, next) {
 	res.render("forgotpassword");
+});
+
+//resetted password page
+router.get("/resetpassword", function (req, res, next) {
+	res.render("resetpassword");
 });
 
 //contact page
@@ -80,7 +86,6 @@ router.get("/contact", function (req, res, next) {
 router.get("/api", function (req, res, next) {
 	res.render("api");
 });
-
 
 
 module.exports = router;
