@@ -68,8 +68,8 @@ router.get("/profile", function (req, res, next) {
 
 
 //forgot password page
-router.get("/forgotPassword", function (req, res, next) {
-	res.render("forgotPassword");
+router.get("/forgotpassword", function (req, res, next) {
+	res.render("forgotpassword");
 });
 
 //resetted password page

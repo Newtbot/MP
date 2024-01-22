@@ -33,10 +33,8 @@
         <!-- Mustache JS -->
 		<script src="https://sso.theta42.com/static/js/mustache.min.js"></script>
 		<!-- jQuery library -->
-		<script
-			src="https://code.jquery.com/jquery-3.7.1.min.js"
-			integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-			crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
 		<!-- Bootstrap 5 JavaScript -->
 		<script
 			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
@@ -63,6 +61,7 @@
 			//check if user is logged in
 			app.auth.isLoggedIn(function (error, data) {
 				if (data) {
+                    app.auth.showUser();
 					$("#cl-logout-button").show("fast");
 					$("#cl-profile-button").show("fast");
 					$("#cl-login-button").hide("fast");
@@ -71,7 +70,8 @@
 				}
 				$("body").show("fast");
 			});
-		});
+        });
+
 	</script>
 
 	<body>
@@ -94,7 +94,7 @@
 				<div class="collapse navbar-collapse" id="navbarResponsive">
 					<ul class="navbar-nav ms-auto">
 						<li jq-repeat="getUsername" class="nav-item">
-							{{ username }}
+                            <a class="nav-link"> Welcome {{ user.username }} </a>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="/">Home</a>

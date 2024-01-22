@@ -33,7 +33,7 @@ $(document).ready(function () {
     $('#logsContainer').hide();
     $('#additional-text').hide();
     $('#additional-text2').hide();
-    $('#additional-text2').hide();
+    $('#additional-text3').hide();
   });
 
   $('#searchUserButton').on('click', function () {
@@ -124,6 +124,7 @@ $('#searchResultsList').on('click', '.deleteUserButton', function () {
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include', // Include cookies in the request
     body: JSON.stringify({ csrfToken }), // Include CSRF token in the request body
   })
   .then(response => {
@@ -243,8 +244,8 @@ function resetFormFields() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            
         },
+        credentials: 'include', // Include cookies in the request
         body: JSON.stringify({
             name: name,
             username: username,
@@ -330,6 +331,7 @@ $('#resetPasswordForm').on('submit', function (e) {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Include cookies in the request
       body: JSON.stringify({
         username: username,
         password: password,
@@ -356,8 +358,6 @@ $('#resetPasswordForm').on('submit', function (e) {
       $('#resetPassword').val('');
       $('#resetConfirmPassword').val('');
 
-      // You might want to hide the reset password form after submission
-      $('#resetPasswordFormContainer').hide();
     })
     .catch(error => {
       // Handle 404 error separately to show an alert
