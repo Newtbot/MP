@@ -66,6 +66,7 @@ router.get("/profile", function (req, res, next) {
 	res.render("profile");
 });
 
+
 //forgot password page
 router.get("/forgotPassword", function (req, res, next) {
 	res.render("forgotPassword");
