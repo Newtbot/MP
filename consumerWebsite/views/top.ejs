@@ -10,6 +10,8 @@
 		<meta http-equiv="cleartype" content="on" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="shortcut icon" type="images/logo.ico" href="images/logo.ico" />
+
 
 		<!-- Bootstrap core CSS -->
 		<link
@@ -58,7 +60,6 @@
 			//check if user is logged in
 			app.auth.isLoggedIn(function (error, data) {
 				if (data) {
-                    app.auth.showUser();
 					$("#cl-logout-button").show("fast");
 					$("#cl-profile-button").show("fast");
 					$("#cl-login-button").hide("fast");

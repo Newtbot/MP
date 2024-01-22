@@ -12,6 +12,7 @@ async function auth(req, res, next){
 
         //get from db
         let token = await apikeyModel.findByPk(rowid, {include: userModel});
+        if (!token) return false;
 
         //compare
         let isMatch = await comparePassword(suppliedToken, token.apikey);
@@ -20,7 +21,7 @@ async function auth(req, res, next){
         //else do logic
         //pass hashed token to req.token (IMPORTANT ITS NOT PASSED TO CLIENT)
         req.token = token
-        req.user = await token.getUser();
+        req.user = await token.getUser(); //taking user seq obj from usermodel
         next();
     }catch(error){
         next(error);
