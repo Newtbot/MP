@@ -10,16 +10,12 @@ const otpGenerator = require('otp-generator');
 const { body, validationResult } = require('express-validator');
 const validator = require('validator');
 const { format } = require('date-fns');
-const helmet = require('helmet');
+
 const { Sequelize } = require('sequelize');
 const { transporter } = require("./modules/nodeMailer");
 const { sequelize, User } = require("./modules/mysql");
 const userLogs= require('./models/userLogs')(sequelize); // Adjust the path based on your project structure
 const app = express();
-
-const nonce = crypto.randomBytes(16).toString('base64');
-  
-console.log('Nonce:', nonce);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -30,17 +26,7 @@ require("dotenv").config();
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
-app.use(
-	helmet.contentSecurityPolicy({
-	  directives: {
-		defaultSrc: ["'self'",`'nonce-${nonce}'`],
-		scriptSrc: ["'self'",`'nonce-${nonce}'`,"'strict-dynamic'", 'cdn.jsdelivr.net', 'fonts.googleapis.com', 'stackpath.bootstrapcdn.com', 'code.jquery.com', 'cdnjs.cloudflare.com'],
-		styleSrc: ["'self'",`'nonce-${nonce}'`, 'cdn.jsdelivr.net', 'fonts.googleapis.com'],
-		imgSrc: ["'self'"],
-		fontSrc: ["'self'", 'fonts.gstatic.com'],
-	  },
-	})
-  );
+
 
 app.use(session({
     secret: process.env.key,
@@ -294,9 +280,8 @@ app.post("/verify-otp", [
 			  });
 	
 			const currentUsername = req.session.username;
-	
 			// Render the inusers page with JSON data
-			res.render("inusers", { nonce: nonce, allUsers, csrfToken: csrfTokenSession, currentUsername });
+			res.render("inusers", {allUsers, csrfToken: csrfTokenSession, currentUsername });
 		} catch (error) {
 			console.error("Error fetching all users:", error);
 			res.status(500).send("Internal Server Error");
@@ -814,6 +799,24 @@ app.get('/api/getLogs', async (req, res) => {
     }
 });
 
+app.get("/locations", isAuthenticated, async (req, res) => {
+	try {
+		// Render the inusers page with JSON data
+		res.render("locations");
+	} catch (error) {
+		console.error("Error fetching all users:", error);
+		res.status(500).send("Internal Server Error");
+	}
+});
+app.get("/sensors", isAuthenticated, async (req, res) => {
+	try {
+		// Render the inusers page with JSON data
+		res.render("sensors");
+	} catch (error) {
+		console.error("Error fetching all users:", error);
+		res.status(500).send("Internal Server Error");
+	}
+});
 app.use(express.static("views"));
 
 app.listen(PORT, () => {
