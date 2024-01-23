@@ -13,18 +13,19 @@
 
 <body>
   
-  <header>
+<header>
     <h1>ECOSAVER MANAGEMENT</h1>
 </header>
-
   <nav>
     <a href="#" id="allLocationLink">All Locations</a>
     <a href="#" id="addLocationLink">Add Locations</a>
-    <a href="#">Update Locations</a>
+    <a href="#" id="updateLocationLink">Update Locations</a>
     <a href="#">Delete Locations</a>
     <a href="/home" id="homeLink">Home</a>
   </nav>
-
+  <main>
+    <h2>Welcome to the Location Page</h2>
+  </main>
   <div id="locationContainer">
     <table class="nice-table">
       <thead>
@@ -38,7 +39,7 @@
     </table>
   </div>
 
-  <div id="createLocationForm" class="location-creation-container" style="display: none;">
+  <div id="createLocationForm" class="location-creation-container custom-location-form" style="display: none;">
     <h3>Add Location</h3>
     <div class="content">
       <form action="/api/v0/location/new" id="locationForm" method="post">
@@ -59,14 +60,36 @@
     </div>
   </div>
 
-
-
-  <main>
-    <h2>Welcome to the Location</h2>
-  </main>
+  <div id="updateLocationForm" class="location-update-container" style="display: none;">
+    <h3>Add Location</h3>
+    <div class="content">
+      <form action="/api/v0/location/update" id="updateForm" method="put">
+        <div class="Location-details">
+          <div class="input-box">
+            <span class="details">Location to Update</span>
+            <select name="location" id="locationDropdown" required>
+            </select>
+        </div>
+          <div class="input-box">
+            <span class="details">Location Name</span>
+            <input type="text" name="location"  id="location" placeholder="Enter Location name" required>
+          </div>
+          <div class="input-box">
+            <span class="details">Description</span>
+            <input type="text" name="description" id="description" placeholder="Enter the description here" required>
+          </div>
+        </div>
+        <div class="button">
+          <input type="submit" value="submit">
+        </div>
+      </form>
+    </div>
+  </div>
   <footer>
     Any Issue faced, Please contact the administrator at 11111111 or ecosaverAdmin@gmail.com
 </footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="location.js"></script>
 </body>
 

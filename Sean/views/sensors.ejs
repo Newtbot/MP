@@ -19,7 +19,7 @@
 
   <nav>
     <a href="#" id="allSensorLink">All Sensor</a>
-    <a href="#"id="addSensorLink">Add Sensor</a>
+    <a href="#" id="addSensorLink">Add Sensor</a>
     <a href="#">Update Sensor</a>
     <a href="#">Delete Sensor</a>
     <a href="/home" id="homeLink">Home</a>
@@ -47,12 +47,8 @@
 <div id="createSensorForm" class="sensor-creation-container" style="display: none;">
     <h3>Add Sensor</h3>
     <div class="content">
-        <form action="/api/v0/sensor/update" id="sensorForm" method="post">
+        <form action="/api/v0/sensor/new" id="sensorForm" method="post">
             <div class="Sensor-details">
-                <div class="input-box">
-                    <span class="details">ID</span>
-                    <input type="text" name="id" id="id" placeholder="Enter an ID Number" required>
-                </div>
                 <div class="input-box">
                     <span class="details">Sensor Name</span>
                     <input type="text" name="sensor" id="sensor" placeholder="Enter Sensor name" required>
@@ -78,10 +74,21 @@
         </form>
     </div>
 </div>
+<div id="additional-text4" style="display: none;">
+    <div class="condition">
+      <span>Conditions for creating a Sensor:</span>
+      <ul>
+        <li class="error">Please Remember to fill all inputs.</li>
+        <li class="error">Please ensure all inputs are correct before adding</li>
+      </ul>
+    </div>
+  </div>
 
   <footer>
     Any Issue faced, Please contact the administrator at 11111111 or ecosaverAdmin@gmail.com
 </footer>
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="sensor.js"></script>
 </html>

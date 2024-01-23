@@ -2,10 +2,12 @@ $(document).ready(function () {
     $('#allSensorLink').on('click', function () {
       $('#sensorContainer').show();
       $('#createSensorForm').hide();
+      $('#additional-text4').hide();
     });
     $('#addSensorLink').on('click', function () {
         $('#sensorContainer').hide();
         $('#createSensorForm').show();
+        $('#additional-text4').show();
       });
   });
     let locationsArray = [];
@@ -91,15 +93,39 @@ $(document).ready(function () {
 
 $('#sensorForm').on('submit', function (e) {
     e.preventDefault();
-
-    const id = $('#id').val();
-    const sensor = $('#sensor').val();
-    const user = req.session.jobTitle
-    const macAddress = $('#macAddress').val();
-    const description = $('#description').val();
+       // Sanitize sensor input
+       const sensor = DOMPurify.sanitize($('#sensor').val().trim());
+       // Validate if the sanitized value is empty
+       if (sensor === '') {
+           alert('Sensor name cannot be empty');
+           return;
+       }
+       // Sanitize user input (assuming req.session is available)
+       const user = DOMPurify.sanitize(req.session.jobTitle);
+       
+       // Validate if the sanitized value is missing
+       if (!user) {
+           alert('User information is missing');
+           return;
+       }
+       // Sanitize macAddress input
+       const macAddress = DOMPurify.sanitize($('#macAddress').val().trim());
+       // Validate macAddress format
+       const macAddressRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+       if (!macAddressRegex.test(macAddress)) {
+           alert('Invalid MAC Address format');
+           return;
+       }
+       // Sanitize description input
+       const description = DOMPurify.sanitize($('#description').val().trim());
+       // Validate if the sanitized value is empty
+       if (description === '') {
+           alert('Description cannot be empty');
+           return;
+       }
     const location = $('#location').val();
    
-    fetch('/api/v0/location/new', {
+    fetch('/api/v0/sensor/new', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
