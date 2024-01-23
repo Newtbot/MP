@@ -10,126 +10,67 @@ $(document).ready(function () {
         $('#additional-text4').show();
       });
   });
-    let locationsArray = [];
+  function populateTableAndArray(data, locationsArray) {
+    const tableBody = document.getElementById("sensorTableBody");
+    // Clear existing rows and array
+    tableBody.innerHTML = "";
+    sensorArray.length = 0;
+    // Loop through the data and create table rows
+    data.forEach(sensor => {
+      const location = locationsArray.find(loc => loc.id === sensor.location);
+  
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${sensor.id}</td>
+        <td>${sensor.sensorname}</td>
+        <td>${sensor.added_by}</td>
+        <td>${sensor.description}</td>
+        <td>${location ? location.name : 'Unknown Location'}</td>
+      `;
+      tableBody.appendChild(row);
+      // Push sensor data to the array
+      sensorArray.push(sensor);
+    });
+  }
+  // Assuming locationsArray is defined elsewhere in your code
+  populateTableAndArray(sensorData);
+  console.log(sensorArray);
 
-    // Function to fetch and store locations in the array
-    function fetchLocations() {
-        // Make a GET request to retrieve all locations
-        fetch('/api/v0/location', {
-            method: 'GET',
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-            })
-            .then(locations => {
-                // Reset the array
-                locationsArray = [];
+  function populateLocationDropdown() {
+    const locationDropdown = document.getElementById('locationDropdown');
 
-                // Populate the array with location information
-                locations.forEach(location => {
-                    // Store in the array
-                    locationsArray.push({
-                        id: location.id,
-                        location: location.name,
-                    });
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching locations:', error);
-                // Handle error as needed
-            });
-    }
-    // Call the fetchLocations function when the page loads
-    fetchLocations();
+    // Clear existing options
+    locationDropdown.innerHTML = '';
 
-    // Function to fetch sensor data and populate the table
-    function fetchAndPopulateSensorTable() {
-        // Fetch sensor data from the API
-        fetch('/api/v0/sensor', {
-            method: 'GET',
-            headers: {
-                'Authorization': '1-1ec4ce9d-bcff-46c4-a023-c34171b9ca51'
-            },
-        })
-            .then(response => response.json())
-            .then(sensorData => {
-                // Get the table body
-                const tableBody = document.getElementById('sensorTableBody');
+    // Add a default option
+    const defaultOption = document.createElement('option');
+    defaultOption.text = 'Select a Location';
+    defaultOption.value = '';
+    locationDropdown.add(defaultOption);
 
-                // Clear existing rows
-                tableBody.innerHTML = '';
-
-                // Iterate through each sensor data
-                sensorData.forEach(sensor => {
-                    // Find the corresponding location object
-                    const location = locationsArray.find(loc => loc.id === sensor.location);
-
-                    // Create a new row
-                    const row = tableBody.insertRow();
-
-                    // Insert cells with sensor data
-                    row.insertCell(0).textContent = sensor.id;
-                    row.insertCell(1).textContent = sensor.sensorname;
-                    row.insertCell(2).textContent = sensor.added_by;
-                    row.insertCell(3).textContent = sensor.mac_address;
-                    row.insertCell(4).textContent = sensor.description;
-
-                    // Insert location cell with corresponding location name
-                    const locationCell = row.insertCell(5);
-                    locationCell.textContent = location ? location.location : 'Unknown';
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching sensor data:', error);
-            });
-    }
-
-    // Call the function to fetch and populate the table
-    fetchAndPopulateSensorTable();
+    // Add locations as options
+    locationsArray.forEach(location => {
+        const option = document.createElement('option');
+        option.text = location.location;
+        option.value = location.id;
+        locationDropdown.add(option);
+    });
+}
+populateLocationDropdown();
 
 $('#sensorForm').on('submit', function (e) {
     e.preventDefault();
-       // Sanitize sensor input
-       const sensor = DOMPurify.sanitize($('#sensor').val().trim());
-       // Validate if the sanitized value is empty
-       if (sensor === '') {
-           alert('Sensor name cannot be empty');
-           return;
-       }
-       // Sanitize user input (assuming req.session is available)
-       const user = DOMPurify.sanitize(req.session.jobTitle);
-       
-       // Validate if the sanitized value is missing
-       if (!user) {
-           alert('User information is missing');
-           return;
-       }
-       // Sanitize macAddress input
-       const macAddress = DOMPurify.sanitize($('#macAddress').val().trim());
-       // Validate macAddress format
-       const macAddressRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
-       if (!macAddressRegex.test(macAddress)) {
-           alert('Invalid MAC Address format');
-           return;
-       }
-       // Sanitize description input
-       const description = DOMPurify.sanitize($('#description').val().trim());
-       // Validate if the sanitized value is empty
-       if (description === '') {
-           alert('Description cannot be empty');
-           return;
-       }
-    const location = $('#location').val();
+       const sensor = $('#sensor').val();
+       const user = req.session.jobTitle;
+       const macAddress = $('#macAddress').val();
+       const description = $('#description').val();
+       const location = $('#location').val();
+       const csrf_token = $('#userForm input[name="csrf_token"]').val();
    
-    fetch('/api/v0/sensor/new', {
+    fetch('sensor/new', {
       method: 'POST',
       headers: {
-          'Content-Type': 'application/json',
-          'Authorization': '2-eb0c08b0-250a-4249-8a87-11141e2ff8fb'
+          'Content-Type': 'application/json'
       },
       body: JSON.stringify({
           id: id,
@@ -137,7 +78,8 @@ $('#sensorForm').on('submit', function (e) {
           added_by: user,
           mac_address: macAddress,
           description: description,
-          location: location
+          location: location,
+          csrf_token: csrf_token
       }),
   })
   .then(response => {
@@ -160,27 +102,3 @@ $('#sensorForm').on('submit', function (e) {
     // Handle error as needed
 });
   });
-
-  function populateLocationDropdown() {
-    const locationDropdown = document.getElementById('locationDropdown');
-
-    // Clear existing options
-    locationDropdown.innerHTML = '';
-
-    // Add a default option
-    const defaultOption = document.createElement('option');
-    defaultOption.text = 'Select a Location';
-    defaultOption.value = '';
-    locationDropdown.add(defaultOption);
-
-    // Add locations as options
-    locationsArray.forEach(location => {
-        const option = document.createElement('option');
-        option.text = location.location;
-        option.value = location.id;
-        locationDropdown.add(option);
-    });
-}
-
-// Call the function to populate the dropdown when the page loads
-populateLocationDropdown();

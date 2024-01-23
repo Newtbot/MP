@@ -64,10 +64,10 @@
                 <div class="input-box">
                     <span class="details">Location</span>
                     <select name="location" id="locationDropdown" required>
-                        
                     </select>
                 </div>
             </div>
+            <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
             <div class="button">
                 <input type="submit" value="Submit">
             </div>
@@ -88,6 +88,10 @@
     Any Issue faced, Please contact the administrator at 11111111 or ecosaverAdmin@gmail.com
 </footer>
 </body>
+<script>
+const locationsArray = <%=-JSON.stringify(locationsData) %>;
+const sensorArray = <%- JSON.stringify(sensorData) %>;
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="sensor.js"></script>

@@ -9,8 +9,9 @@ const nodemailer = require("nodemailer");
 const otpGenerator = require('otp-generator');
 const { body, validationResult } = require('express-validator');
 const validator = require('validator');
-const { format } = require('date-fns');
+const axios = require('axios');
 
+const { format } = require('date-fns');
 const { Sequelize } = require('sequelize');
 const { transporter } = require("./modules/nodeMailer");
 const { sequelize, User } = require("./modules/mysql");
@@ -801,22 +802,139 @@ app.get('/api/getLogs', async (req, res) => {
 
 app.get("/locations", isAuthenticated, async (req, res) => {
 	try {
-		// Render the inusers page with JSON data
-		res.render("locations");
+	  // Fetch data using Axios
+	  const response = await axios.get(process.env.API_ALLLOCATION);
+	  const locationsData = response.data;
+  
+	  // Render the "locations" page with the fetched JSON data
+	  res.render("locations", { locationsData, csrfToken: csrfTokenSession});
 	} catch (error) {
-		console.error("Error fetching all users:", error);
-		res.status(500).send("Internal Server Error");
+	  console.error("Error fetching locations:", error);
+	  res.status(500).send("Internal Server Error");
 	}
-});
+  });
+
+  const locationValidation = [
+	body('name').trim().isLength({ min: 1 }).withMessage('Name must not be empty').escape(),
+	body('added_by').trim().isLength({ min: 1 }).withMessage('Added by must not be empty').escape(),
+	body('description').trim().escape(),
+  ];
+  app.post('/location/new', locationValidation, async (req, res) => {
+	try {
+	  const errors = validationResult(req);
+	  if (!errors.isEmpty()) {
+		return res.status(400).json({ errors: errors.array() });
+	  }
+	  const sessionTokencookie = req.cookies['sessionToken'];
+	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
+	  if (!user) {
+		  return res.status(403).json({ error: 'Invalid sessionToken' });
+	  }
+	  const submittedCSRFToken = req.body.csrf_token;
+	  if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+		  return res.status(403).json({ error: 'CSRF token mismatch' });
+	  }
+	  const { name, added_by, description } = req.body;
+	  const preparedData = {name, added_by, description};
+	  // Make a POST request with the sanitized data using Axios
+	  const axiosResponse = await axios.post(process.env.API_NEWLOCATION, preparedData);
+	  // Send the Axios response back to the client
+	  res.status(axiosResponse.status).json(axiosResponse.data);
+	} catch (error) {
+	  console.error('Error handling new location submission:', error);
+	  res.status(500).json({ message: 'Internal Server Error' });
+	}
+  });
+
+  const locationValidationUpdate = [
+	body('id').trim().escape(),
+	body('name').trim().isLength({ min: 1 }).withMessage('Name must not be empty').escape(),
+	body('added_by').trim().isLength({ min: 1 }).withMessage('Added by must not be empty').escape(),
+	body('description').trim().escape(),
+  ];
+  app.post('/location/update', locationValidationUpdate, async (req, res) => {
+	try {
+	  const errors = validationResult(req);
+	  if (!errors.isEmpty()) {
+		return res.status(400).json({ errors: errors.array() });
+	  }
+	  const sessionTokencookie = req.cookies['sessionToken'];
+	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
+	  if (!user) {
+		  return res.status(403).json({ error: 'Invalid sessionToken' });
+	  }
+	  const submittedCSRFToken = req.body.csrf_token;
+	  if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+		  return res.status(403).json({ error: 'CSRF token mismatch' });
+	  }
+	  const { id, name, added_by, description } = req.body;
+	  const preparedData = {id, name, added_by, description};
+	  // Make a POST request with the sanitized data using Axios
+	  const axiosResponse = await axios.post(process.env.API_UPDATELOCATION, preparedData);
+	  // Send the Axios response back to the client
+	  res.status(axiosResponse.status).json(axiosResponse.data);
+	} catch (error) {
+	  console.error('Error handling new location submission:', error);
+	  res.status(500).json({ message: 'Internal Server Error' });
+	}
+  });
+
+
 app.get("/sensors", isAuthenticated, async (req, res) => {
 	try {
 		// Render the inusers page with JSON data
-		res.render("sensors");
+		const response = await axios.get(process.env.API_ALLLOCATION);
+		const locationsData = response.data;
+		const response2 = await axios.get(process.env.API_ALLSENSOR);
+		const sensorData = response2.data;
+		res.render("sensors",{locationsData, sensorData, csrfToken: csrfTokenSession});
 	} catch (error) {
-		console.error("Error fetching all users:", error);
+		console.error("Error:", error);
 		res.status(500).send("Internal Server Error");
 	}
 });
+
+const sensorValidation = [
+	body('id').trim().escape(),
+	body('sensorname').trim().isLength({ min: 1 }).withMessage('Sensor Name must not be empty').escape(),
+	body('added_by').trim().isLength({ min: 1 }).withMessage('Added by must not be empty').escape(),
+	body('macAddress').custom(value => {
+	  const macAddressRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+	  if (!macAddressRegex.test(value)) {
+		throw new Error('Invalid MAC address format');
+	  }
+	  return true;
+	}).withMessage('Invalid MAC address format').escape(),
+	body('description').trim().escape(),
+	body('location').trim().escape()
+  ];
+  app.post('sensor/new',sensorValidation, async (req, res) => {
+	try {
+	  const errors = validationResult(req);
+	  if (!errors.isEmpty()) {
+		return res.status(400).json({ errors: errors.array() });
+	  }
+	  const sessionTokencookie = req.cookies['sessionToken'];
+	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
+	  if (!user) {
+		  return res.status(403).json({ error: 'Invalid sessionToken' });
+	  }
+	  const submittedCSRFToken = req.body.csrf_token;
+	  if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+		  return res.status(403).json({ error: 'CSRF token mismatch' });
+	  }
+	  const { id, sensorname, added_by, macAddress, description, location} = req.body;
+	  const preparedData = {id, sensorname, added_by, macAddress, description, location};
+	  // Make a POST request with the sanitized data using Axios
+	  const axiosResponse = await axios.post(process.env.API_NEWSENSOR, preparedData);
+	  // Send the Axios response back to the client
+	  res.status(axiosResponse.status).json(axiosResponse.data);
+	} catch (error) {
+	  console.error('Error handling new sensor submission:', error);
+	  res.status(500).json({ message: 'Internal Server Error' });
+	}
+  });
+
 app.use(express.static("views"));
 
 app.listen(PORT, () => {

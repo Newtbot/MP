@@ -20,78 +20,48 @@ $(document).ready(function () {
 
   let locationArray = [];
 
-$(document).ready(function () {
-    // Function to fetch and display locations
-    function fetchLocations() {
-        // Make a GET request to retrieve all locations
-        fetch('/api/v0/location', {
-            method: 'GET',
-        
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-            })
-            .then(locations => {
-                // Clear existing table rows
-                $('#locationTableBody').empty();
-                locationArray = [];
+  function populateTableAndArray(data) {
+    const tableBody = document.getElementById("locationTableBody");
 
-                // Populate the table with location information
-                locations.forEach(location => {
-                    locationArray.push({
-                        id: location.id,
-                        name: location.name,
-                        description: location.description
-                    });
+    // Clear existing rows and array
+    tableBody.innerHTML = "";
+    locationArray.length = 0;
 
-                    $('#locationTableBody').append(`
-                        <tr>
-                            <td>${location.id}</td>
-                            <td>${location.name}</td>
-                            <td>${location.description}</td>
-                        </tr>
-                    `);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching locations:', error);
-                // Handle error as needed
-            });
-    }
-    // Call the fetchLocations function when the page loads
-    fetchLocations();
-});
+    // Loop through the data and create table rows
+    data.forEach(location => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${location.id}</td>
+        <td>${location.location}</td>
+        <td>${location.description}</td>
+      `;
+      tableBody.appendChild(row);
+
+      // Push location data to the array
+      locationArray.push(location);
+    });
+  }
+  populateTableAndArray(locationsData);
+  console.log(locationArray);
 
 $('#locationForm').on('submit', function (e) {
     e.preventDefault();
 
-    const location= DOMPurify.sanitize($('#location').val().trim());
-    // Validate if the sanitized value is empty
-    if (location === '') {
-        alert('Location name cannot be empty');
-        return;
-    }
+    const location= $('#location').val();
     const user = req.session.jobTitle
-    const description= DOMPurify.sanitize($('#description').val().trim());
-    // Validate if the sanitized value is empty
-    if (description === '') {
-        alert('description name cannot be empty');
-        return;
-    }
-    fetch('/api/v0/location/new', {
+    const description= $('#description').val();
+    const csrf_token = $('#userForm input[name="csrf_token"]').val();
+   
+    fetch('/location/new', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
-          'Authorization': '2-eb0c08b0-250a-4249-8a87-11141e2ff8fb'
       },
       body: JSON.stringify({
           name: location,
           added_by: user,
-          description: description
+          description: description,
+          csrf_token: csrf_token
       }),
   })
   .then(response => {
@@ -127,37 +97,23 @@ $('#locationForm').on('submit', function (e) {
 
   $('#updateForm').on('submit', function (e) {
     e.preventDefault();
-    const selectedLocationId = DOMPurify.sanitize($('#locationDropdown').val().trim());
-
-    // Validate if the selected location ID is empty
-    if (selectedLocationId === '') {
-        alert('Please select a location to update');
-        return;
-    }
-    const location= DOMPurify.sanitize($('#location').val().trim());
-    // Validate if the sanitized value is empty
-    if (location === '') {
-        alert('Location name cannot be empty');
-        return;
-    }
+    const selectedLocationId = $('#locationDropdown').val();
+    const location= $('#location').val();
     const user = req.session.jobTitle
-    const description= DOMPurify.sanitize($('#description').val().trim());
-    // Validate if the sanitized value is empty
-    if (description === '') {
-        alert('description name cannot be empty');
-        return;
-    }
-    fetch('/api/v0/location/update', {
+    const description=$('#description').val();
+    const csrf_token = $('#userForm input[name="csrf_token"]').val();
+
+    fetch('/location/update', {
       method: 'POST',
       headers: {
-          'Content-Type': 'application/json',
-          'Authorization': '1-1ec4ce9d-bcff-46c4-a023-c34171b9ca51'
+          'Content-Type': 'application/json'
       },
       body: JSON.stringify({
           id:selectedLocationId,
           name: location,
           added_by: user,
-          description: description
+          description: description,
+          csrf_token: csrf_token
       }),
   })
   .then(response => {
