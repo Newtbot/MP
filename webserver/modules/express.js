@@ -1,12 +1,23 @@
 const express = require("express");
-const helmet = require("helmet");
+//const helmet = require("helmet");
+var cors = require('cors');
 const { rateLimit } = require("express-rate-limit");
 const { APIlogger } = require('../middleware/apiLogger.js');
 const { apikeyCheck } = require('../middleware/apiKey.js');
 
 const app = express();
-app.use(helmet());
+//app.use(cors());
+//allow cors from localhost:3000
+//app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 const port = 80;
+
+// Hold list of functions to run when the server is ready
+app.onListen = [function(){console.log('hello')}];
+
+module.exports = app; 
+
+//handle cors 
+
 
 //express-rate-limit stolen from docs
 const limiter = rateLimit({
@@ -73,8 +84,8 @@ app.use(function(err, req, res, next) {
 	  keyErrors,
 	});
   });
+/*
 app.listen(port, () => {
 	console.log(`app listening on port ${port}`);
 });
-
-module.exports = { app };
+*/

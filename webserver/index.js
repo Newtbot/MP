@@ -1,4 +1,3 @@
-const { app } = require("./modules/express.js");
 const client = require("./modules/mqtt");
 const { isJson, isNumber } = require("./functions/validateData.js");
 const { insertDatatoDB } = require("./functions/database.js");

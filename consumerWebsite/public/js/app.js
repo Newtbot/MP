@@ -144,6 +144,33 @@ app.api = (function (app) {
 	return { post: post, get: get, put: put, delete: remove };
 })(app);
 
+//socket.io
+app.socket = (function (app) {
+	//need to replace with domain name of server when published
+	var socket = io("localhost", {
+		transports: ["websocket"],
+		'Access-Control-Allow-Origin': 'http://localhost:3000',
+	});
+	socket.on("disconnect", () => {
+		console.log("disconnected");
+	});
+
+	socket.io.on("reconnect", () => {
+		console.log("reconnected");
+	});
+	socket.io.on("connect_error", (err) => {
+		console.log(err);
+	});
+	return socket;
+})(app);
+
+//sensor data
+app.sensordata = (function (app) {
+
+
+})(app);
+
+
 app.auth = (function (app) {
 	var user = {};
 	function setToken(token) {
@@ -154,18 +181,20 @@ app.auth = (function (app) {
 		return localStorage.getItem("APIToken");
 	}
 
-
 	function isLoggedIn(callback) {
 		if (getToken()) {
 			return app.api.get("user/me", function (error, data) {
 				if (!error) app.auth.user = data;
 				//for navbar to show username
-				$.scope.getUsername.update(data);
+				if (!location.pathname === "/login")
+				{
+					$.scope.getUsername.update(data);
+
+				}
 
 				//for edit profile to show user details
 				//if not in edit profile page, it will not show
-				if (location.pathname === "/profile")
-				{
+				if (location.pathname === "/profile") {
 					$.scope.getUserDetails.update(data);
 				}
 				return callback(error, data);
@@ -232,11 +261,8 @@ app.auth = (function (app) {
 		logInRedirect,
 		homeRedirect,
 		profileRedirect,
-		//showUser,
-		//redirectIfLoggedIn,
 	};
 })(app);
-
 
 app.user = (function (app) {
 	//delete profile
@@ -250,12 +276,10 @@ app.user = (function (app) {
 				});
 			}
 		});
-		
 	}
 	return {
 		deleteProfile,
 	};
-
 })(app);
 
 //ajax form submit and pass to api

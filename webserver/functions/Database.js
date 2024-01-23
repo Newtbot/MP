@@ -23,11 +23,15 @@ async function insertLogData(log) {
 
 async function insertDatatoDB(data) {
 	try {
+		const app = require("../modules/express.js");
+
 		sensorDataModel.create({
 			sensorid: data.sensorid,
 			locationid: data.locationid,
 			measurement: data.measurement,
 		});
+		//ws broadcast event except to the sender.
+		app.io.emit("sensorData:new", data);
 	} catch (error) {
 		console.error(error);
 	}
@@ -37,15 +41,15 @@ async function checkAPikey(SuppliedKey, rowid) {
 	try {
 		const retrivedKey = await apikeyModel.findOne({
 			raw: true,
-			attributes: ["apikey" , "permission"],
+			attributes: ["apikey", "permission"],
 			where: {
-				userid: rowid,
+				id: rowid,
 			},
 		});
 		//console.log(retrivedKey.apikey);
 		if (compareAPIKey(SuppliedKey, retrivedKey.apikey)) {
 			//return true;
-            return retrivedKey.permission;
+			return retrivedKey.permission;
 		}
 	} catch (error) {
 		console.error(error);

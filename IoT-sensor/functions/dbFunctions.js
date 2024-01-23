@@ -1,5 +1,5 @@
-const { locationModel } = require("../Database/locationModel");
-const { sensorModel } = require("../Database/sensorModel");
+const { locationModel } = require("../database/locationModel");
+const { sensorModel } = require("../database/sensorModel");
 
 async function getLocation() {
 	const location = locationModel.findAll({

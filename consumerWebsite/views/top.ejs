@@ -1,144 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-		<meta name="description" content="" />
-		<meta name="author" content="" />
-		<meta http-equiv="cleartype" content="on" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="shortcut icon" type="images/logo.ico" href="images/logo.ico" />
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<meta name="description" content="" />
+	<meta name="author" content="" />
+	<meta http-equiv="cleartype" content="on" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="shortcut icon" type="images/logo.ico" href="images/logo.ico" />
 
 
-		<!-- Bootstrap core CSS -->
-		<link
-			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-			rel="stylesheet"
-			integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-			crossorigin="anonymous" />
+	<!-- Bootstrap core CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
 
-		<!-- Custom styles for this template -->
-		<link href="css/all.css" rel="stylesheet" />
-		<link href="css/style.css" rel="stylesheet" />
-		<!-- weird api page cdn -->
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;1,300&family=Source+Code+Pro:wght@300&display=swap"
-			rel="stylesheet" />
-        <!-- Mustache JS -->
-		<script src="https://sso.theta42.com/static/js/mustache.min.js"></script>
-		<!-- jQuery library -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<!-- Custom styles for this template -->
+	<link href="css/all.css" rel="stylesheet" />
+	<link href="css/style.css" rel="stylesheet" />
+	<!-- weird api page cdn -->
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;1,300&family=Source+Code+Pro:wght@300&display=swap"
+		rel="stylesheet" />
+	<!-- Mustache JS -->
+	<script src="https://sso.theta42.com/static/js/mustache.min.js"></script>
+	<!-- jQuery library -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<!-- Bootstrap 5 JavaScript -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+		crossorigin="anonymous"></script>
 
-		<!-- Bootstrap 5 JavaScript -->
-		<script
-			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-			integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-			crossorigin="anonymous"></script>
-
-		<!-- weird api page cdn -->
-		<!-- https://github.com/floriannicolas/API-Documentation-HTML-Template/tree/master -->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
-		<script>
-			hljs.initHighlightingOnLoad();
-		</script>
-
-		<!-- jq-repeat -->
-		<script src="js/jq-repeat.js"></script>
-
-		<!-- jquery app.js -->
-		<script src="js/app.js"></script>
-	</head>
-	<!-- javascript function to check if user is auth -->
+	<!-- weird api page cdn -->
+	<!-- https://github.com/floriannicolas/API-Documentation-HTML-Template/tree/master -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
 	<script>
-		//make document ready
-		$(document).ready(function () {
-			//check if user is logged in
-			app.auth.isLoggedIn(function (error, data) {
-				if (data) {
-					$("#cl-logout-button").show("fast");
-					$("#cl-profile-button").show("fast");
-					$("#cl-login-button").hide("fast");
-				} else {
-					$("#cl-login-button").show("fast");
-				}
-				$("body").show("fast");
-			});
-        });
-
+		hljs.initHighlightingOnLoad();
 	</script>
+	<!-- socket.io scriot -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"></script>
 
-	<body>
-		<nav
-			class="navbar fixed-top navbar-expand-lg navbar-dark bg-light top-nav fixed-top">
-			<div class="container">
-				<a class="navbar-brand" href="/">
-					<img src="images/logo.png" alt="logo" />
-				</a>
-				<button
-					class="navbar-toggler"
-					type="button"
-					data-toggle="collapse"
-					data-target="#navbarResponsive"
-					aria-controls="navbarResponsive"
-					aria-expanded="false"
-					aria-label="Toggle navigation">
-					<span class="fas fa-bars"></span>
-				</button>
-				<div class="collapse navbar-collapse" id="navbarResponsive">
-					<ul class="navbar-nav ms-auto">
-						<li jq-repeat="getUsername" class="nav-item">
-                            <a class="nav-link"> Welcome {{ user.username }} </a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="/">Home</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="/news">News</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="/contact">Contact</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="/api">API Doc</a>
-						</li>
-						<!-- profile button -->
-						<div class="form-inline mt-2 mt-md-0">
-							<!-- Profile Button -->
-							<a
-								id="cl-profile-button"
-								class="btn btn-outline-info btn-sm my-2 my-sm-0"
-								href="/profile"
-								style="display: none">
-								<i class="fas fa-sign-out"></i> Profile
-							</a>
 
-							<!-- Login Button -->
-							<a
-								id="cl-login-button"
-								class="btn btn-outline-danger btn-sm my-2 my-sm-0"
-								onclick="app.auth.forceLogin()"
-								style="display: none">
-								<i class="fas fa-sign-out"></i> Login
-							</a>
+	<!-- jq-repeat -->
+	<script src="js/jq-repeat.js"></script>
 
-							<!-- Logout Button -->
-							<button
-								id="cl-logout-button"
-								class="btn btn-outline-danger btn-sm my-2 my-sm-0"
-								href="/"
-								onclick="app.auth.logOut(e => window.location.href='/')"
-								style="display: none">
-								<i class="fas fa-sign-out"></i> Logout
-							</button>
-						</div>
-					</ul>
-				</div>
+	<!-- jquery app.js -->
+	<script src="js/app.js"></script>
+</head>
+<!-- javascript function to check if user is auth -->
+<script>
+	//make document ready
+	$(document).ready(function () {
+		//check if user is logged in
+		app.auth.isLoggedIn(function (error, data) {
+			if (data) {
+				$("#cl-logout-button").show("fast");
+				$("#cl-api-button").show("fast");
+				$("#cl-profile-button").show("fast");
+				$("#cl-login-button").hide("fast");
+			} else {
+				$("#cl-login-button").show("fast");
+			}
+			$("body").show("fast");
+		});
+	});
+
+</script>
+
+<body>
+	<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-light top-nav fixed-top">
+		<div class="container">
+			<a class="navbar-brand" href="/">
+				<img src="images/logo.png" alt="logo" />
+			</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+				aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="fas fa-bars"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarResponsive">
+				<ul class="navbar-nav ms-auto">
+					<li jq-repeat="getUsername" class="nav-item">
+						<a class="nav-link"> Welcome {{ user.username }} </a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/">Home</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/news">News</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/contact">Contact</a>
+					</li>
+					<!-- 
+					<li class="nav-item">
+						<a class="nav-link" href="/api">API Doc</a>
+					</li>
+
+					 -->
+					<!-- profile button -->
+					<div class="form-inline mt-2 mt-md-0">
+						<a id="cl-api-button" class="btn btn-outline-info btn-sm my-2 my-sm-0" href="/api"
+							style="display: none">
+							<i class="fas fa-sign-out"></i> API
+						</a>
+						<!-- Profile Button -->
+						<a id="cl-profile-button" class="btn btn-outline-info btn-sm my-2 my-sm-0" href="/profile"
+							style="display: none">
+							<i class="fas fa-sign-out"></i> Profile
+						</a>
+
+						<!-- Login Button -->
+						<a id="cl-login-button" class="btn btn-outline-danger btn-sm my-2 my-sm-0"
+							onclick="app.auth.forceLogin()" style="display: none">
+							<i class="fas fa-sign-out"></i> Login
+						</a>
+
+						<!-- Logout Button -->
+						<button id="cl-logout-button" class="btn btn-outline-danger btn-sm my-2 my-sm-0" href="/"
+							onclick="app.auth.logOut(e => window.location.href='/')" style="display: none">
+							<i class="fas fa-sign-out"></i> Logout
+						</button>
+					</div>
+				</ul>
 			</div>
-		</nav>
-	</body>
+		</div>
+	</nav>
+</body>
+
 </html>

@@ -10,8 +10,8 @@ const options = {
   username: process.env.MQTT_USER, 
   password: process.env.MQTT_PASS, 
   protocol: 'mqtts', // Use MQTT over TLS
-  key: fs.readFileSync(path.resolve(__dirname, '../../cert/privkey.pem')), 
-  cert: fs.readFileSync(path.resolve(__dirname, '../../cert/cert.pem')), 
+  key: fs.readFileSync(path.resolve(__dirname, '../cert/privkey.pem')), 
+  cert: fs.readFileSync(path.resolve(__dirname, '../cert/cert.pem')), 
 
 };
 
