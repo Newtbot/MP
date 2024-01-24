@@ -1,6 +1,6 @@
-const client = require("./modules/mqtt");
+const client = require("./modules/mqtt.js");
 const { isJson, isNumber } = require("./functions/validateData.js");
-const { insertDatatoDB } = require("./functions/database.js");
+const { addSensorData } = require("./functions/sensorData");
 
 // Event handlers
 client.on("connect", () => {
@@ -37,7 +37,7 @@ client.on("message", (topic, message) => {
 				if (isNumber(data)) {
 					{
 						//pass datas to database
-						insertDatatoDB(datas[key]);
+						addSensorData(datas[key].sensorid, datas[key].locationid, datas[key]);
 
 					}
 				} else {
@@ -63,3 +63,4 @@ client.on("end", () => {
 	console.log("Disconnected from MQTT broker");
 	client.reconnect();
 });
+

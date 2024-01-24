@@ -4,7 +4,7 @@ const {
 	getLocationById,
 	updateLocation,
 	deleteLocation,
-} = require("../functions/apiDatabase.js");
+} = require("../functions/location");
 
 const express = require("express");
 const router = express.Router();

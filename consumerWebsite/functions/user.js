@@ -1,13 +1,44 @@
-const { sequelize } = require("../database/mySql.js");
-const { apikeyModel } = require("../database/model/apikeyModel.js");
-const { userModel } = require("../database/model/userModel.js");
-const { Op, Sequelize } = require("sequelize");
-const { generateUUID } = require("../functions/generateUUID.js");
-const {
-	hashPassword,
-	comparePassword,
-	hashAPIKey,
-} = require("../functions/bcrypt.js");
+const { Op } = require('sequelize')
+const { hash, compareHash } = require("./bcrypt.js");
+const { addAPIKey } = require("./api");
+const { userModel } = require("../database/model/userModel");
+
+
+
+//getuser
+//api/v0/user/me
+async function getUserID(userid) {
+	//console.log(userid);
+	//console.log(userid.id);
+	let userRes = await userModel.findByPk(userid.id, {
+		attributes: {
+			exclude: ["password"],
+		},
+	});
+
+	if (!userRes) return false;
+	return userRes;
+}
+
+async function addUser(user) {
+	//hash password
+	let hashed = await hash(user.password);
+
+	const addRes = await userModel.create({
+		firstname: user.firstname,
+		lastname: user.lastname,
+		username: user.username,
+		password: hashed,
+		email: user.email,
+		address: user.address,
+		phone: user.phone,
+	});
+	if (addRes) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
 //getuser
 //api/v0/user/me
@@ -32,13 +63,13 @@ async function getUserID(userid) {
 */
 async function addUser(user) {
 	//hash password
-	let hash = await hashPassword(user.password);
+	let hashed = await hash(user.password);
 
 	const addRes = await userModel.create({
 		firstname: user.firstname,
 		lastname: user.lastname,
 		username: user.username,
-		password: hash,
+		password: hashed,
 		email: user.email,
 		address: user.address,
 		phone: user.phone,
@@ -70,7 +101,7 @@ async function loginUser(user) {
 	if (!userRes) return false;
 
 	// Compare passwords
-	let match = await comparePassword(user.password, userRes.password);
+	let match = await compareHash(user.password, userRes.password);
 	if (!match) return false;
 	//console.log('loginUser', userRes.id, userRes.username);
 
@@ -89,20 +120,6 @@ async function loginUser(user) {
 6) store in database
 */
 
-//can be used for api key or token. Both are the same logic
-async function addAPIKey(userId, permission) {
-	let hashtoken = await generateUUID();
-	let apikey = await hashAPIKey(hashtoken);
-
-	let token = await apikeyModel.create({
-		userid: userId,
-		apikey: apikey,
-		permission: permission,
-	});
-
-	//user token with - tokenid is table id
-	return token.id + "-" + hashtoken;
-}
 
 //api/v0/user/update
 async function updateProfile(user, body) {
@@ -125,7 +142,7 @@ async function updateProfile(user, body) {
 		if (!updateUser) return false;
 		return true;
 	} else {
-		let hash = await hashPassword(body.password);
+		let hashed = await hash(body.password);
 		let updateUser = await userModel.update(
 			{
 				firstname: body.first_name,
@@ -134,7 +151,7 @@ async function updateProfile(user, body) {
 				email: body.email,
 				address: body.address,
 				phone: body.phone,
-				password: hash,
+				password: hashed,
 			},
 			{
 				where: {
@@ -152,5 +169,4 @@ module.exports = {
 	addUser,
 	loginUser,
 	updateProfile,
-	addAPIKey,
 };

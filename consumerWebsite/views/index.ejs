@@ -2,6 +2,7 @@
    <script>
       //call socket.io
       app.socket.on("sensorData:new", function (data) {
+         console.log("new data!!")
          console.log(data);
       });
 

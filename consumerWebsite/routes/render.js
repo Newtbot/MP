@@ -87,5 +87,9 @@ router.get("/api", function (req, res, next) {
 	res.render("api");
 });
 
+// sensor data
+router.get("/sensor-data", function (req, res, next) {
+	res.render("sensor-data");
+});
 
 module.exports = router;

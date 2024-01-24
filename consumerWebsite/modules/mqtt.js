@@ -18,5 +18,3 @@ const options = {
 const client = mqtt.connect(brokerUrl, options);
 
 module.exports = client;
-
-

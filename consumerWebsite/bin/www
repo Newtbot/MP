@@ -4,36 +4,28 @@
  * Module dependencies.
  */
 
-var app = require('../../webserver/modules/express.js');
-const index = require("../index.js")
-var debug = require('debug')('proxy-api:server');
-var http = require('http');
+const app = require('../app');
+const mqttApp = require('../mqttApp');
+const debug = require('debug')('proxy-api:server');
+const http = require('http');
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env')})
 
 /**
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || '80');
+var port = normalizePort(process.env.NODE_PORT  || '3000');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
+//create server with app
 var server = http.createServer(app);
 
-const io = require('socket.io')(server
-    , {
-    cors: {
-        //replace with domain name when deployed
-        origin: 'http://localhost:3000', // client!
-        methods: ["GET"],
-        allowedHeaders: ["my-custom-header"],
-        credentials: true
-
-    }
-});
-
+var io = require('socket.io')(server);
 app.io = io;
 
 /**
@@ -103,6 +95,7 @@ function onListening() {
     : 'port ' + addr.port;
   console.log('Listening on ' + bind);
 
+  // execute list of functions when app is ready
   for(let listener of app.onListen){
     listener()
   }

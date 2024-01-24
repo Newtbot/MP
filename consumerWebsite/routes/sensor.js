@@ -4,7 +4,7 @@ const {
 	updateSensor,
     deleteSensor,
     getSensorById
-} = require("../functions/apiDatabase.js");
+} = require("../functions/sensor.js");
 
 const express = require("express");
 const router = express.Router();

@@ -1,18 +1,8 @@
-const { getAPIKey , addAPIKey } = require("../functions/apiDatabase.js");
+const { addAPIKey } = require("../functions/api");
 
 
 const express = require("express");
 const router = express.Router();
-
-router.get("/", async (req, res, next) => {
-	try {
-		const location = await getAPIKey();
-		res.status(200).json(location);
-	} catch (error) {
-		console.error(error);
-		next(error);
-	}
-});
 
 /*
 1) ensure user is logged in (frontend session validation blah or wtv)
@@ -34,9 +24,6 @@ router.post("/new", async (req, res, next) => {
 	}
 });
 
-//update
-//delete
-//getbyid
 
 module.exports = router;
 

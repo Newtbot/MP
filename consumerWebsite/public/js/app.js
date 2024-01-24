@@ -145,15 +145,17 @@ app.api = (function (app) {
 })(app);
 
 //socket.io
+//socket.io
 app.socket = (function (app) {
 	//need to replace with domain name of server when published
-	var socket = io("localhost", {
-		transports: ["websocket"],
-		'Access-Control-Allow-Origin': 'http://localhost:3000',
-	});
+	var socket = io();
 	socket.on("disconnect", () => {
 		console.log("disconnected");
 	});
+
+	socket.on('connect', ()=>{
+		console.info('WS connected');
+	})
 
 	socket.io.on("reconnect", () => {
 		console.log("reconnected");
@@ -163,7 +165,6 @@ app.socket = (function (app) {
 	});
 	return socket;
 })(app);
-
 //sensor data
 app.sensordata = (function (app) {
 

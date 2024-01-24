@@ -1,6 +1,6 @@
 const { apikeyModel } = require("../database/model/apiKeyModel");
 const { userModel } = require("../database/model/userModel");
-const { comparePassword } = require("../functions/bcrypt");
+const { compareHash } = require("../functions/bcrypt");
 
 async function auth(req, res, next){
     try{ 
@@ -15,7 +15,7 @@ async function auth(req, res, next){
         if (!token) return false;
 
         //compare
-        let isMatch = await comparePassword(suppliedToken, token.apikey);
+        let isMatch = await compareHash(suppliedToken, token.apikey);
         if (!isMatch) return false;
 
         //else do logic
