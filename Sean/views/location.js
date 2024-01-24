@@ -3,19 +3,26 @@ $(document).ready(function () {
       $('#locationContainer').show();
       $('#createLocationForm').hide();
       $('#updateLocationForm').hide();
+      $('#deleteLocationForm').hide();
     });
     $('#addLocationLink').on('click', function () {
         $('#locationContainer').hide();
         $('#createLocationForm').show();
         $('#updateLocationForm').hide();
+        $('#deleteLocationForm').hide();
       });
       $('#updateLocationLink').on('click', function () {
         $('#locationContainer').hide();
         $('#createLocationForm').hide();
         $('#updateLocationForm').show();
-        populateLocationDropdown();
+        $('#deleteLocationForm').hide();
       });
-      
+      $('#deleteLocationLink').on('click', function () {
+        $('#locationContainer').hide();
+        $('#createLocationForm').hide();
+        $('#updateLocationForm').show();
+        $('#deleteLocationForm').show();
+      }); 
   });
 
   let locationArray = [];
@@ -42,8 +49,7 @@ $(document).ready(function () {
     });
   }
   populateTableAndArray(locationsData);
-  console.log(locationArray);
-
+  populateLocationDropdown();
 $('#locationForm').on('submit', function (e) {
     e.preventDefault();
 
@@ -133,6 +139,42 @@ $('#locationForm').on('submit', function (e) {
 })
 .catch(error => {
     console.error('Location not updated successfully', error);
+    // Handle error as needed
+});
+  });
+
+  $('#deleteForm').on('submit', function (e) {
+    e.preventDefault();
+    const selectedLocationId = $('#locationDropdown').val();
+    const csrf_token = $('#userForm input[name="csrf_token"]').val();
+
+    fetch('/location/delete', {
+      method: 'DELETE',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          id:selectedLocationId,
+          csrf_token: csrf_token
+      }),
+  })
+  .then(response => {
+    if (response.ok) {
+        // Status 201 indicates successful creation
+        return response.json();
+    } else {
+        return response.json().then(data => {
+            throw new Error(data.message || `HTTP error! Status: ${response.status}`);
+        });
+    }
+})
+.then(data => {
+    console.log(`Location deleted successfully. Message: ${data.message}`);
+    alert('Location deleted successfully!');
+    resetFormFields();
+})
+.catch(error => {
+    console.error('Location not deleted successfully', error);
     // Handle error as needed
 });
   });

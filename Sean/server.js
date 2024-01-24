@@ -1,21 +1,23 @@
 const express = require("express");
 const session = require("express-session");
-const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
-const otpGenerator = require('otp-generator');
-const { body, validationResult } = require('express-validator');
 const validator = require('validator');
 const axios = require('axios');
 
+const {validationResult } = require('express-validator');
+const {locationValidation, locationValidationUpdate, locationdeleteValidation
+,sensorValidation, sensorupdateValidation, sensordeleteValidation, loginValidation
+,otpValidation, createValidation} = require('./modules/validationMiddleware');
+const rateLimit = require('./modules/rateLimitMiddleware');
+const { generateOTP, sendOTPByEmail } = require('./modules/otpUtils');
 const { format } = require('date-fns');
 const { Sequelize } = require('sequelize');
 const { transporter } = require("./modules/nodeMailer");
 const { sequelize, User } = require("./modules/mysql");
-const userLogs= require('./models/userLogs')(sequelize); // Adjust the path based on your project structure
+const userLogs= require('./models/userLogs')(sequelize); 
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -27,7 +29,6 @@ require("dotenv").config();
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
-
 
 app.use(session({
     secret: process.env.key,
@@ -46,75 +47,26 @@ function isAuthenticated(req, res, next) {
 		res.redirect("/login");
 	}
 }
-const generateOTP = () => {
-	const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false });
-	const expirationTime = Date.now() + 5 * 60 * 1000; // 5 minutes expiration
-	return { otp, expirationTime };
-  };
-
-const sendOTPByEmail = async (email, otp) => {
-	try {
-	  const transporter = nodemailer.createTransport({
-		service: 'gmail',
-		auth: {
-		  user: process.env.euser,  // replace with your email
-		  pass: process.env.epass   // replace with your email password
-		}
-	  });
-  
-	  const mailOptions = {
-		from: process.env.euser,
-		to: email,
-		subject: 'Login OTP',
-		text: `Your OTP for login is: ${otp}`
-	  };
-  
-	  await transporter.sendMail(mailOptions);
-	  console.log('OTP sent successfully to', email);
-	} catch (error) {
-	  console.error('Error sending OTP:', error);
-	  throw error;
-	}
-  };
-
 
 app.get("/login", (req, res) => {
-	
 	res.render("login", { error: null });
 });
 
-  const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000, // 15 minutes
-	max: 5, // limit each IP to 3 requests per windowMs
-	message: 'Too many login attempts from this IP, please try again later.',
-  });
-
-app.use('/login', limiter);
+app.use('/login', rateLimit);
   
-
-app.post('/login', [
-  body('username').escape().trim().isLength({ min: 1 }).withMessage('Username must not be empty'),
-  body('password').escape().trim().isLength({ min: 1 }).withMessage('Password must not be empty'),
-],
-async (req, res) => {
-  try {
-    const errors = validationResult(req);
-
+app.post('/login', loginValidation, async (req, res) => {
+  try {const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.render('login', { error: 'Invalid input. Please check your credentials.', csrfToken: req.session.csrfToken });
     }
-
     let { username, password } = req.body;
     username = username.trim();
-
     const user = await User.findOne({ where: { username } });
-
     if (user) {
       const isLoginSuccessful = await bcrypt.compare(password, user.password);
 
       if (isLoginSuccessful) {
 		await userLogs.create({ username, success: true, activity: "Credentials entered correctly" });
-
 
         const { otp, expirationTime } = generateOTP();
 
@@ -161,17 +113,12 @@ async (req, res) => {
 
 
 // OTP verification route
-app.post("/verify-otp", [
-	body('otp').escape().trim().isLength({ min: 1 }).withMessage('OTP must not be empty'),
-  ],
-  async (req, res) => {
+app.post("/verify-otp", otpValidation ,async (req, res) => {
 	try {
 	  const errors = validationResult(req);
-  
 	  if (!errors.isEmpty()) {
 		return res.render('otp', { error: 'Invalid OTP. Please try again.'});
 	  }
-  
 	  const enteredOTP = req.body.otp;
   
 	  if (!req.session) {
@@ -209,16 +156,9 @@ app.post("/verify-otp", [
 		req.session.authenticated = true;
 		req.session.username = req.body.username;
 		req.session.sessionToken = sessionToken;
-  
-		
 		csrfTokenSession = crypto.randomBytes(32).toString('hex');
   
-		// Log anti-CSRF token
-		console.log(`Generated Anti-CSRF Token: ${csrfTokenSession}`);
-  
 		res.cookie('sessionToken', sessionToken, { secure: true, httpOnly: true, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // Expires in 1 day
-  
-		console.log(`Generated Session Token: ${sessionToken}`);
   
 		res.redirect("/home");
 	  } else {
@@ -262,17 +202,14 @@ app.post("/verify-otp", [
 	}
   });
   
-  
-
-  app.get("/home", isAuthenticated, (req, res) => {
-	  // Render the home page with sensor data
-	  res.render("home", {
-		username: req.session.username,
-	  });
+  app.get("/home", isAuthenticated, async (req, res) => {
+	  
+	  const response = await axios.get(process.env.API_ALLLOCATION);
+	  const valueData = response.data;
+	  console.log = (valueData);
+	  res.render("home", { username: req.session.username, valueData});
 	});
 
-
-  
 	app.get("/inusers", isAuthenticated, async (req, res) => {
 		try {
 			// Fetch all user data from the database using Sequelize
@@ -318,20 +255,8 @@ function isStrongPassword(password) {
 	return true;
 }
 
-
-
 app.post(
-    '/createUser',
-    [
-        body('name').trim().isLength({ min: 1 }).withMessage('Name must not be empty').escape(),
-        body('username').trim().isLength({ min: 1 }).withMessage('Username must not be empty').escape(),
-        body('email').isEmail().withMessage('Invalid email address').normalizeEmail(),
-        body('password').custom((value) => {
-            if (!isStrongPassword(value)) { throw new Error('Password does not meet complexity requirements'); } return true;
-        }),
-        body('jobTitle').trim().isLength({ min: 1 }).withMessage('Job title must not be empty').escape(),
-    ],
-    async (req, res) => {
+    '/createUser', createValidation, async (req, res) => {
         try {
             const errors = validationResult(req);
 
@@ -463,24 +388,13 @@ app.post("/forgot-password", async (req, res) => {
 		const error = "Username or email not found.";
 		return res.render("forgot-password", { error, success: null });
 	  }
-  
 	  // Generate reset token and update the user
 	  const reset_token = crypto.randomBytes(20).toString("hex");
 	  const reset_token_expiry = new Date(Date.now() + 3600000); // Token expires in 1 hour
-  
 	  // Update the user with the reset token and expiry
-	  await User.update(
-		{
-		  reset_token,
-		  reset_token_expiry,
-		},
-		{
-		  where: {
-			id: user.id, // Replace 'id' with the actual primary key field of your User model
-		  },
-		}
+	  await User.update({reset_token,reset_token_expiry,},
+		{where: {id: user.id},}
 	  );
-  
 	  // Send email with reset link
 	  const resetLink = `http://localhost:3000/reset-password/${reset_token}`;
 	  const mailOptions = {
@@ -488,12 +402,9 @@ app.post("/forgot-password", async (req, res) => {
 		subject: "Password Reset",
 		text: `Click on the following link to reset your password: ${resetLink}`,
 	  };
-  
 	  await transporter.sendMail(mailOptions);
-  
 	  const success = "Password reset email sent successfully. Check your inbox.";
 	  res.render("forgot-password", { error: null, success });
-  
 	  // Log the successful sending of the reset link in the database
 	  await userLogs.create({
 		username: user.username,
@@ -509,29 +420,22 @@ app.post("/forgot-password", async (req, res) => {
 	  console.error("Error during password reset:", error);
 	  const errorMessage = "An error occurred during the password reset process.";
 	  res.render("forgot-password", { error: errorMessage, success: null });
-	}
-  });
+	}});
   
-  
-
   app.post("/reset-password/:token", async (req, res) => {
 	try {
 	  const { token } = req.params;
 	  const { password, confirmPassword } = req.body;
-  
 	  // Sanitize the inputs
 	  const sanitizedToken = validator.escape(token);
 	  const sanitizedPassword = validator.escape(password);
 	  const sanitizedConfirmPassword = validator.escape(confirmPassword);
-  
 	  // Find user with matching reset token and not expired
 	  const user = await User.findOne({
-		where: {
-		  reset_token: sanitizedToken,
-		  reset_token_expiry: { [Sequelize.Op.gt]: new Date() },
+		where: {reset_token: sanitizedToken,
+		reset_token_expiry: { [Sequelize.Op.gt]: new Date() },
 		},
 	  });
-  
 	  if (!user) {
 		// Pass the error to the template when rendering the reset-password page
 		return res.render("reset-password", {
@@ -539,7 +443,6 @@ app.post("/forgot-password", async (req, res) => {
 		  resetError: "Invalid or expired reset token",
 		});
 	  }
-  
 	  // Check if passwords match
 	  if (sanitizedPassword !== sanitizedConfirmPassword) {
 		// Pass the error to the template when rendering the reset-password page
@@ -548,31 +451,24 @@ app.post("/forgot-password", async (req, res) => {
 		  resetError: "Passwords do not match",
 		});
 	  }
-  
 	  // Check if the new password meets complexity requirements
 	  if (!isStrongPassword(sanitizedPassword)) {
 		// Pass the error to the template when rendering the reset-password page
 		return res.render("reset-password", {
-		  token,
-		  resetError:
+		  token, resetError:
 			"Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.",
 		});
 	  }
-  
 	  // Hash the new password 
 	  const saltRounds = 10;
 	  const hashedPassword = await bcrypt.hash(sanitizedPassword, saltRounds);
-  
 	  // Update user's password and clear reset token
 	  const updateQuery = {
 		password: hashedPassword,
 		reset_token: null,
 		reset_token_expiry: null,
 	  };
-	  const whereCondition = {
-		reset_token: sanitizedToken,
-	  };
-  
+	  const whereCondition = {reset_token: sanitizedToken,};
 	  await User.update(updateQuery, {
 		where: whereCondition,
 	  });
@@ -619,10 +515,8 @@ app.post("/reset-password", async (req, res) => {
         return res.status(403).json({ error: 'CSRF token mismatch' });
     }
 	const sessionTokencookie = req.cookies['sessionToken'];
-
             // Verify sessionToken with the one stored in the database
             const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
-
             if (!user) {
                 return res.status(403).json({ error: 'Invalid sessionToken' });
             }
@@ -630,12 +524,10 @@ app.post("/reset-password", async (req, res) => {
     const sanitizedUsername = validator.escape(username);
     const sanitizedPassword = validator.escape(password);
     const sanitizedConfirmPassword = validator.escape(confirmPassword);
-
     // Check if passwords match
     if (sanitizedPassword !== sanitizedConfirmPassword) {
         return res.status(400).json({ error: "Passwords do not match" });
     }
-
     // Check if the new password meets complexity requirements
     if (!isStrongPassword(sanitizedPassword)) {
         return res.status(400).json({
@@ -643,31 +535,25 @@ app.post("/reset-password", async (req, res) => {
                 "Password does not meet complexity requirements. It must be at least 10 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one symbol.",
         });
     }
-
     try {
         // Find the user in the database
         const user = await User.findOne({ where: { username: sanitizedUsername } });
-
         if (!user) {
             return res.status(404).json({ error: "User does not exist" });
         }
-
         // Generate a random salt and hash the new password
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(sanitizedPassword, saltRounds);
-
         // Update user's password
         await User.update(
 			{ password: hashedPassword },
 			{ where: { username: sanitizedUsername } }
 		);
-
         // Log password reset activity
         await userLogs.create({
             username: creatorUsername,
             activity: `Password has been reset for ${sanitizedUsername}`,
         });
-
         // Password update successful
         return res.status(200).json({ success: "Password updated successfully" });
     } catch (error) {
@@ -679,10 +565,8 @@ app.post("/reset-password", async (req, res) => {
 
 app.get('/searchUser', async (req, res) => {
     const { username } = req.query;
-
     // Sanitize the input
     const sanitizedUsername = validator.escape(username);
-
     try {
         // Find the user in the database
         const user = await User.findOne({ where: { username: sanitizedUsername } });
@@ -690,11 +574,7 @@ app.get('/searchUser', async (req, res) => {
         if (!user) {
             // No user found with the given username
             res.status(404).json({ success: false, error: 'User not found' });
-        } else {
-            // User found, return user data
-            res.json(user);
-
-        }
+        } else {res.json(user)}
     } catch (error) {
         console.error('Sequelize query error:', error);
         res.status(500).json({ success: false, error: 'Internal Server Error' });
@@ -705,7 +585,6 @@ app.get('/api/users', async (req, res) => {
     try {
         // Find all users in the database
         const users = await User.findAll();
-
         // Return the users in the response
         res.json(users);
     } catch (error) {
@@ -773,9 +652,6 @@ app.delete('/api/deleteUser/:username', async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal Server Error', details: error.message });
     }
 });
-  
-
-  
 
 app.get('/api/getLogs', async (req, res) => {
     try {
@@ -814,11 +690,6 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 	}
   });
 
-  const locationValidation = [
-	body('name').trim().isLength({ min: 1 }).withMessage('Name must not be empty').escape(),
-	body('added_by').trim().isLength({ min: 1 }).withMessage('Added by must not be empty').escape(),
-	body('description').trim().escape(),
-  ];
   app.post('/location/new', locationValidation, async (req, res) => {
 	try {
 	  const errors = validationResult(req);
@@ -846,12 +717,6 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 	}
   });
 
-  const locationValidationUpdate = [
-	body('id').trim().escape(),
-	body('name').trim().isLength({ min: 1 }).withMessage('Name must not be empty').escape(),
-	body('added_by').trim().isLength({ min: 1 }).withMessage('Added by must not be empty').escape(),
-	body('description').trim().escape(),
-  ];
   app.post('/location/update', locationValidationUpdate, async (req, res) => {
 	try {
 	  const errors = validationResult(req);
@@ -879,6 +744,33 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 	}
   });
 
+ 
+  app.post('location/delete',locationdeleteValidation, async (req, res) => {
+	try {
+	  const errors = validationResult(req);
+	  if (!errors.isEmpty()) {
+		return res.status(400).json({ errors: errors.array() });
+	  }
+	  const sessionTokencookie = req.cookies['sessionToken'];
+	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
+	  if (!user) {
+		  return res.status(403).json({ error: 'Invalid sessionToken' });
+	  }
+	  const submittedCSRFToken = req.body.csrf_token;
+	  if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+		  return res.status(403).json({ error: 'CSRF token mismatch' });
+	  }
+	  const {id} = req.body;
+	  const preparedData = {id};
+	  // Make a POST request with the sanitized data using Axios
+	  const axiosResponse = await axios.post(process.env.API_DELLOCATION, preparedData);
+	  // Send the Axios response back to the client
+	  res.status(axiosResponse.status).json(axiosResponse.data);
+	} catch (error) {
+	  console.error('Error handling new sensor submission:', error);
+	  res.status(500).json({ message: 'Internal Server Error' });
+	}
+  });
 
 app.get("/sensors", isAuthenticated, async (req, res) => {
 	try {
@@ -894,21 +786,34 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	}
 });
 
-const sensorValidation = [
-	body('id').trim().escape(),
-	body('sensorname').trim().isLength({ min: 1 }).withMessage('Sensor Name must not be empty').escape(),
-	body('added_by').trim().isLength({ min: 1 }).withMessage('Added by must not be empty').escape(),
-	body('macAddress').custom(value => {
-	  const macAddressRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
-	  if (!macAddressRegex.test(value)) {
-		throw new Error('Invalid MAC address format');
-	  }
-	  return true;
-	}).withMessage('Invalid MAC address format').escape(),
-	body('description').trim().escape(),
-	body('location').trim().escape()
-  ];
   app.post('sensor/new',sensorValidation, async (req, res) => {
+	try {
+	  const errors = validationResult(req);
+	  if (!errors.isEmpty()) {
+		return res.status(400).json({ errors: errors.array() });
+	  }
+	  const sessionTokencookie = req.cookies['sessionToken'];
+	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
+	  if (!user) {
+		  return res.status(403).json({ error: 'Invalid sessionToken' });
+	  }
+	  const submittedCSRFToken = req.body.csrf_token;
+	  if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+		  return res.status(403).json({ error: 'CSRF token mismatch' });
+	  }
+	  const { sensorname, added_by, macAddress, description, location} = req.body;
+	  const preparedData = {sensorname, added_by, macAddress, description, location};
+	  // Make a POST request with the sanitized data using Axios
+	  const axiosResponse = await axios.post(process.env.API_NEWSENSOR, preparedData);
+	  // Send the Axios response back to the client
+	  res.status(axiosResponse.status).json(axiosResponse.data);
+	} catch (error) {
+	  console.error('Error handling new sensor submission:', error);
+	  res.status(500).json({ message: 'Internal Server Error' });
+	}
+  });
+
+  app.post('sensor/update',sensorupdateValidation, async (req, res) => {
 	try {
 	  const errors = validationResult(req);
 	  if (!errors.isEmpty()) {
@@ -927,6 +832,33 @@ const sensorValidation = [
 	  const preparedData = {id, sensorname, added_by, macAddress, description, location};
 	  // Make a POST request with the sanitized data using Axios
 	  const axiosResponse = await axios.post(process.env.API_NEWSENSOR, preparedData);
+	  // Send the Axios response back to the client
+	  res.status(axiosResponse.status).json(axiosResponse.data);
+	} catch (error) {
+	  console.error('Error handling new sensor submission:', error);
+	  res.status(500).json({ message: 'Internal Server Error' });
+	}
+  });
+
+  app.post('sensor/delete',sensordeleteValidation, async (req, res) => {
+	try {
+	  const errors = validationResult(req);
+	  if (!errors.isEmpty()) {
+		return res.status(400).json({ errors: errors.array() });
+	  }
+	  const sessionTokencookie = req.cookies['sessionToken'];
+	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
+	  if (!user) {
+		  return res.status(403).json({ error: 'Invalid sessionToken' });
+	  }
+	  const submittedCSRFToken = req.body.csrf_token;
+	  if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+		  return res.status(403).json({ error: 'CSRF token mismatch' });
+	  }
+	  const {id} = req.body;
+	  const preparedData = {id};
+	  // Make a POST request with the sanitized data using Axios
+	  const axiosResponse = await axios.post(process.env.API_DELSENSOR, preparedData);
 	  // Send the Axios response back to the client
 	  res.status(axiosResponse.status).json(axiosResponse.data);
 	} catch (error) {

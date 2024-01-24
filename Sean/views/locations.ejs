@@ -62,9 +62,9 @@
   </div>
 
   <div id="updateLocationForm" class="location-update-container" style="display: none;">
-    <h3>Add Location</h3>
+    <h3>Update Location</h3>
     <div class="content">
-      <form action="/api/v0/location/update" id="updateForm" method="put">
+      <form action="/location/update" id="updateForm" method="put">
         <div class="Location-details">
           <div class="input-box">
             <span class="details">Location to Update</span>
@@ -79,6 +79,25 @@
             <span class="details">Description</span>
             <input type="text" name="description" id="description" placeholder="Enter the description here" required>
           </div>
+        </div>
+        <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+        <div class="button">
+          <input type="submit" value="submit">
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="deleteLocationForm" class="location-delete-container" style="display: none;">
+    <h3>Delete Location</h3>
+    <div class="content">
+      <form action="/location/delete" id="deleteForm" method="delete">
+        <div class="Location-details">
+          <div class="input-box">
+            <span class="details">Location to Delete</span>
+            <select name="location" id="locationDropdown" required>
+            </select>
+        </div>
         </div>
         <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
         <div class="button">

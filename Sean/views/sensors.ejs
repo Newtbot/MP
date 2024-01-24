@@ -20,8 +20,8 @@
   <nav>
     <a href="#" id="allSensorLink">All Sensor</a>
     <a href="#" id="addSensorLink">Add Sensor</a>
-    <a href="#">Update Sensor</a>
-    <a href="#">Delete Sensor</a>
+    <a href="#" id="updateSensorLink">Update Sensor</a>
+    <a href="#" id="deleteSensorLink">Delete Sensor</a>
     <a href="/home" id="homeLink">Home</a>
   </nav>
 
@@ -83,13 +83,68 @@
       </ul>
     </div>
   </div>
+  <div id="updateSensorForm" class="sensor-update-container" style="display: none;">
+    <h3>Add Location</h3>
+    <div class="content">
+      <form action="/sensor/update" id="updateForm" method="put">
+        <div class="Location-details">
+          <div class="input-box">
+            <span class="details">Sensor to Update</span>
+            <select name="Sensor" id="sensorDropdown" required>
+            </select>
+        </div>
+          <div class="input-box">
+            <span class="details">Sensor Name</span>
+            <input type="text" name="sensorname"  id="sensorname" placeholder="Enter Sensor name" required>
+          </div>
+          <div class="input-box">
+            <span class="details">Mac Address</span>
+            <input type="text" name="macAddress" id="macAddress" placeholder="Enter the Mac Address" required>
+        </div>
+          <div class="input-box">
+            <span class="details">Description</span>
+            <input type="text" name="description" id="description" placeholder="Enter the description here" required>
+          </div>
+        </div>
+        <div class="input-box">
+          <span class="details">Location</span>
+          <select name="location" id="locationDropdown" required>
+          </select>
+      </div>
+  </div>
+  <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+        <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+        <div class="button">
+          <input type="submit" value="submit">
+        </div>
+      </form>
+    </div>
+  </div>
 
+  <div id="deleteSensorForm" class="sensor-delete-container" style="display: none;">
+    <h3>Delete Location</h3>
+    <div class="content">
+      <form action="/sensor/delete" id="deleteForm" method="delete">
+        <div class="Location-details">
+          <div class="input-box">
+            <span class="details">Sensor to Delete</span>
+            <select name="sensor" id="sensorDropdown" required>
+            </select>
+        </div>
+        </div>
+        <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+        <div class="button">
+          <input type="submit" value="submit">
+        </div>
+      </form>
+    </div>
+  </div>
   <footer>
     Any Issue faced, Please contact the administrator at 11111111 or ecosaverAdmin@gmail.com
 </footer>
 </body>
 <script>
-const locationsArray = <%=-JSON.stringify(locationsData) %>;
+const locationsArray = <%-JSON.stringify(locationsData) %>;
 const sensorArray = <%- JSON.stringify(sensorData) %>;
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
