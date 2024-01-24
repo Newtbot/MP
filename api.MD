@@ -174,4 +174,4 @@ http://localhost/api/v0/sensor-data/data?week=1&sensorid=1&locationid=1&page=2&p
 curl localhost/api/v0/user/register -H "Content-Type: application/json" -X POST -d '{"username": "testuser123", "password": "thisisthesystemuserpasswordnoob", "email": "testuser123@ecosaver.com", "address": "Nanyang Polytechnic 180 Ang Mo Kio Avenue 8 Singapore 569830", "phone": "12345678"}'
 
 
-curl localhost/api/v0/apikey/new -H "Content-Type: application/json" -X POST -d '{"userid": "5", "permission": "canRead"}'
+curl localhost:3000/api/v0/apikey/new -H "Content-Type: application/json" -X POST -d '{"userid": "5", "permission": "canRead"}'

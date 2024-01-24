@@ -1,4 +1,4 @@
-const { getUserID, updateProfile } = require("../functions/apiDatabase.js");
+const { getUserID, updateProfile } = require("../functions/user");
 
 const express = require("express");
 const router = express.Router();

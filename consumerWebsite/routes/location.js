@@ -4,7 +4,7 @@ const {
 	getLocationById,
 	updateLocation,
 	deleteLocation,
-} = require("../functions/apiDatabase.js");
+} = require("../functions/location");
 
 const express = require("express");
 const router = express.Router();
@@ -25,6 +25,7 @@ router.get("/", async (req, res, next) => {
 //add location 
 router.post("/new", async (req, res, next) => {
 	try {
+		console.log(req.body);
 		const { name, added_by, description } = req.body;
 		await addLocation(name, added_by, description);
 		res.sendStatus(200)

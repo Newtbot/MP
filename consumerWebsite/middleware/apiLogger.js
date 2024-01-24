@@ -1,4 +1,4 @@
-const { insertLogData } = require("../functions/database.js");
+const { insertLogData } = require("../functions/logger.js");
 const APIlogger = (req, res, next) => {
   try {
     const log = {
