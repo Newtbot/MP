@@ -1,6 +1,6 @@
 const { apikeyModel } = require("../database/model/apiKeyModel");
 const { userModel } = require("../database/model/userModel");
-const { comparePassword } = require("../functions/bcrypt");
+const { compareHash } = require("../functions/bcrypt");
 
 async function auth(req, res, next){
     try{ 
@@ -12,15 +12,16 @@ async function auth(req, res, next){
 
         //get from db
         let token = await apikeyModel.findByPk(rowid, {include: userModel});
+        if (!token) return false;
 
         //compare
-        let isMatch = await comparePassword(suppliedToken, token.apikey);
+        let isMatch = await compareHash(suppliedToken, token.apikey);
         if (!isMatch) return false;
 
         //else do logic
         //pass hashed token to req.token (IMPORTANT ITS NOT PASSED TO CLIENT)
         req.token = token
-        req.user = await token.getUser();
+        req.user = await token.getUser(); //taking user seq obj from usermodel
         next();
     }catch(error){
         next(error);

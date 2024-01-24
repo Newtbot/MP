@@ -27,9 +27,9 @@ client.on("error", (err) => {
 });
 
 //every 15 minutes
-setInterval(publishData, 900000);
+//setInterval(publishData, 900000);
 //every 1 minute
-//setInterval(publishData, 60000);
+setInterval(publishData, 60000);
 
 
 

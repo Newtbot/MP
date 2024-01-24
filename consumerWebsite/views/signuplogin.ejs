@@ -9,6 +9,7 @@
             <div class="form signup iot-card">
                 <!--<div class="form signup card" -->
                 <header>Signup</header>
+                <div class="card-header shadow actionMessage" style="display:none"></div>
                 <!-- localhost/api/v0/user/register -->
                 <!-- evalAjax Fires when status 200 is returned  -->
                 <form action="auth/register" onsubmit="formAJAX(this)" evalAJAX="app.auth.logInRedirect();">
@@ -35,7 +36,7 @@
                 <form action="auth/login" onsubmit="formAJAX(this)" evalAJAX="app.auth.homeRedirect();
                 app.auth.setToken(data.token);">
                     <input type="text" name="username" placeholder="Email address | Username" required
-                        pattern="^\w+$" />
+                        pattern="^(\w+@\w+\.\w+)$|^\w+$"/>
                     <input type="password" name="password" placeholder="Password" required />
                     <a href="/forgotpassword">Forgot password?</a>
                     <input type="submit" value="Login" />

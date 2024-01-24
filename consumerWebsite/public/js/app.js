@@ -144,6 +144,34 @@ app.api = (function (app) {
 	return { post: post, get: get, put: put, delete: remove };
 })(app);
 
+//socket.io
+//socket.io
+app.socket = (function (app) {
+	//need to replace with domain name of server when published
+	var socket = io();
+	socket.on("disconnect", () => {
+		console.log("disconnected");
+	});
+
+	socket.on('connect', ()=>{
+		console.info('WS connected');
+	})
+
+	socket.io.on("reconnect", () => {
+		console.log("reconnected");
+	});
+	socket.io.on("connect_error", (err) => {
+		console.log(err);
+	});
+	return socket;
+})(app);
+//sensor data
+app.sensordata = (function (app) {
+
+
+})(app);
+
+
 app.auth = (function (app) {
 	var user = {};
 	function setToken(token) {
@@ -154,28 +182,28 @@ app.auth = (function (app) {
 		return localStorage.getItem("APIToken");
 	}
 
-
 	function isLoggedIn(callback) {
 		if (getToken()) {
 			return app.api.get("user/me", function (error, data) {
 				if (!error) app.auth.user = data;
-				//$.scope.getUsername.push(data);
+				//for navbar to show username
+				if (!location.pathname === "/login")
+				{
+					$.scope.getUsername.update(data);
+
+				}
+
+				//for edit profile to show user details
+				//if not in edit profile page, it will not show
+				if (location.pathname === "/profile") {
+					$.scope.getUserDetails.update(data);
+				}
 				return callback(error, data);
 			});
 		} else {
 			callback(null, false);
 		}
 	}
-
-	function showUser(){
-		app.api.get("user/me", function (error, data) {
-			if (!error) app.auth.user = data;
-			$.scope.getUsername.push(data);
-		});
-	}
-
-
-	
 
 	function logOut(callback) {
 		//call logout route
@@ -217,19 +245,13 @@ app.auth = (function (app) {
 	}
 
 	function homeRedirect() {
-		window.location.href = location.href.replace(location.replace(`/`)) || "/";
+		//window.location.href = location.href.replace(location.replace(`/`)) || "/";
+		location.replace(`/`);
 	}
-	/*
-	function redirectIfLoggedIn() {
-		if (getToken()){
-			homeRedirect();
-		}
-		logInRedirect();
 
+	function profileRedirect() {
+		location.replace(`/profile`);
 	}
-	*/
-
-
 
 	return {
 		getToken: getToken,
@@ -239,8 +261,25 @@ app.auth = (function (app) {
 		forceLogin,
 		logInRedirect,
 		homeRedirect,
-		showUser,
-		//redirectIfLoggedIn,
+		profileRedirect,
+	};
+})(app);
+
+app.user = (function (app) {
+	//delete profile
+	function deleteProfile() {
+		app.api.delete("user/delete", function (error, data) {
+			if (error) {
+				app.util.actionMessage(error.message, $("#deleteProfile"), "danger");
+			} else {
+				app.auth.logOut(function () {
+					location.replace(`/login`);
+				});
+			}
+		});
+	}
+	return {
+		deleteProfile,
 	};
 })(app);
 
@@ -250,11 +289,6 @@ function formAJAX(btn, del) {
 	var $form = $(btn).closest("[action]"); // gets the 'form' parent
 	var formData = $form.find("[name]").serializeObject(); // builds query formDataing
 	var method = $form.attr("method") || "post";
-
-	// if( !$form.validate()) {
-	//     app.util.actionMessage('Please fix the form errors.', $form, 'danger')
-	//     return false;
-	// }
 
 	app.util.actionMessage("Loading...", $form, "info");
 

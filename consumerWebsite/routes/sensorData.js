@@ -6,10 +6,9 @@ const {
 	getSensorDataById,
 	getData,
 	getDatabyRange,
-} = require("../functions/apiDatabase.js");
+} = require("../functions/sensorData");
 
 const express = require("express");
-const { json } = require("body-parser");
 const router = express.Router();
 
 router.get("/", async (req, res, next) => {
@@ -24,9 +23,9 @@ router.get("/", async (req, res, next) => {
 
 router.post("/new", async (req, res, next) => {
 	try {
-		const { id, id_sensor, id_location, sensordata } = req.body;
-		await addSensorData(id, id_sensor, id_location, sensordata);
-		res.sendStatus(200).json({ message: "SensorData " + id + " added" });
+		const { id_sensor, id_location, sensordata } = req.body;
+		let data = await addSensorData(id_sensor, id_location, sensordata);
+		res.json({ message: "SensorData " + data.id + " added", ...data });
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -91,4 +90,3 @@ router.get("/:id", async (req, res, next) => {
 });
 
 module.exports = router;
-

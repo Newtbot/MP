@@ -6,6 +6,7 @@
  !-->
 
 <%- include('top') %>
+    <link rel="stylesheet" href="css/api.css" media="all">
 
     <body class="one-content-column-version">
         <div class="left-menu">
@@ -38,8 +39,8 @@
                     <li class="scroll-to-link active" data-target="content-get-started">
                         <a>GET STARTED</a>
                     </li>
-                    <li class="scroll-to-link" data-target="content-get-characters">
-                        <a>Get Data From API</a>
+                    <li class="scroll-to-link" data-target="content-get-api">
+                        <a>Generate API</a>
                     </li>
                     <li class="scroll-to-link" data-target="content-errors">
                         <a>Errors</a>
@@ -86,7 +87,8 @@
                                 <td>Authorization</td>
                                 <td>JSON</td>
                                 <td>Your API key.</td>
-                                <td>(Required) Example: curl https://api.teeseng.uk/api/v0/location -H "Authorization: {provide your
+                                <td>(Required) Example: curl https://api.teeseng.uk/api/v0/location -H "Authorization:
+                                    {provide your
                                     API key here}"</td>
                                 </td>
                             </tr>
@@ -118,7 +120,8 @@
                                 <td>Authorization</td>
                                 <td>JSON</td>
                                 <td>(Required) Your API key.</td>
-                                <td>Example: curl https://api.teeseng.uk/api/v0/location -H "Authorization: {provide your
+                                <td>Example: curl https://api.teeseng.uk/api/v0/location -H "Authorization: {provide
+                                    your
                                     API key here}"</td>
                                 </td>
                             </tr>
@@ -129,11 +132,12 @@
                     <h2>Add Location (Only for system or admin API key)</h2>
                     <p>
                         To add an Location you need to make a POST call to the following url :<br>
-                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/new</code> 
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/new</code>
                         <br>
                         <br>
                         Example :<br>
-                        <code class="higlighted break-word">curl https://api.teeseng.uk/api/v0/location/new -H "Content-Type: application/json" -X POST -d '{"name": "SAMPLE", "added_by": "system" , "description": "test"}'</code>
+                        <code
+                            class="higlighted break-word">curl https://api.teeseng.uk/api/v0/location/new -H "Content-Type: application/json" -X POST -d '{"name": "SAMPLE", "added_by": "system" , "description": "test"}'</code>
                         <br>
                         <br>
                         Return Response :<br>
@@ -154,7 +158,8 @@
                                 <td>Authorization</td>
                                 <td>JSON</td>
                                 <td>Your API key.</td>
-                                <td>(Required) Example: curl https://api.teeseng.uk/api/v0/location/new -H "Authorization: {provide your
+                                <td>(Required) Example: curl https://api.teeseng.uk/api/v0/location/new -H
+                                    "Authorization: {provide your
                                     API key here}"</td>
                                 </td>
                             </tr>
@@ -162,7 +167,8 @@
                                 <td>Location name</td>
                                 <td>JSON</td>
                                 <td>Location name.</td>
-                                <td>(Required) Location name. Example: curl https://api.teeseng.uk/api/v0/location/new -H "Authorization: provide
+                                <td>(Required) Location name. Example: curl https://api.teeseng.uk/api/v0/location/new
+                                    -H "Authorization: provide
                                     your API key here" -d '{"name":"Location name"}'</td>
                                 </td>
                             </tr>
@@ -170,7 +176,8 @@
                                 <td>Added by </td>
                                 <td>JSON</td>
                                 <td>System or Admin</td>
-                                <td>(Required) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new -H "Authorization: provide
+                                <td>(Required) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new
+                                    -H "Authorization: provide
                                     your API key here" -d '{"added_by":"system"}'</td>
                                 </td>
                             </tr>
@@ -178,7 +185,8 @@
                                 <td>Description</td>
                                 <td>JSON</td>
                                 <td>Description of Location</td>
-                                <td>(Required) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new -H "Authorization: provide
+                                <td>(Required) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new
+                                    -H "Authorization: provide
                                     your API key here" -d '{"description":"test"}'</td>
                                 </td>
                             </tr>
@@ -190,13 +198,14 @@
                     <h2>Update Location (Only for system or admin API key)</h2>
                     <p>
                         To update an Location you need to make a PUT call to the following url :<br>
-                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/update</code> 
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/update</code>
                         <br>
                         <br>
                         Example :<br>
-                        <code class="higlighted break-word">curl https://api.teeseng.uk/api/v0/location/update -H "Content-Type: application/json" -X POST -d '{"id": "7" , "name": "SAMPLE", "added_by": "system" , "description": "test"}'</code>
+                        <code
+                            class="higlighted break-word">curl https://api.teeseng.uk/api/v0/location/update -H "Content-Type: application/json" -X POST -d '{"id": "7" , "name": "SAMPLE", "added_by": "system" , "description": "test"}'</code>
                         <br>
-                        <br>                       
+                        <br>
                         Return Response :<br>
                         <code class="higlighted break-word">{"status":"200","message":"Location 7 updated"}</code>
                     </p>
@@ -215,7 +224,8 @@
                                 <td>Authorization</td>
                                 <td>JSON</td>
                                 <td>Your API key.</td>
-                                <td>(Required) example: curl https://api.teeseng.uk/api/v0/location/update -H "Authorization: {provide your
+                                <td>(Required) example: curl https://api.teeseng.uk/api/v0/location/update -H
+                                    "Authorization: {provide your
                                     API key here}"</td>
                                 </td>
                             </tr>
@@ -223,7 +233,8 @@
                                 <td>ID</td>
                                 <td>JSON</td>
                                 <td>Location ID</td>
-                                <td>(Required) Location ID Example: curl https://api.teeseng.uk/api/v0/location/update -H "Authorization: provide
+                                <td>(Required) Location ID Example: curl https://api.teeseng.uk/api/v0/location/update
+                                    -H "Authorization: provide
                                     your API key here" -d '{"id": "7"}'</td>
                                 </td>
                             </tr>
@@ -231,7 +242,8 @@
                                 <td>Location name</td>
                                 <td>JSON</td>
                                 <td>Location name.</td>
-                                <td>(Optional) Location name. Example: curl https://api.teeseng.uk/api/v0/location/new -H "Authorization: provide
+                                <td>(Optional) Location name. Example: curl https://api.teeseng.uk/api/v0/location/new
+                                    -H "Authorization: provide
                                     your API key here" -d '{"name":"Location name"}'</td>
                                 </td>
                             </tr>
@@ -239,7 +251,8 @@
                                 <td>Added by </td>
                                 <td>JSON</td>
                                 <td>System or Admin</td>
-                                <td>(Optional) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new -H "Authorization: provide
+                                <td>(Optional) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new
+                                    -H "Authorization: provide
                                     your API key here" -d '{"added_by":"system"}'</td>
                                 </td>
                             </tr>
@@ -247,7 +260,8 @@
                                 <td>Description</td>
                                 <td>JSON</td>
                                 <td>Description of Location</td>
-                                <td>(Optional) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new -H "Authorization: provide
+                                <td>(Optional) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new
+                                    -H "Authorization: provide
                                     your API key here" -d '{"description":"test"}'</td>
                                 </td>
                             </tr>
@@ -259,11 +273,12 @@
                     <h2>Delete Location (Only for system or admin API key)</h2>
                     <p>
                         To delete an Location you need to make a DELETE call to the following url :<br>
-                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/delete</code> 
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/delete</code>
                         <br>
                         <br>
                         Example :<br>
-                        <code class="higlighted break-word">curl https://api.teeseng.uk/api/v0/location/delete -H "Content-Type: application/json" -X POST -d '{"id": "7"}'</code>
+                        <code
+                            class="higlighted break-word">curl https://api.teeseng.uk/api/v0/location/delete -H "Content-Type: application/json" -X POST -d '{"id": "7"}'</code>
                     </p>
                     <br>
                     <h4>QUERY PARAMETERS</h4>
@@ -280,7 +295,8 @@
                                 <td>Authorization</td>
                                 <td>JSON</td>
                                 <td>Your API key.</td>
-                                <td>(Required) example: curl https://api.teeseng.uk/api/v0/location/delete -H "Authorization: {provide your
+                                <td>(Required) example: curl https://api.teeseng.uk/api/v0/location/delete -H
+                                    "Authorization: {provide your
                                     API key here}"</td>
                                 </td>
                             </tr>
@@ -288,31 +304,14 @@
                                 <td>ID</td>
                                 <td>JSON</td>
                                 <td>Location ID</td>
-                                <td>(Required) Location ID Example: curl https://api.teeseng.uk/api/v0/location/delete -H "Authorization: provide
+                                <td>(Required) Location ID Example: curl https://api.teeseng.uk/api/v0/location/delete
+                                    -H "Authorization: provide
                                     your API key here" -d '{"id": "7"}'</td>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                 <div class="overflow-hidden content-section" id="content-errors">
                     <h2>Errors</h2>
@@ -359,9 +358,41 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="overflow-hidden content-section" id="content-get-api">
+                    <div class="api-keys-header">
+                        <h2>API Keys</h2>
+                        <button class="generate-key-button">Generate Key</button>
+                        <p>
+                            You can generate API Keys here:
+                        </p>
+                        <table>
+                            <thead>
+                                <tr>
+                                  <th>Name</th>
+                                  <th>Public Key</th>
+                                  <th>Private Key</th>
+                                  <th>Key Type</th>
+                                  <th>Created</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>API Key</td>
+                                  <td>GR234-We34</td>
+                                  <td>greR-234-fEG</td>
+                                  <td>Type</td>
+                                  <td>2024-01-22</td>
+                                </tr>
+                              </tbody>
+                          </table>   
+                    </div>
+                </div>
+                
+                
+
             </div>
         </div>
 
     </body>
-
+    <script src="js/api.js"></script>
     </html>

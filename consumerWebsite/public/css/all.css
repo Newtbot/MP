@@ -3813,3 +3813,12 @@
 .card-text {
     color: #000000;
 }
+
+/* edit profile */
+.profile {
+  margin: auto;
+  width: 40%;
+  border: 1px solid #000000;
+  padding: 10px;
+}
+

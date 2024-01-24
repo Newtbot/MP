@@ -1,4 +1,4 @@
-const { addUser, loginUser } = require("../functions/apiDatabase.js");
+const { addUser, loginUser } = require("../functions/user");
 
 const express = require("express");
 const router = express.Router();

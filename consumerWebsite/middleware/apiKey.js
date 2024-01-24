@@ -1,4 +1,4 @@
-const { checkAPikey } = require("../functions/database.js");
+const { checkAPikey } = require("../functions/api.js");
 async function apikeyCheck(req, res, next) {
 	//const authHeader = req.headers.authorization
 	try {

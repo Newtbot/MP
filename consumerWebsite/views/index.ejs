@@ -1,5 +1,12 @@
 <%- include('top') %>
+   <script>
+      //call socket.io
+      app.socket.on("sensorData:new", function (data) {
+         console.log("new data!!")
+         console.log(data);
+      });
 
+   </script>
 
 
    <header class="slider-main">
@@ -47,43 +54,55 @@
    <!-- Page Content -->
    <div class="container">
       <div class="services-bar">
-         <h1 class="my-4">Services </h1>
-         <!-- Services Section -->
-         <div class="row">
-            <div class="col-lg-4 mb-4">
-               <div class="card">
-                  <h4 class="card-header">Humidity</h4>
-                  <div class="card-body text-center">
-                     <p class="card-text display-4"> 70% - 75% </p>
+          <h1 class="my-4">Services</h1>
+          <!-- Services Section -->
+          <div class="row">
+              <div class="col-lg-3 mb-4">
+                  <div class="card">
+                      <h4 class="card-header">Air Quality Index</h4>
+                      <div class="card-body text-center">
+                          <p class="card-text display-4">15 - 18 PSI</p>
+                      </div>
+                      <div class="card-footer">
+                          <a href="/learnmore" class="btn btn-primary">Learn More</a>
+                      </div>
                   </div>
-                  <div class="card-footer">
-                     <a href="/learnmore" class="btn btn-primary">Learn More</a>
+              </div>
+              <div class="col-lg-3 mb-4">
+                  <div class="card">
+                      <h4 class="card-header">Humidity</h4>
+                      <div class="card-body text-center">
+                          <p class="card-text display-4">70% - 75%</p>
+                      </div>
+                      <div class="card-footer">
+                          <a href="/learnmore" class="btn btn-primary">Learn More</a>
+                      </div>
                   </div>
-               </div>
-            </div>
-            <div class="col-lg-4 mb-4">
-               <div class="card">
-                  <h4 class="card-header">Air Quality Index</h4>
-                  <div class="card-body text-center">
-                     <p class="card-text display-4"> 15 - 18 PSI </p>
+              </div>
+              <div class="col-lg-3 mb-4">
+                  <div class="card">
+                      <h4 class="card-header">Temperature</h4>
+                      <div class="card-body text-center">
+                          <p class="card-text display-4">30&deg; - 37&deg;</p>
+                      </div>
+                      <div class="card-footer">
+                          <a href="/learnmore" class="btn btn-primary">Learn More</a>
+                      </div>
                   </div>
-                  <div class="card-footer">
-                     <a href="/learnmore" class="btn btn-primary">Learn More</a>
+              </div>
+              <div class="col-lg-3 mb-4">
+                  <div class="card">
+                      <h4 class="card-header">Another Category</h4>
+                      <div class="card-body text-center">
+                          <p class="card-text display-4">values</p>
+                      </div>
+                      <div class="card-footer">
+                          <a href="/learnmore" class="btn btn-primary">Learn More</a>
+                      </div>
                   </div>
-               </div>
-            </div>
-            <div class="col-lg-4 mb-4">
-               <div class="card">
-                  <h4 class="card-header">Temperature</h4>
-                  <div class="card-body text-center">
-                     <p class="card-text display-4"> 30&deg; - 37&deg; </p>
-                  </div>
-                  <div class="card-footer">
-                     <a href="/learnmore" class="btn btn-primary">Learn More</a>
-                  </div>
-               </div>
-            </div>
-         </div>
+              </div>
+          </div>
+  
          <!-- /.row -->
       </div>
       <!-- About Section -->
@@ -121,4 +140,4 @@
    </div>
    <hr>
    </div>
-<%- include('bot') %>
+   <%- include('bot') %>

@@ -1,8 +1,7 @@
-const { sequelize }  = require("../Database/mySql.js");
-const { locationModel } = require("../Database/model/locationModel.js");
-const { sensorModel } = require("../Database/model/sensorModel.js");
-const { sensorDataModel } = require("../Database/model/sensorDataModel.js");
 const { Op, Sequelize } = require("sequelize");
+const { sequelize }  = require("../database/mySQL.js");
+const { sensorDataModel } = require("../database/model/sensorDataModel.js");
+const io = require('../functions/socket');
 
 //helper function to convert month name to month number
 //https://stackoverflow.com/questions/13566552/easiest-way-to-convert-month-name-to-month-number-in-js-jan-01
@@ -13,130 +12,22 @@ function getMonthFromString(mon) {
 	}
 	return -1;
 }
-async function getLocation() {
-	const location = await locationModel.findAll();
-	return location;
-}
 
-async function addLocation(name, added_by, description) {
-	const location = await locationModel.create({
-		name: name,
-		added_by: added_by,
-		description: description,
-	});
-}
-
-async function updateLocation(id, name, added_by, description) {
-	const location = await locationModel.update(
-		{
-			name: name,
-			added_by: added_by,
-			description: description,
-		},
-		{
-			where: {
-				id: id,
-			},
-		}
-	);
-}
-
-async function deleteLocation(id) {
-	//delete by id
-	const location = await locationModel.destroy({
-		where: {
-			id: id,
-		},
-	});
-}
-
-async function getLocationById(id) {
-	const location = await locationModel.findAll({
-		where: {
-			id: id,
-		},
-	});
-	return location;
-}
-
-async function getSensor() {
-	const sensor = await sensorModel.findAll();
-	return sensor;
-	console.error(error);
-}
-
-async function addSensor(
-	sensorname,
-	added_by,
-	mac_address,
-	description,
-	location
-) {
-	const sensor = await sensorModel.create({
-		name: sensorname,
-		added_by: added_by,
-		mac_address: mac_address,
-		description: description,
-		location: location,
-	});
-}
-
-async function updateSensor(
-	id,
-	sensorname,
-	added_by,
-	mac_address,
-	description,
-	location
-) {
-	const sensor = await sensorModel.update(
-		{
-			name: sensorname,
-			added_by: added_by,
-			mac_address: mac_address,
-			description: description,
-			location: location,
-		},
-		{
-			where: {
-				id: id,
-			},
-		}
-	);
-}
-
-async function deleteSensor(id) {
-	//delete by id
-	const sensor = await sensorModel.destroy({
-		where: {
-			id: id,
-		},
-	});
-
-	console.error(error);
-}
-
-async function getSensorById(id) {
-	const sensor = await sensorModel.findAll({
-		where: {
-			id: id,
-		},
-	});
-	return sensor;
-}
 
 async function getSensorData() {
 	const sensorData = await sensorDataModel.findAll();
 	return sensorData;
 }
 
-async function addSensorData(id, id_sensor, id_location, sensordata) {
+async function addSensorData(id_sensor, id_location, sensordata) {
 	const sensorData = await sensorDataModel.create({
-		id: id,
 		sensorid: id_sensor,
 		locationid: id_location,
 		measurement: sensordata,
 	});
+	io().emit('sensorData:new', sensorData)
+
+	return sensorData;
 }
 
 async function updateSensorData(id, id_sensor, id_location, sensordata) {
@@ -826,16 +717,6 @@ async function getDatabyRange(queryString) {
 }
 
 module.exports = {
-	getLocation,
-	addLocation,
-	updateLocation,
-	deleteLocation,
-	getLocationById,
-	getSensor,
-	addSensor,
-	updateSensor,
-	deleteSensor,
-	getSensorById,
 	getSensorData,
 	addSensorData,
 	updateSensorData,
@@ -843,4 +724,5 @@ module.exports = {
 	getSensorDataById,
 	getData,
 	getDatabyRange,
+
 };

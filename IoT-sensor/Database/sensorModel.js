@@ -2,11 +2,7 @@
 const { Sequelize, DataTypes } = require("sequelize");
 const { sequelize } = require("./mySQL");
 const { locationModel } = require("./locationModel");
-const {
-	isAlphaNumericwithSpaces,
-	isAlphaNumericWithSpacesAndDash,
-	isMacAddress,
-} = require("../../Web-Server/functions/validateData");
+
 
 //sequelize.sync();
 const sensorModel = sequelize.define(
