@@ -9,8 +9,8 @@ let transporter = nodemailer.createTransport({
     port: 587, 
     secure: false, 
     auth: {
-      user: 
-      pass: 
+      user: process.env.euser,
+      pass: process.env.epass
     },
   });
 module.exports = { transporter };

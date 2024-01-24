@@ -11,11 +11,14 @@ router.get("/me", async function (req, res, next) {
 		if (!user) {
 			let error = new Error("User not found");
 			error.status = 400;
+			console.log(error);
 			return next(error);
 		}
+		if (user){
 		res.json({
 			user: user,
 		});
+	}
 	} catch (error) {
 		next(error);
 	}

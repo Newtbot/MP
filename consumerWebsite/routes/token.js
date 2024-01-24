@@ -1,4 +1,4 @@
-const { addAPIKey } = require("../functions/api");
+const { addToken } = require("../functions/api");
 
 
 const express = require("express");
@@ -10,14 +10,13 @@ const router = express.Router();
 3) hash the api key
 4) store the api key in database
 */
+//token/new
+//curl localhost:3000/api/v0/token/new -H "Content-Type: application/json" -X POST -d 
+//'{"userid": "5", "permission": "canRead" ,}'
 router.post("/new", async (req, res, next) => {
 	try {
-        //curl localhost/api/v0/apikey/new -H "Content-Type: application/json" -X POST -d 
-        //'{"userid": 1, "permission": "canWrite"}'
-        const apikey = await addAPIKey(req.body.userid, req.body.permission);
-        //console.log(typeof req.body.userid);
-        //console.log(typeof req.body.permission);
-        res.json({apikey: apikey});
+        const token = await addToken(req.body.userid, req.body.permission , "2204-01-24 07:34:36" );
+        res.json({token: token});
 	} catch (error) {
 		console.error(error);
 		next(error);

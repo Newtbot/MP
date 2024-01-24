@@ -18,19 +18,19 @@ class IoTdataGenerator {
 	async generateData() {
 		try {
 			const { loc, sen } = await this.getLocationAndSensorId();
+			const dataAray = []; // create a new array for each call
+	
 			for (let i = 0; i < sen.length; i++) {
-				//console.log(sen[i].id);
-				//console.log(loc[i].id);
-				//console.log("you should appear 6 times only")
 				dataAray.push(firstDataRow(sen[i].id, loc[i].id));
-			}	
+			}
+	
+			return dataAray;
 		} catch (err) {
 			console.error(err);
 		}
-		return dataAray;
-
 	}
 }
+	
 
 //helper function to generate random data
 function firstDataRow(sensorId, locationId) {
@@ -57,15 +57,7 @@ function firstDataRow(sensorId, locationId) {
 2) loop through each sensor id and location id and generate random data and pass to mqtt
 */
 
-async function run() {
-    let iotData = new IoTdataGenerator();
-    const result = await iotData.generateData();
-	console.log(result);
-	return result;
-}
-  
-
-module.exports = { run };
+module.exports = { IoTdataGenerator };
 
 
 

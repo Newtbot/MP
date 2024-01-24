@@ -165,6 +165,7 @@ app.socket = (function (app) {
 	});
 	return socket;
 })(app);
+
 //sensor data
 app.sensordata = (function (app) {
 
@@ -183,21 +184,11 @@ app.auth = (function (app) {
 	}
 
 	function isLoggedIn(callback) {
+		
 		if (getToken()) {
 			return app.api.get("user/me", function (error, data) {
+				console.log(error, data);
 				if (!error) app.auth.user = data;
-				//for navbar to show username
-				if (!location.pathname === "/login")
-				{
-					$.scope.getUsername.update(data);
-
-				}
-
-				//for edit profile to show user details
-				//if not in edit profile page, it will not show
-				if (location.pathname === "/profile") {
-					$.scope.getUserDetails.update(data);
-				}
 				return callback(error, data);
 			});
 		} else {
@@ -206,7 +197,7 @@ app.auth = (function (app) {
 	}
 
 	function logOut(callback) {
-		//call logout route
+		console.log("Logging out");
 		$.ajax({
 			type: "DELETE",
 			url: "/api/v0/user/logout",

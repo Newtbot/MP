@@ -51,7 +51,6 @@ router.post("/login", async (req, res, next) => {
 
 //contact
 //auth/contact
-
 router.post("/contact", async (req, res, next) => {
 
 });

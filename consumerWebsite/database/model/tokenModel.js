@@ -4,8 +4,8 @@ const { sequelize } = require("../mySQL");
 const { userModel } = require("./userModel");
 
 //sequelize.sync();
-const apikeyModel = sequelize.define(
-	"apikey",
+const tokenModel = sequelize.define(
+	"token",
 	{
 		id: {
 			type: DataTypes.INTEGER,
@@ -28,7 +28,7 @@ const apikeyModel = sequelize.define(
 				key: "id",
 			},
 		},
-		apikey: {
+		token: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			length: 255,
@@ -45,7 +45,14 @@ const apikeyModel = sequelize.define(
 			validate: {
 				notEmpty: true,
 				len: [1, 255],
-				isIn: [["canRead", "canWrite" , "auto-generated"]],
+				isIn: [["canRead", "canWrite",]],
+			},
+		},
+		expiration: {
+			type: DataTypes.DATE,
+			allowNull: false,
+			validate: {
+				isDate: true,
 			},
 		},
 		createdAt: {
@@ -61,9 +68,9 @@ const apikeyModel = sequelize.define(
 		timestamps: true,
 	}
 );
-apikeyModel.belongsTo(userModel);
+tokenModel.belongsTo(userModel);
 
-module.exports = { apikeyModel };
+module.exports = { tokenModel };
 
 /*
   class AuthToken extends Model {

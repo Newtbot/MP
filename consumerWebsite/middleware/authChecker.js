@@ -1,29 +1,63 @@
-const { apikeyModel } = require("../database/model/apiKeyModel");
+const { tokenModel } = require("../database/model/tokenModel");
 const { userModel } = require("../database/model/userModel");
 const { compareHash } = require("../functions/bcrypt");
+const { checkToken } = require("../functions/api");
+const { isValid } = require("../functions/isValid");
 
-async function auth(req, res, next){
-    try{ 
-        //		let user = await Auth.checkToken({token: req.header('auth-token')});
-        let authToken = req.header('auth-token');
-        let splitAuthToken = authToken.split('-');
-        let rowid = splitAuthToken[0];
-        let suppliedToken = splitAuthToken.slice(1).join('-');
 
-        //get from db
-        let token = await apikeyModel.findByPk(rowid, {include: userModel});
-        if (!token) return false;
+async function auth(req, res, next) {
+    try {
+        const authToken = req.header("auth-token");
+        if (!authToken) {
+            const error = new Error("No Token key was supplied. Invalid request");
+            error.status = 401;
+            throw error;
+        }
 
-        //compare
-        let isMatch = await compareHash(suppliedToken, token.apikey);
-        if (!isMatch) return false;
+        const splitAuthToken = authToken.split("-");
+        const rowid = splitAuthToken[0];
+        const suppliedToken = splitAuthToken.slice(1).join("-");
 
-        //else do logic
-        //pass hashed token to req.token (IMPORTANT ITS NOT PASSED TO CLIENT)
-        req.token = token
-        req.user = await token.getUser(); //taking user seq obj from usermodel
-        next();
-    }catch(error){
+        const token = await tokenModel.findByPk(rowid, { include: userModel });
+
+        if (!token) {
+            const error = new Error("Token key not found. Invalid request");
+            error.status = 401;
+            throw error;
+        }
+
+        const isMatch = await compareHash(suppliedToken, token.token);
+
+        if (!isMatch) {
+            const error = new Error("Token key not found. Invalid request");
+            error.status = 401;
+            throw error;
+        }
+        //if token is a match
+        req.token = token;
+        req.user = await token.getUser();
+        const permission = await checkToken(suppliedToken, rowid);
+
+        const route = req.originalUrl.split("?")[0]; // Removing query parameters
+        //if route is from user/ and permission is canRead allow it to do CRUD
+        if (route.includes("/user/") && permission === "canRead") {
+            next();
+        }
+        else if ((req.method === "GET" && permission === "canRead") || (["GET", "POST", "PUT", "DELETE"].includes(req.method) && permission === "canWrite")) {
+            next();
+        }
+        else {
+            const error = new Error("Insufficient permission");
+            error.status = 401;
+            throw error;
+        }
+        if (!isValid(token.expiration)){
+            req.token.destroy();
+            throw new Error("Token expired");            
+        }
+
+     
+    } catch (error) {
         next(error);
     }
 }
