@@ -7,6 +7,8 @@ const ejs = require("ejs");
 
 module.exports = app;
 
+process.nextTick(() => require('./mqttApp'));
+
 app.use(express.json());
 app.set("json spaces", 2);
 

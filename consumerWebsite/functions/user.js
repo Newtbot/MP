@@ -20,28 +20,6 @@ async function getUserID(userid) {
 	return userRes;
 }
 
-//register
-//api/v0/auth/register
-async function addUser(user) {
-	//hash password
-	let hashed = await hash(user.password);
-
-	const addRes = await userModel.create({
-		firstname: user.firstname,
-		lastname: user.lastname,
-		username: user.username,
-		password: hashed,
-		email: user.email,
-		address: user.address,
-		phone: user.phone,
-	});
-	if (addRes) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
 //api/v0/auth/register
 /* Registering new user 
 1) req.body is taken from html form or wtv 

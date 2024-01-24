@@ -6,7 +6,6 @@ async function getLocation() {
 }
 
 async function addLocation(name, added_by, description) {
-	console.log(name, added_by, description);
 	const location = await locationModel.create({
 		name: name,
 		added_by: added_by,
@@ -30,13 +29,13 @@ async function updateLocation(id, name, added_by, description) {
 }
 
 async function deleteLocation(id) {
-	//delete by id
 	const location = await locationModel.destroy({
 		where: {
 			id: id,
 		},
 	});
 }
+
 
 async function getLocationById(id) {
 	const location = await locationModel.findAll({

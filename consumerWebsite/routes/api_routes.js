@@ -18,8 +18,8 @@ router.use('/location', [apikeyCheck , APIlogger], require('./location.js'));
 //location route
 router.use('/sensor', [apikeyCheck , APIlogger], require('./sensor.js'));
 
-//location route
-router.use('/sensor-data', [apikeyCheck, APIlogger], require('./sensorData.js'));
+//sensor data route
+router.use('/sensor-data', [ APIlogger], require('./sensorData.js'));
 
 module.exports = router;
 
