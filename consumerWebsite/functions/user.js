@@ -8,7 +8,7 @@ moment = require('moment')
 
 //getuser
 //api/v0/user/me
-async function getUserID(userid) {
+async function getUserByID(userid) {
 	//console.log(userid);
 	//console.log(userid.id);
 	let userRes = await userModel.findByPk(userid.id, {
@@ -131,7 +131,7 @@ async function updateProfile(user, body) {
 }
 
 module.exports = {
-	getUserID,
+	getUserByID,
 	addUser,
 	loginUser,
 	updateProfile,

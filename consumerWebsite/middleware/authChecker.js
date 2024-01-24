@@ -10,7 +10,6 @@ async function auth(req, res, next) {
         const authToken = req.header("auth-token");
         if (!authToken) {
             const error = new Error("No Token key was supplied. Invalid request");
-            error.status = 401;
             throw error;
         }
 
@@ -22,15 +21,14 @@ async function auth(req, res, next) {
 
         if (!token) {
             const error = new Error("Token key not found. Invalid request");
-            error.status = 401;
             throw error;
         }
 
         const isMatch = await compareHash(suppliedToken, token.token);
 
+        console.log(isMatch);
         if (!isMatch) {
             const error = new Error("Token key not found. Invalid request");
-            error.status = 401;
             throw error;
         }
         //if token is a match
@@ -43,14 +41,10 @@ async function auth(req, res, next) {
         if (route.includes("/user/") && permission === "canRead") {
             next();
         }
-        else if ((req.method === "GET" && permission === "canRead") || (["GET", "POST", "PUT", "DELETE"].includes(req.method) && permission === "canWrite")) {
+        if ((req.method === "GET" && permission === "canRead") || (["GET", "POST", "PUT", "DELETE"].includes(req.method) && permission === "canWrite")) {
             next();
         }
-        else {
-            const error = new Error("Insufficient permission");
-            error.status = 401;
-            throw error;
-        }
+
         if (!isValid(token.expiration)){
             req.token.destroy();
             throw new Error("Token expired");            
@@ -63,3 +57,12 @@ async function auth(req, res, next) {
 }
 
 module.exports = { auth };
+
+/*
+        else {
+            const error = new Error("Insufficient permission");
+            error.status = 401;
+            throw error;
+        }
+
+*/

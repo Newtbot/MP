@@ -1,4 +1,4 @@
-const { getUserID, updateProfile } = require("../functions/user");
+const { getUserByID, updateProfile } = require("../functions/user");
 
 const express = require("express");
 const router = express.Router();
@@ -7,18 +7,11 @@ const router = express.Router();
 //getbyid
 router.get("/me", async function (req, res, next) {
 	try {
-		let user = await getUserID(req.user);
-		if (!user) {
-			let error = new Error("User not found");
-			error.status = 400;
-			console.log(error);
-			return next(error);
-		}
-		if (user){
+		let user = await getUserByID(req.user);
+		console.log(user);
 		res.json({
 			user: user,
 		});
-	}
 	} catch (error) {
 		next(error);
 	}
