@@ -82,6 +82,11 @@ router.get("/contact", function (req, res, next) {
 	res.render("contact");
 });
 
+//data page
+router.get("/viewdata", function (req, res, next) {
+	res.render("viewdata");
+});
+
 //api doc
 router.get("/api", function (req, res, next) {
 	res.render("api");

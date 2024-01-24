@@ -1,0 +1,43 @@
+<%- include('top') %>
+<link href="css/data.css" rel="stylesheet" />
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<br>
+<br>
+<br>
+
+<body>
+
+    <div class="air-quality-container">
+        <%#
+        <div class="graphbutton-container">
+            <button id="barButton">Bar Graph</button>
+            <button id="lineButton">Line Graph</button>
+        </div> %>
+        <div class="chart-container">
+            <canvas id="dataChart"></canvas>
+        </div>
+        <div class="button-container">
+            <button id="aqiButton">AQI</button>
+            <button id="tempButton">Temperature</button>
+            <button id="humButton">Humidity</button>
+            <button id="pm25Button">PM2.5</button>
+            <button id="pm10Button">PM10</button>
+            <button id="o3Button">O3</button>
+            <button id="no2Button">NO2</button>
+            <button id="so2Button">SO2</button>
+            <button id="coButton">CO</button>
+        </div>
+        <div class="download-container">
+            <p>Download data here:</p>
+            <button id="downloadCSVButton">Download CSV</button>
+        </div>
+    </div>
+
+</body>
+
+
+<br>
+<br>
+
+<%- include('bot') %>
