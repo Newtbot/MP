@@ -6,6 +6,7 @@ async function getLocation() {
 }
 
 async function addLocation(name, added_by, description) {
+	console.log(name, added_by, description);
 	const location = await locationModel.create({
 		name: name,
 		added_by: added_by,

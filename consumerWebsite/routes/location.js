@@ -25,6 +25,7 @@ router.get("/", async (req, res, next) => {
 //add location 
 router.post("/new", async (req, res, next) => {
 	try {
+		console.log(req.body);
 		const { name, added_by, description } = req.body;
 		await addLocation(name, added_by, description);
 		res.sendStatus(200)

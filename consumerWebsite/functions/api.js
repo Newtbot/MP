@@ -13,7 +13,7 @@ const { generateUUID } = require("./generateUUID.js");
 //can be used for api key or token. Both are the same logic
 async function addAPIKey(userId, permission) {
 	let hashtoken = await generateUUID();
-	let apikey = await hashAPIKey(hashtoken);
+	let apikey = await hash(hashtoken);
 
 	let token = await apikeyModel.create({
 		userid: userId,

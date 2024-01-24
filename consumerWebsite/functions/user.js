@@ -20,6 +20,8 @@ async function getUserID(userid) {
 	return userRes;
 }
 
+//register
+//api/v0/auth/register
 async function addUser(user) {
 	//hash password
 	let hashed = await hash(user.password);
@@ -38,21 +40,6 @@ async function addUser(user) {
 	} else {
 		return false;
 	}
-}
-
-//getuser
-//api/v0/user/me
-async function getUserID(userid) {
-	//console.log(userid);
-	//console.log(userid.id);
-	let userRes = await userModel.findByPk(userid.id, {
-		attributes: {
-			exclude: ["password"],
-		},
-	});
-
-	if (!userRes) return false;
-	return userRes;
 }
 
 //api/v0/auth/register
