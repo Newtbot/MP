@@ -44,9 +44,12 @@ function isAuthenticated(req, res, next) {
 	if (req.session && req.session.authenticated) {
 		return next();
 	} else {
-		res.redirect("/login");
+		res.redirect("/index");
 	}
 }
+app.get('/index', (req, res) => {
+	res.render('index'); 
+  });
 
 app.get("/login", (req, res) => {
 	res.render("login", { error: null });
@@ -203,11 +206,8 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
   });
   
   app.get("/home", isAuthenticated, async (req, res) => {
-	  
-	  const response = await axios.get(process.env.API_ALLLOCATION);
-	  const valueData = response.data;
-	  console.log = (valueData);
-	  res.render("home", { username: req.session.username, valueData});
+	
+	  res.render("home", { username: req.session.username});
 	});
 
 	app.get("/inusers", isAuthenticated, async (req, res) => {
