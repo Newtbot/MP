@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { validationResult, body } = require('express-validator');
 
 const locationValidation = [
   body('name').trim().isLength({ min: 1 }).withMessage('Name must not be empty').escape(),
@@ -69,7 +69,34 @@ const createValidation = [
     body('jobTitle').trim().isLength({ min: 1 }).withMessage('Job title must not be empty').escape(),
   ]; 
   
-  
+  function isStrongPassword(password) {
+	// Password must be at least 10 characters long
+	if (password.length < 10) {
+		return false;
+	}
+
+	// Password must contain at least one uppercase letter
+	if (!/[A-Z]/.test(password)) {
+		return false;
+	}
+
+	// Password must contain at least one lowercase letter
+	if (!/[a-z]/.test(password)) {
+		return false;
+	}
+
+	// Password must contain at least one digit
+	if (!/\d/.test(password)) {
+		return false;
+	}
+
+	// Password must contain at least one symbol
+	if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+		return false;
+	}
+
+	return true;
+}
 module.exports = {
   locationValidation,locationValidationUpdate,locationdeleteValidation
   ,sensorValidation,sensorupdateValidation,sensordeleteValidation,loginValidation,otpValidation

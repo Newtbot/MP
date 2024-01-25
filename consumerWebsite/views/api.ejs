@@ -387,9 +387,299 @@
                           </table>   
                     </div>
                 </div>
-                
-                
-
+                <div class="overflow-hidden content-section" id="content-get-sensor">
+                    <h2>Get all sensor</h2>
+                    <p>
+                        To get sensors you need to make a GET call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/sensor</code>
+                        <br>
+                        <br>
+                        Return Response :<br>
+                        <code class="higlighted break-word">{"status":"200"}</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>Your API key.</td>
+                                <td>(Required) Example: curl https://api.teeseng.uk/api/v0/sensor -H "Authorization:
+                                    {provide your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="overflow-hidden content-section" id="content-get-sensor-by-id">
+                    <h2>Get sensor by ID</h2>
+                    <p>
+                        To get Sensor you need to make a GET call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/sensor/{id}</code>
+                        <br>
+                        <br>
+                        Return Response :<br>
+                        <code class="higlighted break-word">{"status":"200"}</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>(Required) Your API key.</td>
+                                <td>Example: curl https://api.teeseng.uk/api/v0/sensor/{id} -H "Authorization: {provide
+                                    your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="overflow-hidden content-section" id="content-add-sensor">
+                    <h2>Add Sensor (Only for system or admin API key)</h2>
+                    <p>
+                        To add a Sensor you need to make a POST call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/sensor/new</code>
+                        <br>
+                        <br>
+                        Example :<br>
+                        <code
+                            class="higlighted break-word">curl https://api.teeseng.uk/api/v0/sensor/new -H "Content-Type: application/json" -X POST -d '{"sensorname": "test", "added_by": "system" , "mac_address": "99-6A-F8-7D-B4-94", "description": "test" , "location": "11"}'</code>
+                        <br>
+                        <br>
+                        Return Response :<br>
+                        <code class="higlighted break-word">{"status":"200"}</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>Your API key.</td>
+                                <td>(Required) Example: curl https://api.teeseng.uk/api/v0/sensor/new 
+                                    -H "Authorization: {provide your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Sensor name</td>
+                                <td>JSON</td>
+                                <td>Sesnsor name.</td>
+                                <td>(Required) Location name. Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"sensorname": "test"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Added by </td>
+                                <td>JSON</td>
+                                <td>System or Admin</td>
+                                <td>(Required) System or Admin Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"added_by":"system"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Mac Address</td>
+                                <td>JSON</td>
+                                <td>Mac Address</td>
+                                <td>(Required) Mac Address Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"mac_address": "99-6A-F8-7D-B4-94"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>JSON</td>
+                                <td>Description of Sensor</td>
+                                <td>(Required) System or Admin Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"description":"test"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Mac Address</td>
+                                <td>JSON</td>
+                                <td>Mac Address</td>
+                                <td>(Required) Mac Address Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"mac_address": "99-6A-F8-7D-B4-94"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Location</td>
+                                <td>JSON</td>
+                                <td>Location</td>
+                                <td>(Required) Location Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"location": "11"}'</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="overflow-hidden content-section" id="content-update-sensor-by-id">
+                    <h2>Update Sensor (Only for system or admin API key)</h2>
+                    <p>
+                        To update a Sensor you need to make a PUT call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/sensor/update</code>
+                        <br>
+                        <br>
+                        Example :<br>
+                        <code
+                            class="higlighted break-word">curl https://api.teeseng.uk/api/v0/sensor/update -H "Content-Type: application/json" -X POST -d '{"id": "2" ,"sensorname": "test", "added_by": "system" , "mac_address": "99-6A-F8-7D-B4-94" , "description": "test123" , "location": "11" }'</code>
+                        <br>
+                        <br>
+                        Return Response :<br>
+                        <code class="higlighted break-word">{"status":"200","message":"Sensor 2 updated"}</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>Your API key.</td>
+                                <td>(Required) example: curl https://api.teeseng.uk/api/v0/sensor/update -H
+                                    "Authorization: {provide your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>ID</td>
+                                <td>JSON</td>
+                                <td>Sensor ID</td>
+                                <td>(Required) Sensor ID Example: curl https://api.teeseng.uk/api/v0/sensor/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"id": "7"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Sensor name</td>
+                                <td>JSON</td>
+                                <td>Sensor name.</td>
+                                <td>(Optional) Sensor name. Example: curl https://api.teeseng.uk/api/v0/sensor/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"sensorname": "test"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Added by </td>
+                                <td>JSON</td>
+                                <td>System or Admin</td>
+                                <td>(Optional) System or Admin Example: curl https://api.teeseng.uk/api/v0/sensor/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"added_by":"system"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Mac Address </td>
+                                <td>JSON</td>
+                                <td>Mac Address</td>
+                                <td>(Optional) Mac Address Example: curl https://api.teeseng.uk/api/v0/sensor/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"mac_address": "99-6A-F8-7D-B4-94"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>JSON</td>
+                                <td>Description of Sensor</td>
+                                <td>(Optional) Description of Sensor Example: curl https://api.teeseng.uk/api/v0/sensor/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"description":"test"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Location</td>
+                                <td>JSON</td>
+                                <td>Location of Sensor</td>
+                                <td>(Optional) Location of Sensor Example: curl https://api.teeseng.uk/api/v0/sensor/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"location": "11"}'</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="overflow-hidden content-section" id="content-delete-sensor-by-id">
+                    <h2>Delete Sensor (Only for system or admin API key)</h2>
+                    <p>
+                        To delete a sensor you need to make a DELETE call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/sensor/delete</code>
+                        <br>
+                        <br>
+                        Example :<br>
+                        <code
+                            class="higlighted break-word">curl https://api.teeseng.uk/api/v0/sensor/delete -H "Content-Type: application/json" -X POST -d '{"id": "7"}'</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>Your API key.</td>
+                                <td>(Required) example: curl https://api.teeseng.uk/api/v0/sensor/delete -H
+                                    "Authorization: {provide your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>ID</td>
+                                <td>JSON</td>
+                                <td>Sensor ID</td>
+                                <td>(Required) Sensor ID Example: curl https://api.teeseng.uk/api/v0/sensor/delete
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"id": "7"}'</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
