@@ -107,4 +107,6 @@ const sensorModel = sequelize.define(
 	}
 );
 
+sensorModel.belongsTo(locationModel);
+
 module.exports = { sensorModel };

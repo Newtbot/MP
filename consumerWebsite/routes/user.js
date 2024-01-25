@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/me", async function (req, res, next) {
 	try {
 		let user = await getUserByID(req.user);
-		console.log(user);
+		//console.log(user);
 		res.json({
 			user: user,
 		});

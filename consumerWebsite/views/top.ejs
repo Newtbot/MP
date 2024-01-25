@@ -57,9 +57,7 @@
 		//check if user is logged in
 		app.auth.isLoggedIn(function (error, data) {
 			if (!error) {
-				console.log(error);
 				$.scope.getUsername.update(data);
-
 				if (location.pathname == "/profile") {
 					$.scope.getUserDetails.update(data);
 				}

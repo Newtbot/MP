@@ -8,10 +8,9 @@
 
 	<ul id="sensorDataList">
 		<li jq-repeat='sensorData'>
-			rowid: {{ id }}
 			sensorId: {{ sensorid }}
-			created: {{ createdAt }}
 			location: {{ locationid }}
+			created: {{ createdAt }}
 			<br />
 			co: {{ measurement.co }}
 			humidity: {{ measurement.humidity }}
@@ -30,7 +29,7 @@
 
 	<script type="text/javascript">
 		$(document).ready(async function () {
-			app.api.get('sensor-data/data?order=DESC&limit=40', function(error, data){
+			app.api.get('sensor-data/data?order=DESC&limit=6', function(error, data){
             $.scope.sensorData.push(...data);
         })
 		})

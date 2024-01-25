@@ -186,9 +186,7 @@ app.auth = (function (app) {
 	function isLoggedIn(callback) {
 		
 		if (getToken()) {
-			console.log("you shldnt appear at all");
 			return app.api.get("user/me", function (error, data) {
-				console.log(error, data);
 				if (!error) app.auth.user = data;
 				return callback(error, data);
 			});

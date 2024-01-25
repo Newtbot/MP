@@ -2,7 +2,6 @@ const { Op } = require('sequelize')
 const { hash, compareHash } = require("./bcrypt.js");
 const { addToken } = require("./api");
 const { userModel } = require("../database/model/userModel");
-moment = require('moment')
 
 
 
@@ -71,9 +70,11 @@ async function loginUser(user) {
 	if (!match) return false;
 	//console.log('loginUser', userRes.id, userRes.username);
 
-	//generate token and permission and experiation time 
-	const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
-	let token = await addToken(userRes.id , "canRead" , currentTime);
+	//generate token and permission and experiation time + 30 mins
+	//let tokenToLive = moment().add(30, 'minutes').format();
+	let currentDate = new Date();
+	let tokenToLive = new Date(currentDate.getTime() + 30 * 60000);
+	let token = await addToken(userRes.id , "canRead" , tokenToLive);
 	return { token: token, userid: userRes.id, username: userRes.username };
 }
 
