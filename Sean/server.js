@@ -7,10 +7,10 @@ const crypto = require("crypto");
 const validator = require('validator');
 const axios = require('axios');
 
-const {validationResult } = require('express-validator');
-const {locationValidation, locationValidationUpdate, locationdeleteValidation
+const { validationResult } = require('express-validator');
+const { locationValidation, locationValidationUpdate, locationdeleteValidation
 ,sensorValidation, sensorupdateValidation, sensordeleteValidation, loginValidation
-,otpValidation, createValidation} = require('./modules/validationMiddleware');
+,otpValidation, createValidation } = require('./modules/validationMiddleware');
 const rateLimit = require('./modules/rateLimitMiddleware');
 const { generateOTP, sendOTPByEmail } = require('./modules/otpUtils');
 const { format } = require('date-fns');
@@ -255,15 +255,15 @@ function isStrongPassword(password) {
 	return true;
 }
 
-app.post(
-    '/createUser', createValidation, async (req, res) => {
+app.post
+	('/createUser', createValidation,
+  async (req, res) => {
         try {
-            const errors = validationResult(req);
+			const errors = validationResult(req);
 
             if (!errors.isEmpty()) {
                 return res.status(400).json({ errors: errors.array() });
             }
-
 			const sessionTokencookie = req.cookies['sessionToken'];
 
             // Verify sessionToken with the one stored in the database
@@ -286,10 +286,6 @@ app.post(
             // Extract the username of the user creating a new user
             const creatorUsername = req.session.username; // Adjust this based on how you store the creator's username in your session
 
-            // Additional password complexity check
-            if (!isStrongPassword(password)) {
-                return res.status(400).json({ error: "Password does not meet complexity requirements" });
-            }
 
             // Check if the username is already taken
             const existingUser = await User.findOne({ where: { username } });
