@@ -25,7 +25,7 @@ async function addSensorData(id_sensor, id_location, sensordata) {
 		locationid: id_location,
 		measurement: sensordata,
 	});
-	io().emit('sensordata:new', sensorData)
+	io().emit('sensorData:new', sensorData)
 
 	return sensorData;
 }

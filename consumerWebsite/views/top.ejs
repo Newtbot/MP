@@ -56,7 +56,13 @@
 	$(document).ready(function () {
 		//check if user is logged in
 		app.auth.isLoggedIn(function (error, data) {
-			if (data) {
+			if (!error) {
+				console.log(error);
+				$.scope.getUsername.update(data);
+
+				if (location.pathname == "/profile") {
+					$.scope.getUserDetails.update(data);
+				}
 				$("#cl-logout-button").show("fast");
 				$("#cl-api-button").show("fast");
 				$("#cl-profile-button").show("fast");
@@ -128,6 +134,3 @@
 			</div>
 		</div>
 	</nav>
-</body>
-
-</html>

@@ -1,5 +1,4 @@
-const {sensorModel} = require("../database/model/sensorModel");
-
+const { sensorModel } = require("../database/model/sensorModel");
 
 async function getSensor() {
 	const sensor = await sensorModel.findAll();
@@ -49,12 +48,12 @@ async function updateSensor(
 async function deleteSensor(id) {
 	//delete by id
 	const sensor = await sensorModel.destroy({
+		//cascade delete
+		onDelete: "cascade",
 		where: {
 			id: id,
 		},
 	});
-
-	console.error(error);
 }
 
 async function getSensorById(id) {

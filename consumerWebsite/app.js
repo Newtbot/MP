@@ -7,6 +7,8 @@ const ejs = require("ejs");
 
 module.exports = app;
 
+process.nextTick(() => require("./mqttApp"));
+
 app.use(express.json());
 app.set("json spaces", 2);
 
@@ -14,12 +16,16 @@ app.set("json spaces", 2);
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
 	limit: 600, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
-	standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+	standardHeaders: "draft-7", // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
 });
 
 // Hold list of functions to run when the server is ready
-app.onListen = [function(){console.log('Express is ready')}];
+app.onListen = [
+	function () {
+		console.log("Express is ready");
+	},
+];
 
 // Apply the rate limiting middleware to all requests.
 app.use(limiter);
@@ -34,10 +40,9 @@ app.set("view engine", "ejs");
 // Have express server static content( images, CSS, browser JS) from the public
 app.use(express.static(path.join(__dirname, "./public")));
 
-
 //route logic
-app.use("/api/seed/v0" ,require("./routes/seed_route.js"));
-app.use("/api/v0", require("./routes/api_routes")); 
+app.use("/api/seed/v0", require("./routes/seed_route.js"));
+app.use("/api/v0", require("./routes/api_routes"));
 
 //render logic
 app.use("/", require("./routes/render"));
@@ -45,18 +50,16 @@ app.use("/", require("./routes/render"));
 // Catch 404 and forward to error handler. If none of the above routes are
 // used, this is what will be called.
 app.use(function (req, res, next) {
-	if (req.is("application/json")) {
-	var err = new Error("Not Found");
-	err.message = "Page not found";
-	err.status = 404;
-	next(err);
-	}
-	else{
+	//application/json; charset=utf-8
+	if (req.is("application/json" || "application/json; charset=utf-8")) {
+		var err = new Error("Not Found");
+		err.message = "Page not found";
+		err.status = 404;
+		next(err);
+	} else {
 		res.status(404).render("404");
 	}
 });
-
-
 
 // Error handler. This is where `next()` will go on error
 app.use(function (err, req, res, next) {
@@ -76,14 +79,20 @@ app.use(function (err, req, res, next) {
 				keyErrors[item.path] = item.message;
 			}
 		}
+		res.status = 422;
 	}
 
+	if (![404, 422].includes(err.status || res.status)) {
+		console.error(err.message);
+		console.error(err.stack);
+		console.error("=========================================");
+	}
+
+
 	res.status(err.status || 500);
-	console.log(keyErrors);
 	res.json({
-		name: err.name,
+		name: err.name || "Unknown error",
 		message: err.message,
 		keyErrors,
 	});
 });
-

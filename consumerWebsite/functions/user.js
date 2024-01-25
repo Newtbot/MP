@@ -1,13 +1,14 @@
 const { Op } = require('sequelize')
 const { hash, compareHash } = require("./bcrypt.js");
-const { addAPIKey } = require("./api");
+const { addToken } = require("./api");
 const { userModel } = require("../database/model/userModel");
+moment = require('moment')
 
 
 
 //getuser
 //api/v0/user/me
-async function getUserID(userid) {
+async function getUserByID(userid) {
 	//console.log(userid);
 	//console.log(userid.id);
 	let userRes = await userModel.findByPk(userid.id, {
@@ -18,28 +19,6 @@ async function getUserID(userid) {
 
 	if (!userRes) return false;
 	return userRes;
-}
-
-//register
-//api/v0/auth/register
-async function addUser(user) {
-	//hash password
-	let hashed = await hash(user.password);
-
-	const addRes = await userModel.create({
-		firstname: user.firstname,
-		lastname: user.lastname,
-		username: user.username,
-		password: hashed,
-		email: user.email,
-		address: user.address,
-		phone: user.phone,
-	});
-	if (addRes) {
-		return true;
-	} else {
-		return false;
-	}
 }
 
 //api/v0/auth/register
@@ -92,9 +71,9 @@ async function loginUser(user) {
 	if (!match) return false;
 	//console.log('loginUser', userRes.id, userRes.username);
 
-	//generate token
-	let token = await addAPIKey(userRes.id, "auto-generated");
-
+	//generate token and permission and experiation time 
+	const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
+	let token = await addToken(userRes.id , "canRead" , currentTime);
 	return { token: token, userid: userRes.id, username: userRes.username };
 }
 
@@ -152,7 +131,7 @@ async function updateProfile(user, body) {
 }
 
 module.exports = {
-	getUserID,
+	getUserByID,
 	addUser,
 	loginUser,
 	updateProfile,

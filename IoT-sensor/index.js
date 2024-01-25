@@ -1,9 +1,10 @@
-const { run } = require("./modules/IoT-sensor");
+const { IoTdataGenerator  } = require("./modules/IoT-sensor");
 const client = require("./modules/mqtt");
 
 async function publishData() {
     try {
-        const data = await run();
+        let iothub = new IoTdataGenerator();
+        let data = await iothub.generateData();
         console.log(data);
         client.publish("iot-data", JSON.stringify(data));
     } catch (err) {
