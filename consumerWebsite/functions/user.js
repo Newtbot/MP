@@ -20,6 +20,16 @@ async function getUserByID(userid) {
 	return userRes;
 }
 
+async function getUserByEmail(email) {
+	let userRes = await userModel.findOne({
+		where: {
+			email: email,
+		},
+	});
+	if (!userRes) return false;
+	return userRes;
+}
+
 //api/v0/auth/register
 /* Registering new user 
 1) req.body is taken from html form or wtv 
@@ -131,9 +141,23 @@ async function updateProfile(user, body) {
 	}
 }
 
+async function checkEmail(email) {
+	let emailRes = await userModel.findOne({
+		where: {
+			email: email,
+		},
+	});	
+	if (!emailRes) return false;
+	return true;
+
+}
+
+
 module.exports = {
 	getUserByID,
+	getUserByEmail,
 	addUser,
 	loginUser,
 	updateProfile,
+	checkEmail
 };

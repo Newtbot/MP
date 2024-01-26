@@ -6,6 +6,10 @@
  !-->
 
 <%- include('top') %>
+    <script type="text/javascript">
+        // Require login to see this page.
+        app.auth.forceLogin()
+    </script>
     <link rel="stylesheet" href="css/api.css" media="all">
 
     <body class="one-content-column-version">
@@ -312,81 +316,6 @@
                         </tbody>
                     </table>
                 </div>
-
-                <div class="overflow-hidden content-section" id="content-errors">
-                    <h2>Errors</h2>
-                    <p>
-                        The Westeros API uses the following error codes:
-                    </p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Error Code</th>
-                                <th>Meaning</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>X000</td>
-                                <td>
-                                    Some parameters are missing. This error appears when you don't pass every mandatory
-                                    parameters.
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>403</td>
-                                <td>
-                                    Unknown or unvalid <code class="higlighted">secret_key</code>. This error appears if
-                                    you use an unknow API key or if your API key expired.
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>500</td>
-                                <td>
-                                    Unvalid <code class="higlighted">secret_key</code> No API key was supplied. Invalid
-                                    request.
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>X003</td>
-                                <td>
-                                    Unknown or unvalid user <code class="higlighted">token</code>. This error appears if
-                                    you use an unknow user <code class="higlighted">token</code> or if the user <code
-                                        class="higlighted">token</code> expired.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="overflow-hidden content-section" id="content-get-api">
-                    <div class="api-keys-header">
-                        <h2>API Keys</h2>
-                        <button class="generate-key-button">Generate Key</button>
-                        <p>
-                            You can generate API Keys here:
-                        </p>
-                        <table>
-                            <thead>
-                                <tr>
-                                  <th>Name</th>
-                                  <th>Public Key</th>
-                                  <th>Private Key</th>
-                                  <th>Key Type</th>
-                                  <th>Created</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <td>API Key</td>
-                                  <td>GR234-We34</td>
-                                  <td>greR-234-fEG</td>
-                                  <td>Type</td>
-                                  <td>2024-01-22</td>
-                                </tr>
-                              </tbody>
-                          </table>   
-                    </div>
-                </div>
                 <div class="overflow-hidden content-section" id="content-get-sensor">
                     <h2>Get all sensor</h2>
                     <p>
@@ -483,7 +412,7 @@
                                 <td>Authorization</td>
                                 <td>JSON</td>
                                 <td>Your API key.</td>
-                                <td>(Required) Example: curl https://api.teeseng.uk/api/v0/sensor/new 
+                                <td>(Required) Example: curl https://api.teeseng.uk/api/v0/sensor/new
                                     -H "Authorization: {provide your
                                     API key here}"</td>
                                 </td>
@@ -620,7 +549,8 @@
                                 <td>Description</td>
                                 <td>JSON</td>
                                 <td>Description of Sensor</td>
-                                <td>(Optional) Description of Sensor Example: curl https://api.teeseng.uk/api/v0/sensor/update
+                                <td>(Optional) Description of Sensor Example: curl
+                                    https://api.teeseng.uk/api/v0/sensor/update
                                     -H "Authorization: provide
                                     your API key here" -d '{"description":"test"}'</td>
                                 </td>
@@ -629,7 +559,8 @@
                                 <td>Location</td>
                                 <td>JSON</td>
                                 <td>Location of Sensor</td>
-                                <td>(Optional) Location of Sensor Example: curl https://api.teeseng.uk/api/v0/sensor/update
+                                <td>(Optional) Location of Sensor Example: curl
+                                    https://api.teeseng.uk/api/v0/sensor/update
                                     -H "Authorization: provide
                                     your API key here" -d '{"location": "11"}'</td>
                                 </td>
@@ -679,10 +610,77 @@
                             </tr>
                         </tbody>
                     </table>
+                    <div class="api-keys-header  iot-card" id="content-get-api">
+                        <h2>API Keys</h2>
+                        <p>
+                            You can generate API Keys here:
+                        </p>
+                        <form action="token/new" onsubmit="formAJAX(this)" class="api-form">
+                            <div class="card-header shadow actionMessage" style="display:none;"></div>
+                            <input type="email" name="email" id="email" placeholder="Email address"
+                                pattern="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*">
+                            <div style="margin-top: 10px;"></div> 
+                            <button class="generate-key-button">Generate Key</button>
+
+                        </form>
+
+                    </div>
+                </div>
+
+                <div class="overflow-hidden content-section" id="content-errors">
+                    <h2>Errors</h2>
+                    <p>
+                        The EcoSaver API uses the following error codes:
+                    </p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Error Code</th>
+                                <th>Meaning</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>X000</td>
+                                <td>
+                                    Some parameters are missing. This error appears when you don't pass every
+                                    mandatory
+                                    parameters.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>403</td>
+                                <td>
+                                    Unknown or unvalid <code class="higlighted">secret_key</code>. This error
+                                    appears if
+                                    you use an unknow API key or if your API key expired.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>500</td>
+                                <td>
+                                    Unvalid <code class="higlighted">secret_key</code> No API key was supplied.
+                                    Invalid
+                                    request.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>X003</td>
+                                <td>
+                                    Unknown or unvalid user <code class="higlighted">token</code>. This error
+                                    appears if
+                                    you use an unknow user <code class="higlighted">token</code> or if the user
+                                    <code class="higlighted">token</code> expired.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
         </div>
 
     </body>
     <script src="js/api.js"></script>
+
     </html>

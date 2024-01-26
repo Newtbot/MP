@@ -19,12 +19,24 @@ async function auth(req, res, next) {
 
         const route = req.originalUrl.split("?")[0]; // Removing query parameters
         //if route is from user/ and permission is canRead allow it to do CRUD
-        if (route.includes("/user/") && token.permission === "canRead") {
+        if (route.includes("/user/") || route.includes("/token/") && token.permission === "canRead") {
+            console.log("user route");
             return next();
         }
-        if ((req.method === "GET" && token.permission === "canRead") || (["GET", "POST", "PUT", "DELETE"].includes(req.method) && token.permission === "canWrite")) {
+        if ((req.method === "GET" && token.permission === "canRead")){
+            console.log("wtf you shldnt be here");
             return next();
         }
+        if (["GET", "POST", "PUT", "DELETE"].includes(req.method) && token.permission === "canWrite") {
+            console.log("wtf you shldnt be here");
+            return next();
+        }
+        /*
+        if ((req.method === "GET" && token.permission === "canRead") ||
+         (["GET", "POST", "PUT", "DELETE"].includes(req.method) && token.permission === "canWrite")) {
+            return next();
+        }
+        */
 
         throw permissionError
      

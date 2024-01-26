@@ -42,7 +42,8 @@
         </p>
         <p>
           <abbr title="Email">E</abbr>:
-          <a href="mailto:name@example.com">leongdingxuan@gmail.com
+          <a href="mailto:name@example.com">ecosaverx@gmail.com
+
           </a>
         </p>
         <p>
@@ -55,17 +56,18 @@
     <!-- Contact Form -->
     <!-- In order to set the email address and subject line for the contact form go to the bin/contact_me.php file. -->
     <div class="row">
+      <div class="form contact iot-card">
       <div class="col-lg-8 mb-4 contact-left">
         <h3>Send us a Message</h3>
-        <form id="form">
-          <input type="hidden" name="access_key" value="">
+        <form action="auth/contact" onsubmit="formAJAX(this)">
+          <div class="card-header shadow actionMessage" style="display:none"></div>
           <div class="mb-3">
             <label for="name">Full Name</label>
-            <input type="text" name="name" id="name" required>
+            <input type="text" name="name" id="name" required pattern="^[a-zA-Z]{3,}( {1,2}[a-zA-Z]{3,}){0,}$">
           </div>
           <div class="mb-3">
             <label for="email">Email address</label>
-            <input type="email" name="email" id="email" required>
+            <input type="email" name="email" id="email" required pattern="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*">
           </div>
           <div class="mb-3">
             <label for="message">Message</label>
@@ -75,6 +77,8 @@
         </form>
       </div>
     </div>
+    </div>
+
     
   </div>
   <!-- /.row -->

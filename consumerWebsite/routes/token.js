@@ -1,4 +1,7 @@
 const { addToken } = require("../functions/api");
+const { checkEmail , getUserByEmail } = require("../functions/user");
+const { sendTokenEmail } = require("../functions/nodeMail");
+
 
 
 const express = require("express");
@@ -15,8 +18,29 @@ const router = express.Router();
 //'{"userid": "5", "permission": "canRead" ,}'
 router.post("/new", async (req, res, next) => {
 	try {
-        const token = await addToken(req.body.userid, req.body.permission , "2204-01-24 07:34:36" );
-        res.json({token: token});
+		//console.log(req.body);
+		const Res = await checkEmail(req.body.email);
+		if (!Res) {
+			let error = new Error("Email not found");
+			error.status = 400;
+			return next(error);
+		}
+		else 
+		{
+			//console.log("email found");
+			let userid = await getUserByEmail(req.body.email);
+			if (!userid) return false;
+
+			const token = await addToken(userid.id, "canRead" , "2204-01-24 07:34:36" );
+			if (!token) return false;
+			sendTokenEmail(req.body.email, token);
+			res.json({
+				message: "Token generated successfully and sent to email",
+			})
+
+		}
+        //const token = await addToken(req.body.userid, "canRead" , "2204-01-24 07:34:36" );
+        //res.json({token: token});
 	} catch (error) {
 		console.error(error);
 		next(error);
