@@ -27,7 +27,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.1/mustache.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.1/mustache.js"></script>
     <!-- socket.io scriot -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"></script>
 
     <!-- jquery app.js -->
     <script src="js/app.js"></script>
@@ -44,19 +44,22 @@
         $(document).ready(function () {
             //check if user is logged in
             app.auth.isLoggedIn(function (error, data) {
-                if (data) {
-                    $('#cl-logout-button').show('fast');
-                    $('#cl-profile-button').show('fast');
-                    $('#cl-login-button').hide('fast');
+                if (!error) {
+                    $("#cl-logout-button").show("fast");
+                    $("#cl-api-button").show("fast");
+                    $("#cl-profile-button").show("fast");
+                    $("#cl-login-button").hide("fast");
+
                 } else {
                     $('#cl-login-button').show('fast');
+
                 }
                 $('body').show('fast')
 
             });
         });
 
-</script>
+    </script>
 
 
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-light top-nav fixed-top">
@@ -79,11 +82,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/contact">Contact</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/api">API Doc</a>
-                    </li>
                     <!-- profile button -->
                     <div class="form-inline mt-2 mt-md-0">
+                        <a id="cl-api-button" class="btn btn-outline-info btn-sm my-2 my-sm-0" href="/api"
+                            style="display: none">
+                            <i class="fas fa-sign-out"></i> API
+                        </a>
                         <a id="cl-profile-button" class="btn btn-outline-info my-2 my-sm-0" href="/profile"
                             style="display: none;">
                             <i class="fas fa-sign-out"></i>
@@ -104,4 +108,3 @@
             </div>
         </div>
     </nav>
-

@@ -186,9 +186,7 @@ app.auth = (function (app) {
 	function isLoggedIn(callback) {
 		
 		if (getToken()) {
-			console.log("you shldnt appear at all");
 			return app.api.get("user/me", function (error, data) {
-				console.log(error, data);
 				if (!error) app.auth.user = data;
 				return callback(error, data);
 			});
@@ -287,7 +285,7 @@ function formAJAX(btn, del) {
 	//console.log('Data being sent to', $form.attr('action'), formData)
 
 	app.api[method]($form.attr("action"), formData, function (error, data) {
-		//console.log('Data back from the server', error, data)
+		console.log('Data back from the server', error, data)
 		app.util.actionMessage(data.message, $form, error ? "danger" : "success"); //re-populate table
 		if (!error) {
 			$form.trigger("reset");

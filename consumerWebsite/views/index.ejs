@@ -1,10 +1,59 @@
 <%- include('top') %>
-   <script>
-      //call socket.io
-      app.socket.on("sensorData:new", function (data) {
-         console.log("new data!!")
-         console.log(data);
+   <script type="text/javascript">
+      function extractNumbers(str) {
+         if (typeof str === 'number') return str;
+         return str.match(/\d+/)[0];
+      }
+
+      function calculateAverage(numbers) {
+         if (numbers.length === 0) return 0
+         const sum = numbers.reduce((acc, num) => acc + num, 0);
+         return sum / numbers.length;
+      }
+      const values = {
+         psi: [],
+         humidity: [],
+         temperature: [],
+         windspeed: [],
+      };
+
+      function parseRowToTemplace(row) {
+         values.psi.unshift(extractNumbers(row.measurement.psi))
+         values.humidity.unshift(extractNumbers(row.measurement.humidity))
+         values.temperature.unshift(extractNumbers(row.measurement.temperature))
+         values.windspeed.unshift(extractNumbers(row.measurement.windspeed))
+
+         return {
+            average: {
+               psi: parseInt(calculateAverage(values.psi)),
+               humidity: parseInt(calculateAverage(values.humidity)),
+               temperature: parseInt(calculateAverage(values.temperature)),
+               windspeed: parseInt(calculateAverage(values.windspeed)),
+            },
+            latest: {
+               psi: values.psi[0],
+               humidity: values.humidity[0],
+               temperature: values.temperature[0],
+               windspeed: values.windspeed[0],
+            }
+         }
+      }
+
+      $(document).ready(async function () {
+
+         app.api.get('latest-sensor-data/data', function (error, data) {
+            for (let row of data) {
+               //console.log(row);
+               $.scope.LatestSensorData.update(parseRowToTemplace(row));
+            }
+         });
+
+         //call socket.io to get live data
+         app.socket.on("sensorData:new", function (data) {
+            $.scope.LatestSensorData.update(parseRowToTemplace(data));
+         });
       });
+
 
    </script>
 
@@ -53,56 +102,60 @@
    </header>
    <!-- Page Content -->
    <div class="container">
-      <div class="services-bar">
-          <h1 class="my-4">Services</h1>
-          <!-- Services Section -->
-          <div class="row">
-              <div class="col-lg-3 mb-4">
-                  <div class="card">
-                      <h4 class="card-header">Air Quality Index</h4>
-                      <div class="card-body text-center">
-                          <p class="card-text display-4">15 - 18 PSI</p>
-                      </div>
-                      <div class="card-footer">
-                          <a href="/learnmore" class="btn btn-primary">Learn More</a>
-                      </div>
+      <div class="services-bar" jq-repeat="LatestSensorData">
+         <h1 class="my-4">Services</h1>
+         <!-- Services Section -->
+         <div class="row">
+            <div class="col-lg-3 mb-4">
+               <div class="card">
+                  <h4 class="card-header">Air Quality Index</h4>
+                  <div class="card-body text-center">
+                     <p class="card-text display-4"> Average: {{average.psi}} PSI</p>
+                     <p class="card-text display-4"> Latest: {{latest.psi}} PSI</p>
                   </div>
-              </div>
-              <div class="col-lg-3 mb-4">
-                  <div class="card">
-                      <h4 class="card-header">Humidity</h4>
-                      <div class="card-body text-center">
-                          <p class="card-text display-4">70% - 75%</p>
-                      </div>
-                      <div class="card-footer">
-                          <a href="/learnmore" class="btn btn-primary">Learn More</a>
-                      </div>
+                  <div class="card-footer">
+                     <a href="/learnmore" class="btn btn-primary">Learn More</a>
                   </div>
-              </div>
-              <div class="col-lg-3 mb-4">
-                  <div class="card">
-                      <h4 class="card-header">Temperature</h4>
-                      <div class="card-body text-center">
-                          <p class="card-text display-4">30&deg; - 37&deg;</p>
-                      </div>
-                      <div class="card-footer">
-                          <a href="/learnmore" class="btn btn-primary">Learn More</a>
-                      </div>
+               </div>
+            </div>
+            <div class="col-lg-3 mb-4">
+               <div class="card">
+                  <h4 class="card-header">Humidity</h4>
+                  <div class="card-body text-center">
+                     <p class="card-text display-4"> Average: {{average.humidity}} %</p>
+                     <p class="card-text display-4"> Latest: {{latest.humidity}} %</p>
                   </div>
-              </div>
-              <div class="col-lg-3 mb-4">
-                  <div class="card">
-                      <h4 class="card-header">Another Category</h4>
-                      <div class="card-body text-center">
-                          <p class="card-text display-4">values</p>
-                      </div>
-                      <div class="card-footer">
-                          <a href="/learnmore" class="btn btn-primary">Learn More</a>
-                      </div>
+                  <div class="card-footer">
+                     <a href="/learnmore" class="btn btn-primary">Learn More</a>
                   </div>
-              </div>
-          </div>
-  
+               </div>
+            </div>
+            <div class="col-lg-3 mb-4">
+               <div class="card">
+                  <h4 class="card-header">Temperature</h4>
+                  <div class="card-body text-center">
+                     <p class="card-text display-4"> Average: {{average.temperature}}&deg;</p>
+                     <p class="card-text display-4"> Latest: {{latest.temperature}}&deg;</p>
+                  </div>
+                  <div class="card-footer">
+                     <a href="/learnmore" class="btn btn-primary">Learn More</a>
+                  </div>
+               </div>
+            </div>
+            <div class="col-lg-3 mb-4">
+               <div class="card">
+                  <h4 class="card-header">Wind Speed</h4>
+                  <div class="card-body text-center">
+                     <p class="card-text display-4"> Average: {{average.windspeed}} Km/h</p>
+                     <p class="card-text display-4"> Latest: {{latest.windspeed}} Km/h</p>
+                  </div>
+                  <div class="card-footer">
+                     <a href="/learnmore" class="btn btn-primary">Learn More</a>
+                  </div>
+               </div>
+            </div>
+         </div>
+
          <!-- /.row -->
       </div>
       <!-- About Section -->

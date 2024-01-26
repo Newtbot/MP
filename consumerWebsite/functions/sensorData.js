@@ -18,15 +18,17 @@ async function getSensorData() {
 	const sensorData = await sensorDataModel.findAll();
 	return sensorData;
 }
-
 async function addSensorData(id_sensor, id_location, sensordata) {
 	const sensorData = await sensorDataModel.create({
 		sensorid: id_sensor,
-		locationid: id_location,
-		measurement: sensordata,
+		locationid: id_location ,
+		measurement: sensordata.measurement,
 	});
-	io().emit('sensorData:new', sensorData)
+	//console.log("sensorData", sensorData);
+	//console.log("sensorData", sensordata.measurement);
 
+	
+	io().emit('sensorData:new', sensordata)
 	return sensorData;
 }
 
@@ -58,6 +60,14 @@ async function getSensorDataById(id) {
 		where: {
 			id: id,
 		},
+	});
+	return sensorData;
+}
+
+async function getLatestData() {
+	const sensorData = await sensorDataModel.findAll({
+		limit: 6,
+		order: [["createdAt", "DESC"]],
 	});
 	return sensorData;
 }
@@ -724,5 +734,6 @@ module.exports = {
 	getSensorDataById,
 	getData,
 	getDatabyRange,
+	getLatestData,
 
 };

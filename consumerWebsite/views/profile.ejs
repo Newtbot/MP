@@ -1,4 +1,8 @@
 <%- include('top') %>
+<script type="text/javascript">
+	// Require login to see this page.
+	app.auth.forceLogin()
+</script>
 
     <br>
     <br>
@@ -6,9 +10,9 @@
     <div class="profile">
         <!-- <li jq-repeat="getUsername" class="nav-item"> -->
         <div class="edit_information" jq-repeat="getUserDetails">
-            <div class="card-header shadow actionMessage" style="display:none"></div>
             <form id="profileForm" action="user/update" method="put" onsubmit="formAJAX(this)"
                 evalAJAX="app.auth.profileRedirect();">
+                <div class="card-header shadow actionMessage" style="display:none"></div>
                 <h3 class="text-center">Edit Personal Information</h3>
                 <br>
                 <div class="row">

@@ -2,7 +2,6 @@ const { Op } = require('sequelize')
 const { hash, compareHash } = require("./bcrypt.js");
 const { addToken } = require("./api");
 const { userModel } = require("../database/model/userModel");
-moment = require('moment')
 
 
 
@@ -17,6 +16,16 @@ async function getUserByID(userid) {
 		},
 	});
 
+	if (!userRes) return false;
+	return userRes;
+}
+
+async function getUserByEmail(email) {
+	let userRes = await userModel.findOne({
+		where: {
+			email: email,
+		},
+	});
 	if (!userRes) return false;
 	return userRes;
 }
@@ -71,9 +80,11 @@ async function loginUser(user) {
 	if (!match) return false;
 	//console.log('loginUser', userRes.id, userRes.username);
 
-	//generate token and permission and experiation time 
-	const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
-	let token = await addToken(userRes.id , "canRead" , currentTime);
+	//generate token and permission and experiation time + 30 mins
+	//let tokenToLive = moment().add(30, 'minutes').format();
+	let currentDate = new Date();
+	let tokenToLive = new Date(currentDate.getTime() + 30 * 60000);
+	let token = await addToken(userRes.id , "canRead" , tokenToLive);
 	return { token: token, userid: userRes.id, username: userRes.username };
 }
 
@@ -130,9 +141,23 @@ async function updateProfile(user, body) {
 	}
 }
 
+async function checkEmail(email) {
+	let emailRes = await userModel.findOne({
+		where: {
+			email: email,
+		},
+	});	
+	if (!emailRes) return false;
+	return true;
+
+}
+
+
 module.exports = {
 	getUserByID,
+	getUserByEmail,
 	addUser,
 	loginUser,
 	updateProfile,
+	checkEmail
 };

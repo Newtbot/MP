@@ -1,19 +1,41 @@
-const { hash, compareHash } = require("./bcrypt.js");
 const { tokenModel } = require("../database/model/tokenModel.js");
+const { userModel } = require("../database/model/userModel");
+const { hash, compareHash } = require("./bcrypt.js");
 const { generateUUID } = require("./generateUUID.js");
+const { isValid } = require("./isValid");
 
-/*
-1) take userid 
-2) generate random api key
-3) hash the api key
-4) append userid with - and api key
-5) you give the user rowid-uuidv4
-6) store in database
-*/
-//can be used for api key or token. Both are the same logic
-async function addToken(userId, permission , expiry) {
+async function getTokenByToken(token) {
+	const splitAuthToken = token.split("-");
+	const rowid = splitAuthToken[0];
+	const suppliedToken = splitAuthToken.slice(1).join("-");
+
+	token = await tokenModel.findByPk(rowid, { include: userModel });
+
+	token.isValid = await compareHash(suppliedToken, token.token); //true
+	console.log("function api getTokenByToken token", token.isValid);
+	token.isValid = token.isValid && isValid(token.expiration); 
+	console.log("function api getTokenByToken token", token.isValid);
+	if (!token.isValid) {
+		//add boolean to token table
+		token.destroy();
+	}
+	/*
+	console.log(
+		"function api getTokenByToken token",
+		await compareHash(suppliedToken, token.token),
+		isValid("token" , token.expiration)
+	);
+	*/
+	console.log(token.isValid);
+	return token;
+}
+
+async function addToken(userId, permission, expiry) {
 	let uuid = await generateUUID();
 	let hashtoken = await hash(uuid);
+	//console.log("user id", userId);
+	//	return { token: token, userid: userRes.id, username: userRes.username };
+	//	let token = await addToken(userRes.id , "canRead" , tokenToLive);
 
 	let token = await tokenModel.create({
 		userid: userId,
@@ -26,23 +48,4 @@ async function addToken(userId, permission , expiry) {
 	return token.id + "-" + uuid;
 }
 
-async function checkToken(Supplied, rowid) {
-	try {
-		const retrivedToken = await tokenModel.findOne({
-			raw: true,
-			attributes: ["token", "permission"],
-			where: {
-				id: rowid,
-			},
-		});
-		//console.log(retrivedKey.apikey);
-		if (compareHash(Supplied, retrivedToken.token)) {
-			//return true;
-			return retrivedToken.permission;
-		}
-	} catch (error) {
-		console.error(error);
-	}
-}
-
-module.exports = { addToken  , checkToken };
+module.exports = { addToken, getTokenByToken };

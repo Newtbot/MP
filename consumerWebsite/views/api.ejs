@@ -5,8 +5,12 @@
  https://github.com/ticlekiwi/API-Documentation-HTML-Template
  !-->
 
- <%- include('top') %>
- <link rel="stylesheet" href="css/api.css" media="all">
+<%- include('top') %>
+    <script type="text/javascript">
+        // Require login to see this page.
+        app.auth.forceLogin()
+    </script>
+    <link rel="stylesheet" href="css/api.css" media="all">
 
  <body class="one-content-column-version">
      <div class="left-menu">
@@ -50,353 +54,633 @@
      </div>
 
 
-     <div class="content-page">
-         <div class="content">
-             <div class="overflow-hidden content-section" id="content-get-started">
-                 <h1>Get started</h1>
-                 <p>
-                     The following API is provided by the Eco saver developer team. It allows you to get Location and
-                     Sensor and Sensor Data from the Eco saver database.
-                 </p>
-                 <p>
-                     To use this API, you need an <strong>API key</strong>.
-                 </p>
-             </div>
-             <div class="overflow-hidden content-section" id="content-get-location">
-                 <h2>Get all location</h2>
-                 <p>
-                     To get Location of sensors you need to make a GET call to the following url :<br>
-                     <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location</code>
-                     <br>
-                     <br>
-                     Return Response :<br>
-                     <code class="higlighted break-word">{"status":"200"}</code>
-                 </p>
-                 <br>
-                 <h4>QUERY PARAMETERS</h4>
-                 <table>
-                     <thead>
-                         <tr>
-                             <th>Field</th>
-                             <th>Type</th>
-                             <th>Description</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         <tr>
-                             <td>Authorization</td>
-                             <td>JSON</td>
-                             <td>Your API key.</td>
-                             <td>(Required) Example: curl https://api.teeseng.uk/api/v0/location -H "Authorization:
-                                 {provide your
-                                 API key here}"</td>
-                             </td>
-                         </tr>
-                     </tbody>
-                 </table>
-             </div>
-             <div class="overflow-hidden content-section" id="content-get-location-by-id">
-                 <h2>Get location by ID</h2>
-                 <p>
-                     To get Location you need to make a GET call to the following url :<br>
-                     <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/{id}</code>
-                     <br>
-                     <br>
-                     Return Response :<br>
-                     <code class="higlighted break-word">{"status":"200"}</code>
-                 </p>
-                 <br>
-                 <h4>QUERY PARAMETERS</h4>
-                 <table>
-                     <thead>
-                         <tr>
-                             <th>Field</th>
-                             <th>Type</th>
-                             <th>Description</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         <tr>
-                             <td>Authorization</td>
-                             <td>JSON</td>
-                             <td>(Required) Your API key.</td>
-                             <td>Example: curl https://api.teeseng.uk/api/v0/location -H "Authorization: {provide
-                                 your
-                                 API key here}"</td>
-                             </td>
-                         </tr>
-                     </tbody>
-                 </table>
-             </div>
-             <div class="overflow-hidden content-section" id="content-add-location">
-                 <h2>Add Location (Only for system or admin API key)</h2>
-                 <p>
-                     To add an Location you need to make a POST call to the following url :<br>
-                     <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/new</code>
-                     <br>
-                     <br>
-                     Example :<br>
-                     <code
-                         class="higlighted break-word">curl https://api.teeseng.uk/api/v0/location/new -H "Content-Type: application/json" -X POST -d '{"name": "SAMPLE", "added_by": "system" , "description": "test"}'</code>
-                     <br>
-                     <br>
-                     Return Response :<br>
-                     <code class="higlighted break-word">{"status":"200"}</code>
-                 </p>
-                 <br>
-                 <h4>QUERY PARAMETERS</h4>
-                 <table>
-                     <thead>
-                         <tr>
-                             <th>Field</th>
-                             <th>Type</th>
-                             <th>Description</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         <tr>
-                             <td>Authorization</td>
-                             <td>JSON</td>
-                             <td>Your API key.</td>
-                             <td>(Required) Example: curl https://api.teeseng.uk/api/v0/location/new -H
-                                 "Authorization: {provide your
-                                 API key here}"</td>
-                             </td>
-                         </tr>
-                         <tr>
-                             <td>Location name</td>
-                             <td>JSON</td>
-                             <td>Location name.</td>
-                             <td>(Required) Location name. Example: curl https://api.teeseng.uk/api/v0/location/new
-                                 -H "Authorization: provide
-                                 your API key here" -d '{"name":"Location name"}'</td>
-                             </td>
-                         </tr>
-                         <tr>
-                             <td>Added by </td>
-                             <td>JSON</td>
-                             <td>System or Admin</td>
-                             <td>(Required) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new
-                                 -H "Authorization: provide
-                                 your API key here" -d '{"added_by":"system"}'</td>
-                             </td>
-                         </tr>
-                         <tr>
-                             <td>Description</td>
-                             <td>JSON</td>
-                             <td>Description of Location</td>
-                             <td>(Required) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new
-                                 -H "Authorization: provide
-                                 your API key here" -d '{"description":"test"}'</td>
-                             </td>
-                         </tr>
-                     </tbody>
-                 </table>
-             </div>
-             <!-- update -->
-             <div class="overflow-hidden content-section" id="content-update-location-by-id">
-                 <h2>Update Location (Only for system or admin API key)</h2>
-                 <p>
-                     To update an Location you need to make a PUT call to the following url :<br>
-                     <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/update</code>
-                     <br>
-                     <br>
-                     Example :<br>
-                     <code
-                         class="higlighted break-word">curl https://api.teeseng.uk/api/v0/location/update -H "Content-Type: application/json" -X POST -d '{"id": "7" , "name": "SAMPLE", "added_by": "system" , "description": "test"}'</code>
-                     <br>
-                     <br>
-                     Return Response :<br>
-                     <code class="higlighted break-word">{"status":"200","message":"Location 7 updated"}</code>
-                 </p>
-                 <br>
-                 <h4>QUERY PARAMETERS</h4>
-                 <table>
-                     <thead>
-                         <tr>
-                             <th>Field</th>
-                             <th>Type</th>
-                             <th>Description</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         <tr>
-                             <td>Authorization</td>
-                             <td>JSON</td>
-                             <td>Your API key.</td>
-                             <td>(Required) example: curl https://api.teeseng.uk/api/v0/location/update -H
-                                 "Authorization: {provide your
-                                 API key here}"</td>
-                             </td>
-                         </tr>
-                         <tr>
-                             <td>ID</td>
-                             <td>JSON</td>
-                             <td>Location ID</td>
-                             <td>(Required) Location ID Example: curl https://api.teeseng.uk/api/v0/location/update
-                                 -H "Authorization: provide
-                                 your API key here" -d '{"id": "7"}'</td>
-                             </td>
-                         </tr>
-                         <tr>
-                             <td>Location name</td>
-                             <td>JSON</td>
-                             <td>Location name.</td>
-                             <td>(Optional) Location name. Example: curl https://api.teeseng.uk/api/v0/location/new
-                                 -H "Authorization: provide
-                                 your API key here" -d '{"name":"Location name"}'</td>
-                             </td>
-                         </tr>
-                         <tr>
-                             <td>Added by </td>
-                             <td>JSON</td>
-                             <td>System or Admin</td>
-                             <td>(Optional) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new
-                                 -H "Authorization: provide
-                                 your API key here" -d '{"added_by":"system"}'</td>
-                             </td>
-                         </tr>
-                         <tr>
-                             <td>Description</td>
-                             <td>JSON</td>
-                             <td>Description of Location</td>
-                             <td>(Optional) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new
-                                 -H "Authorization: provide
-                                 your API key here" -d '{"description":"test"}'</td>
-                             </td>
-                         </tr>
-                     </tbody>
-                 </table>
-             </div>
-             <!-- delete location -->
-             <div class="overflow-hidden content-section" id="content-update-location-by-id">
-                 <h2>Delete Location (Only for system or admin API key)</h2>
-                 <p>
-                     To delete an Location you need to make a DELETE call to the following url :<br>
-                     <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/delete</code>
-                     <br>
-                     <br>
-                     Example :<br>
-                     <code
-                         class="higlighted break-word">curl https://api.teeseng.uk/api/v0/location/delete -H "Content-Type: application/json" -X POST -d '{"id": "7"}'</code>
-                 </p>
-                 <br>
-                 <h4>QUERY PARAMETERS</h4>
-                 <table>
-                     <thead>
-                         <tr>
-                             <th>Field</th>
-                             <th>Type</th>
-                             <th>Description</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         <tr>
-                             <td>Authorization</td>
-                             <td>JSON</td>
-                             <td>Your API key.</td>
-                             <td>(Required) example: curl https://api.teeseng.uk/api/v0/location/delete -H
-                                 "Authorization: {provide your
-                                 API key here}"</td>
-                             </td>
-                         </tr>
-                         <tr>
-                             <td>ID</td>
-                             <td>JSON</td>
-                             <td>Location ID</td>
-                             <td>(Required) Location ID Example: curl https://api.teeseng.uk/api/v0/location/delete
-                                 -H "Authorization: provide
-                                 your API key here" -d '{"id": "7"}'</td>
-                             </td>
-                         </tr>
-                     </tbody>
-                 </table>
-             </div>
-
-             <div class="overflow-hidden content-section" id="content-errors">
-                 <h2>Errors</h2>
-                 <p>
-                     The Westeros API uses the following error codes:
-                 </p>
-                 <table>
-                     <thead>
-                         <tr>
-                             <th>Error Code</th>
-                             <th>Meaning</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         <tr>
-                             <td>X000</td>
-                             <td>
-                                 Some parameters are missing. This error appears when you don't pass every mandatory
-                                 parameters.
-                             </td>
-                         </tr>
-                         <tr>
-                             <td>403</td>
-                             <td>
-                                 Unknown or unvalid <code class="higlighted">secret_key</code>. This error appears if
-                                 you use an unknow API key or if your API key expired.
-                             </td>
-                         </tr>
-                         <tr>
-                             <td>500</td>
-                             <td>
-                                 Unvalid <code class="higlighted">secret_key</code> No API key was supplied. Invalid
-                                 request.
-                             </td>
-                         </tr>
-                         <tr>
-                             <td>X003</td>
-                             <td>
-                                 Unknown or unvalid user <code class="higlighted">token</code>. This error appears if
-                                 you use an unknow user <code class="higlighted">token</code> or if the user <code
-                                     class="higlighted">token</code> expired.
-                             </td>
-                         </tr>
-                     </tbody>
-                 </table>
-             </div>
-             <div class="overflow-hidden content-section" id="content-get-api">
-                <div class="api-keys-header">
-                    <h2>API Keys</h2>
-                    <div class="button-container">
-                        <button class="generate-key-button" onclick="generateKey()">Generate Key</button>
-                        <button class="delete-key-button" onclick="deleteKeys()">Delete Keys</button>
-                    </div>
+        <div class="content-page">
+            <div class="content">
+                <div class="overflow-hidden content-section" id="content-get-started">
+                    <h1>Get started</h1>
                     <p>
-                        You can generate API Keys here:
+                        The following API is provided by the Eco saver developer team. It allows you to get Location and
+                        Sensor and Sensor Data from the Eco saver database.
                     </p>
+                    <p>
+                        To use this API, you need an <strong>API key</strong>.
+                    </p>
+                </div>
+                <div class="overflow-hidden content-section" id="content-get-location">
+                    <h2>Get all location</h2>
+                    <p>
+                        To get Location of sensors you need to make a GET call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location</code>
+                        <br>
+                        <br>
+                        Return Response :<br>
+                        <code class="higlighted break-word">{"status":"200"}</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
                     <table>
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Public Key</th>
-                                <th>Private Key</th>
-                                <th>Created</th>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>API Key</td>
-                                <td>GR234-We34</td>
-                                <td>greR-234-fEG</td>
-                                <td>2024-01-22</td>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>Your API key.</td>
+                                <td>(Required) Example: curl https://api.teeseng.uk/api/v0/location -H "Authorization:
+                                    {provide your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="overflow-hidden content-section" id="content-get-location-by-id">
+                    <h2>Get location by ID</h2>
+                    <p>
+                        To get Location you need to make a GET call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/{id}</code>
+                        <br>
+                        <br>
+                        Return Response :<br>
+                        <code class="higlighted break-word">{"status":"200"}</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>(Required) Your API key.</td>
+                                <td>Example: curl https://api.teeseng.uk/api/v0/location -H "Authorization: {provide
+                                    your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="overflow-hidden content-section" id="content-add-location">
+                    <h2>Add Location (Only for system or admin API key)</h2>
+                    <p>
+                        To add an Location you need to make a POST call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/new</code>
+                        <br>
+                        <br>
+                        Example :<br>
+                        <code
+                            class="higlighted break-word">curl https://api.teeseng.uk/api/v0/location/new -H "Content-Type: application/json" -X POST -d '{"name": "SAMPLE", "added_by": "system" , "description": "test"}'</code>
+                        <br>
+                        <br>
+                        Return Response :<br>
+                        <code class="higlighted break-word">{"status":"200"}</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>Your API key.</td>
+                                <td>(Required) Example: curl https://api.teeseng.uk/api/v0/location/new -H
+                                    "Authorization: {provide your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Location name</td>
+                                <td>JSON</td>
+                                <td>Location name.</td>
+                                <td>(Required) Location name. Example: curl https://api.teeseng.uk/api/v0/location/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"name":"Location name"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Added by </td>
+                                <td>JSON</td>
+                                <td>System or Admin</td>
+                                <td>(Required) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"added_by":"system"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>JSON</td>
+                                <td>Description of Location</td>
+                                <td>(Required) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"description":"test"}'</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- update -->
+                <div class="overflow-hidden content-section" id="content-update-location-by-id">
+                    <h2>Update Location (Only for system or admin API key)</h2>
+                    <p>
+                        To update an Location you need to make a PUT call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/update</code>
+                        <br>
+                        <br>
+                        Example :<br>
+                        <code
+                            class="higlighted break-word">curl https://api.teeseng.uk/api/v0/location/update -H "Content-Type: application/json" -X POST -d '{"id": "7" , "name": "SAMPLE", "added_by": "system" , "description": "test"}'</code>
+                        <br>
+                        <br>
+                        Return Response :<br>
+                        <code class="higlighted break-word">{"status":"200","message":"Location 7 updated"}</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>Your API key.</td>
+                                <td>(Required) example: curl https://api.teeseng.uk/api/v0/location/update -H
+                                    "Authorization: {provide your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>ID</td>
+                                <td>JSON</td>
+                                <td>Location ID</td>
+                                <td>(Required) Location ID Example: curl https://api.teeseng.uk/api/v0/location/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"id": "7"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Location name</td>
+                                <td>JSON</td>
+                                <td>Location name.</td>
+                                <td>(Optional) Location name. Example: curl https://api.teeseng.uk/api/v0/location/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"name":"Location name"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Added by </td>
+                                <td>JSON</td>
+                                <td>System or Admin</td>
+                                <td>(Optional) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"added_by":"system"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>JSON</td>
+                                <td>Description of Location</td>
+                                <td>(Optional) System or Admin Example: curl https://api.teeseng.uk/api/v0/location/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"description":"test"}'</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- delete location -->
+                <div class="overflow-hidden content-section" id="content-update-location-by-id">
+                    <h2>Delete Location (Only for system or admin API key)</h2>
+                    <p>
+                        To delete an Location you need to make a DELETE call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/location/delete</code>
+                        <br>
+                        <br>
+                        Example :<br>
+                        <code
+                            class="higlighted break-word">curl https://api.teeseng.uk/api/v0/location/delete -H "Content-Type: application/json" -X POST -d '{"id": "7"}'</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>Your API key.</td>
+                                <td>(Required) example: curl https://api.teeseng.uk/api/v0/location/delete -H
+                                    "Authorization: {provide your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>ID</td>
+                                <td>JSON</td>
+                                <td>Location ID</td>
+                                <td>(Required) Location ID Example: curl https://api.teeseng.uk/api/v0/location/delete
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"id": "7"}'</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="overflow-hidden content-section" id="content-get-sensor">
+                    <h2>Get all sensor</h2>
+                    <p>
+                        To get sensors you need to make a GET call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/sensor</code>
+                        <br>
+                        <br>
+                        Return Response :<br>
+                        <code class="higlighted break-word">{"status":"200"}</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>Your API key.</td>
+                                <td>(Required) Example: curl https://api.teeseng.uk/api/v0/sensor -H "Authorization:
+                                    {provide your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="overflow-hidden content-section" id="content-get-sensor-by-id">
+                    <h2>Get sensor by ID</h2>
+                    <p>
+                        To get Sensor you need to make a GET call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/sensor/{id}</code>
+                        <br>
+                        <br>
+                        Return Response :<br>
+                        <code class="higlighted break-word">{"status":"200"}</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>(Required) Your API key.</td>
+                                <td>Example: curl https://api.teeseng.uk/api/v0/sensor/{id} -H "Authorization: {provide
+                                    your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="overflow-hidden content-section" id="content-add-sensor">
+                    <h2>Add Sensor (Only for system or admin API key)</h2>
+                    <p>
+                        To add a Sensor you need to make a POST call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/sensor/new</code>
+                        <br>
+                        <br>
+                        Example :<br>
+                        <code
+                            class="higlighted break-word">curl https://api.teeseng.uk/api/v0/sensor/new -H "Content-Type: application/json" -X POST -d '{"sensorname": "test", "added_by": "system" , "mac_address": "99-6A-F8-7D-B4-94", "description": "test" , "location": "11"}'</code>
+                        <br>
+                        <br>
+                        Return Response :<br>
+                        <code class="higlighted break-word">{"status":"200"}</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>Your API key.</td>
+                                <td>(Required) Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: {provide your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Sensor name</td>
+                                <td>JSON</td>
+                                <td>Sesnsor name.</td>
+                                <td>(Required) Location name. Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"sensorname": "test"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Added by </td>
+                                <td>JSON</td>
+                                <td>System or Admin</td>
+                                <td>(Required) System or Admin Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"added_by":"system"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Mac Address</td>
+                                <td>JSON</td>
+                                <td>Mac Address</td>
+                                <td>(Required) Mac Address Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"mac_address": "99-6A-F8-7D-B4-94"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>JSON</td>
+                                <td>Description of Sensor</td>
+                                <td>(Required) System or Admin Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"description":"test"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Mac Address</td>
+                                <td>JSON</td>
+                                <td>Mac Address</td>
+                                <td>(Required) Mac Address Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"mac_address": "99-6A-F8-7D-B4-94"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Location</td>
+                                <td>JSON</td>
+                                <td>Location</td>
+                                <td>(Required) Location Example: curl https://api.teeseng.uk/api/v0/sensor/new
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"location": "11"}'</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="overflow-hidden content-section" id="content-update-sensor-by-id">
+                    <h2>Update Sensor (Only for system or admin API key)</h2>
+                    <p>
+                        To update a Sensor you need to make a PUT call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/sensor/update</code>
+                        <br>
+                        <br>
+                        Example :<br>
+                        <code
+                            class="higlighted break-word">curl https://api.teeseng.uk/api/v0/sensor/update -H "Content-Type: application/json" -X POST -d '{"id": "2" ,"sensorname": "test", "added_by": "system" , "mac_address": "99-6A-F8-7D-B4-94" , "description": "test123" , "location": "11" }'</code>
+                        <br>
+                        <br>
+                        Return Response :<br>
+                        <code class="higlighted break-word">{"status":"200","message":"Sensor 2 updated"}</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>Your API key.</td>
+                                <td>(Required) example: curl https://api.teeseng.uk/api/v0/sensor/update -H
+                                    "Authorization: {provide your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>ID</td>
+                                <td>JSON</td>
+                                <td>Sensor ID</td>
+                                <td>(Required) Sensor ID Example: curl https://api.teeseng.uk/api/v0/sensor/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"id": "7"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Sensor name</td>
+                                <td>JSON</td>
+                                <td>Sensor name.</td>
+                                <td>(Optional) Sensor name. Example: curl https://api.teeseng.uk/api/v0/sensor/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"sensorname": "test"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Added by </td>
+                                <td>JSON</td>
+                                <td>System or Admin</td>
+                                <td>(Optional) System or Admin Example: curl https://api.teeseng.uk/api/v0/sensor/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"added_by":"system"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Mac Address </td>
+                                <td>JSON</td>
+                                <td>Mac Address</td>
+                                <td>(Optional) Mac Address Example: curl https://api.teeseng.uk/api/v0/sensor/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"mac_address": "99-6A-F8-7D-B4-94"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>JSON</td>
+                                <td>Description of Sensor</td>
+                                <td>(Optional) Description of Sensor Example: curl
+                                    https://api.teeseng.uk/api/v0/sensor/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"description":"test"}'</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Location</td>
+                                <td>JSON</td>
+                                <td>Location of Sensor</td>
+                                <td>(Optional) Location of Sensor Example: curl
+                                    https://api.teeseng.uk/api/v0/sensor/update
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"location": "11"}'</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="overflow-hidden content-section" id="content-delete-sensor-by-id">
+                    <h2>Delete Sensor (Only for system or admin API key)</h2>
+                    <p>
+                        To delete a sensor you need to make a DELETE call to the following url :<br>
+                        <code class="higlighted break-word">https://api.teeseng.uk/api/v0/sensor/delete</code>
+                        <br>
+                        <br>
+                        Example :<br>
+                        <code
+                            class="higlighted break-word">curl https://api.teeseng.uk/api/v0/sensor/delete -H "Content-Type: application/json" -X POST -d '{"id": "7"}'</code>
+                    </p>
+                    <br>
+                    <h4>QUERY PARAMETERS</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Authorization</td>
+                                <td>JSON</td>
+                                <td>Your API key.</td>
+                                <td>(Required) example: curl https://api.teeseng.uk/api/v0/sensor/delete -H
+                                    "Authorization: {provide your
+                                    API key here}"</td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>ID</td>
+                                <td>JSON</td>
+                                <td>Sensor ID</td>
+                                <td>(Required) Sensor ID Example: curl https://api.teeseng.uk/api/v0/sensor/delete
+                                    -H "Authorization: provide
+                                    your API key here" -d '{"id": "7"}'</td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="api-keys-header  iot-card" id="content-get-api">
+                        <h2>API Keys</h2>
+                        <p>
+                            You can generate API Keys here:
+                        </p>
+                        <form action="token/new" onsubmit="formAJAX(this)" class="api-form">
+                            <div class="card-header shadow actionMessage" style="display:none;"></div>
+                            <input type="email" name="email" id="email" placeholder="Email address"
+                                pattern="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*">
+                            <div style="margin-top: 10px;"></div> 
+                            <button class="generate-key-button">Generate Key</button>
+
+                        </form>
+
+                    </div>
+                </div>
+
+                <div class="overflow-hidden content-section" id="content-errors">
+                    <h2>Errors</h2>
+                    <p>
+                        The EcoSaver API uses the following error codes:
+                    </p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Error Code</th>
+                                <th>Meaning</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>X000</td>
+                                <td>
+                                    Some parameters are missing. This error appears when you don't pass every
+                                    mandatory
+                                    parameters.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>403</td>
+                                <td>
+                                    Unknown or unvalid <code class="higlighted">secret_key</code>. This error
+                                    appears if
+                                    you use an unknow API key or if your API key expired.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>500</td>
+                                <td>
+                                    Unvalid <code class="higlighted">secret_key</code> No API key was supplied.
+                                    Invalid
+                                    request.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>X003</td>
+                                <td>
+                                    Unknown or unvalid user <code class="higlighted">token</code>. This error
+                                    appears if
+                                    you use an unknow user <code class="higlighted">token</code> or if the user
+                                    <code class="higlighted">token</code> expired.
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+        </div>
+        </div>
 
-             
-             
+    </body>
+    <script src="js/api.js"></script>
 
-         </div>
-     </div>
-
- </body>
- <script src="js/api.js"></script>
- <script src="js/apikey.js"></script>
-
- </html>
+    </html>

@@ -1,20 +1,14 @@
-const moment = require("moment");
-const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
-
 //time is taken from the token
-function isValid(time){
-    const timeDiff = moment(currentTime).diff(time, "minutes");
+function isValid(time) {
 
-    if (timeDiff > 1) {
-        console.log(timeDiff);
-        return false;
-    }
-
-    return true;
-
+	if (
+		Math.floor(new Date(time).getTime() / 1000) <
+		Math.floor(new Date().getTime() / 1000)
+	) {
+		return false;
+	}
+	return true;
+    
 }
-
-
-
 
 module.exports = { isValid };

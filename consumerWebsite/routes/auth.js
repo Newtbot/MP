@@ -1,4 +1,5 @@
-const { addUser, loginUser } = require("../functions/user");
+const { addUser, loginUser, checkEmail } = require("../functions/user");
+const { sendContactEmail } = require("../functions/nodeMail");
 
 const express = require("express");
 const router = express.Router();
@@ -12,12 +13,11 @@ router.post("/register", async (req, res, next) => {
 			error.message = "The user failed to be craated";
 			error.status = 400;
 			return next(error);
+		} else {
+			return res.json({
+				message: "User created successfully",
+			});
 		}
-    else{
-      return res.json({
-        message: "User created successfully",
-      });
-    }
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -29,20 +29,18 @@ router.post("/login", async (req, res, next) => {
 	try {
 		let Res = await loginUser(req.body);
 		if (Res == false) {
-      let error = new Error("User Login Failed");
+			let error = new Error("User Login Failed");
 			error.status = 400;
 			return next(error);
+		} else {
+			//pass res back to form to be set in local storage
+			return res.json({
+				message: "User login successfully",
+				token: Res.token,
+				userid: Res.userid,
+				username: Res.username,
+			});
 		}
-    else{
-      //pass res back to form to be set in local storage
-      return res.json({
-        message: "User login successfully",
-        token: Res.token,
-        userid: Res.userid,
-        username: Res.username,
-      }); 
-
-    }
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -52,8 +50,26 @@ router.post("/login", async (req, res, next) => {
 //contact
 //auth/contact
 router.post("/contact", async (req, res, next) => {
-
+	try {
+		//console.log(req.body);
+		let Res = await checkEmail(req.body.email);
+		if (!Res) {
+			let error = new Error("Email not found");
+			error.status = 400;
+			return next(error);
+		}
+		else{
+			//console.log(Res);
+			sendContactEmail(req.body.email, req.body.name, req.body.message);
+			return res.json({
+				message: "Email sent successfully",
+			});
+			
+		}
+	} catch (error) {
+		console.error(error);
+		next(error);
+	}
 });
 
 module.exports = router;
-
