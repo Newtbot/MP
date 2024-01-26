@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const validator = require('validator');
 const axios = require('axios');
+const pidusage = require('pidusage');
 
 const { validationResult } = require('express-validator');
 const { locationValidation, locationValidationUpdate, locationdeleteValidation
@@ -197,17 +198,28 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 		}
   
 		// Redirect to the login page after logout
-		res.redirect("/login");
+		res.redirect("/index");
 	  });
 	} catch (error) {
 	  console.error("Error in logout route:", error);
 	  res.status(500).send("Internal Server Error");
 	}
   });
-  
+  const getSystemHealth = async () => {
+	const cpuInfo = await pidusage(process.pid);
+	return {
+	  serverStatus: { uptime: process.uptime() },
+	  databaseStatus: { connected: true }, // Replace with actual logic
+	  resourceUtilization: {
+		cpuUsage: cpuInfo.cpu,
+		memoryUsage: process.memoryUsage(),
+	  },
+	  networkHealth: { latency: 10 }, // Replace with actual logic
+	};
+  };
   app.get("/home", isAuthenticated, async (req, res) => {
-	
-	  res.render("home", { username: req.session.username});
+	const systemHealth = await getSystemHealth();
+	  res.render("home", { username: req.session.username, systemHealth});
 	});
 
 	app.get("/inusers", isAuthenticated, async (req, res) => {

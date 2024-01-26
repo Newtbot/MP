@@ -28,9 +28,46 @@
   <main>
     <h2>Welcome to the Home Page, <%= username %>!</h2>
   </main>
+  <section>
+    <div class="health-container">
+      <h4>Server Uptime</h4>
+      <ul>
+        <li><strong>Uptime:</strong> <span id="serverUptime"><%= systemHealth && systemHealth.serverStatus ? (systemHealth.serverStatus.uptime / 60).toFixed(2) : 'N/A' %> minutes</span></li>
+      </ul>
+    </div>
+
+    <div class="health-container">
+      <h4>Database Status</h4>
+      <ul>
+        <li><strong>Status:</strong> <%= systemHealth && systemHealth.databaseStatus ? (systemHealth.databaseStatus.connected ? 'Connected' : 'Disconnected') : 'N/A' %></li>
+      </ul>
+    </div>
+
+    <div class="health-container">
+      <h4>CPU Usage</h4>
+      <ul>
+        <li><strong>Usage:</strong> <span id="cpuUsage"><%= systemHealth && systemHealth.resourceUtilization ? systemHealth.resourceUtilization.cpuUsage.toFixed(2) : 'N/A' %> %</span></li>
+      </ul>
+    </div>
+
+    <div class="health-container">
+      <h4>Memory Usage</h4>
+      <ul>
+        <li><strong>Usage:</strong> <%= systemHealth && systemHealth.resourceUtilization ? (systemHealth.resourceUtilization.memoryUsage.rss / (1024 * 1024)).toFixed(2) : 'N/A' %> MB</li>
+      </ul>
+    </div>
+
+    <div class="health-container">
+      <h4>Network Latency</h4>
+      <ul>
+        <li><strong>Latency:</strong> <%= systemHealth && systemHealth.networkHealth ? systemHealth.networkHealth.latency : 'N/A' %> ms</li>
+      </ul>
+    </div>
+  </section>
   <footer>
     Any Issue faced, Please contact the administrator at 11111111 or ecosaverAdmin@gmail.com
 </footer>
+
 </body>
 
 </html>
