@@ -1,43 +1,187 @@
 <%- include('top') %>
-<link href="css/data.css" rel="stylesheet" />
+    <link href="css/data.css" rel="stylesheet" />
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<br>
-<br>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript">
+        // Require login to see this page.
+        app.auth.forceLogin()
+    </script>
+    <br>
+    <br>
 
+    <body>
 
-<body>
-
-    <div class="air-quality-container">
-        <%#
-        <div class="graphbutton-container">
-            <button id="barButton">Bar Graph</button>
-            <button id="lineButton">Line Graph</button>
-        </div> %>
-        <div class="chart-container">
-            <canvas id="dataChart"></canvas>
+        <div class="air-quality-container">
+            <div class="querybutton-container" id="querybutton-container">
+                <!-- <button id="yearButton">Year</button>
+                <button id="monthButton">Month</button>
+                <button id="weekButton">Week</button> -->
+                <button id="dayButton">Day</button>
+            </div>
+            <br>
+            <div class="chart-container">
+                <canvas id="dataChart"></canvas>
+            </div>
+            <!-- <div class="button-container"> 
+                <button id="psiButton">PSI</button>
+                <button id="tempButton">Temperature</button>
+                <button id="humButton">Humidity</button>
+                <button id="o3Button">O3</button>
+                <button id="no2Button">NO2</button>
+                <button id="so2Button">SO2</button>
+                <button id="coButton">CO</button>
+            </div>
+            -->
+            <br>
+            <div class="download-container">
+                <p>Download data here:</p>
+                <button id="downloadCSVButton" onclick="downloadCSV()">Download CSV</button>
+                <br><br>
+                <button id="downloadCSVButton" onclick="downloadExcel()">Download Excel Sheet</button>
+            </div>
         </div>
-        <div class="button-container">
-            <button id="aqiButton">AQI</button>
-            <button id="tempButton">Temperature</button>
-            <button id="humButton">Humidity</button>
-            <button id="pm25Button">PM2.5</button>
-            <button id="pm10Button">PM10</button>
-            <button id="o3Button">O3</button>
-            <button id="no2Button">NO2</button>
-            <button id="so2Button">SO2</button>
-            <button id="coButton">CO</button>
-        </div>
-        <div class="download-container">
-            <p>Download data here:</p>
-            <button id="downloadCSVButton">Download CSV</button>
-        </div>
-    </div>
 
-</body>
+    </body>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <script src="js/data.js"></script>
+    <!-- //download csv and excel -->
+    <script type="text/javascript">
+        //https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
+        function exportToCsv(filename, rows) {
+            var processRow = function (row) {
+                var finalVal = '';
+                for (var j = 0; j < row.length; j++) {
+                    var innerValue = row[j] === null ? '' : row[j].toString();
+                    if (row[j] instanceof Date) {
+                        innerValue = row[j].toLocaleString();
+                    };
+                    var result = innerValue.replace(/"/g, '""');
+                    if (result.search(/("|,|\n)/g) >= 0)
+                        result = '"' + result + '"';
+                    if (j > 0)
+                        finalVal += ',';
+                    finalVal += result;
+                }
+                return finalVal + '\n';
+            };
 
+            var csvFile = '';
+            for (var i = 0; i < rows.length; i++) {
+                csvFile += processRow(rows[i]);
+            }
 
-<br>
-<br>
+            var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, filename);
+            } else {
+                var link = document.createElement("a");
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", filename);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }
+        }
+        //content="application/vnd.ms-excel;charset=utf-8"
+        function exportToExcel(filename, rows) {
+            var processRow = function (row) {
+                var finalVal = '';
+                for (var j = 0; j < row.length; j++) {
+                    var innerValue = row[j] === null ? '' : row[j].toString();
+                    if (row[j] instanceof Date) {
+                        innerValue = row[j].toLocaleString();
+                    }
+                    var result = innerValue.replace(/"/g, '""');
+                    if (result.search(/("|,|\n)/g) >= 0) {
+                        result = '"' + result + '"';
+                    }
+                    if (j > 0) {
+                        finalVal += '\t'; // Use tabs for Excel format
+                    }
+                    finalVal += result;
+                }
+                return finalVal + '\n';
+            };
 
-<%- include('bot') %>
+            var excelFile = '';
+            for (var i = 0; i < rows.length; i++) {
+                excelFile += processRow(rows[i]);
+            }
+
+            var blob = new Blob([excelFile], { type: "application/vnd.ms-excel;charset=utf-8" });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, filename + '.xls');
+            } else {
+                var link = document.createElement("a");
+                if (link.download !== undefined) { // Feature detection
+                    // Browsers that support HTML5 download attribute
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", filename);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }
+        }
+
+        //onclick call
+        function downloadCSV() {
+            app.api.get('sensor-data/', function (error, data) {
+                //to loop through the data and assign into map array
+                var formattedData = data.map(function (item) {
+                    return [
+                        item.id,
+                        item.sensorid,
+                        item.locationid,
+                        JSON.stringify(item.measurement), //to handle measurement object
+                        item.createdAt
+                    ];
+                });
+                exportToCsv('export.csv', [
+                    ['id', 'sensorid', 'locationid', 'measurement', 'createdAt'],
+                    ...formattedData
+                ]);
+
+            });
+        }
+        function downloadExcel() {
+            app.api.get('sensor-data/', function (error, data) {
+                //to loop through the data and assign into map array
+                var formattedData = data.map(function (item) {
+                    return [
+                        item.id,
+                        item.sensorid,
+                        item.locationid,
+                        JSON.stringify(item.measurement), //to handle measurement object
+                        item.createdAt
+                    ];
+                });
+                exportToExcel('export.xls', [
+                    ['id', 'sensorid', 'locationid', 'measurement', 'createdAt'],
+                    ...formattedData
+                ]);
+
+            });
+        }
+
+    </script>
+
+    <%- include('bot') %>

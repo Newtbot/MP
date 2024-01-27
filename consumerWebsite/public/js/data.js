@@ -1,184 +1,154 @@
-const buttons = document.querySelectorAll('.button-container button');
-const ctx = document.getElementById('dataChart').getContext('2d');
+//getting button from DOM id
+const buttons = document.querySelectorAll(".button-container button");
+const queryButton = document.getElementById("querybutton-container");
+const ctx = document.getElementById("dataChart").getContext("2d");
 
+$(document).ready(async function () {
+	//https://stackoverflow.com/questions/9045868/javascript-date-getweek
+	Date.prototype.getWeek = function () {
+		var onejan = new Date(this.getFullYear(), 0, 1);
+		var today = new Date(this.getFullYear(), this.getMonth(), this.getDate());
+		var dayOfYear = (today - onejan + 86400000) / 86400000;
+		return Math.ceil(dayOfYear / 7);
+	};
+	let date = new Date();
+	var week = date.getWeek();
+	var today = date.getDate();
+	var month = date.getMonth() + 1; // Adding 1 to get the actual month number
+	var year = date.getFullYear();
+	//year data
+	app.api.get("sensor-data/data?year=" + year, function (error, data) {
+		//console.log(data);
+	});
+	//monthly data
+	app.api.get("sensor-data/data?month=" + month, function (error, data) {
+		//console.log(data);
+	});
+	//weekly data
+	app.api.get(
+		"sensor-data/data?month=" + month + "&week=" + week,
+		function (error, data) {
+			//console.log(data);
+		}
+	);
+	//daily data
+	app.api.get(
+		"sensor-data/data?month=" + month + "&week=" + week + "&day=" + today,
+		function (error, data) {
+			for (let rows of data) {
+                console.log(rows);
+                getDate(rows.CreatedAt);
+
+			}
+		}
+	);
+});
+
+function getDate(date){
+    console.log(date);
+
+}
+
+/*
+
+(async function() {
+  const data = [
+    { year: 2010, count: 10 },
+    { year: 2011, count: 20 },
+    { year: 2012, count: 15 },
+    { year: 2013, count: 25 },
+    { year: 2014, count: 22 },
+    { year: 2015, count: 30 },
+    { year: 2016, count: 28 },
+  ];
+
+  new Chart(
+    document.getElementById('acquisitions'),
+    {
+      type: 'bar',
+      data: {
+        labels: data.map(row => row.year),
+        datasets: [
+          {
+            label: 'Acquisitions by year',
+            data: data.map(row => row.count)
+          }
+        ]
+      }
+    }
+  );
+})();
+*/
 // Initial dataset (AQI)
 const initialData = {
-    labels: ['', 'Jan 22 11:00 PM', '', '', 'Jan 23 2:00 AM', '', '', 'Jan 23 5:00 AM', '', '', 'Jan 23 8:00 AM', '',],
-    datasets: [{
-        label: 'AQI',
-        data: [50, 60, 60, 80, 30, 60, 54, 60, 43, 30, 60, 60],
-        backgroundColor: 'green',
-        borderColor: 'green',
-    }]
+	//date and time
+    labels: [ date.map(row => row.CreatedAt)],
+	datasets:[
+		{
+			//data like psi
+			label: "Average PSI Data",
+			data: [],
+			backgroundColor: "green",
+			borderColor: "green",
+		},
+	],
 };
 
+//setting chart
 const chart = new Chart(ctx, {
-    type: 'bar',
-    data: initialData,
-    options: {
-        responsive: true,
-        title: {
-            display: true,
-            text: 'HISTORICAL'
-        },
-        subtitle: {
-            display: true,
-            text: 'Historic air quality graph for Singapore'
-        },
-        legend: {
-            display: false
-        },
-        tooltips: {
-            mode: 'index',
-            intersect: false,
-            callbacks: {
-                label: function (tooltipItem, data) {
-                    const label = data.labels[tooltipItem.index];
-                    return label + ': ' + data.datasets[0].data[tooltipItem.index];
-                }
-            }
-        },
-        scales: {
-            xAxes: [{
-                barPercentage: 0.6,
-                categoryPercentage: 0.7,
-                ticks: {
-                    autoSkip: true,
-                },
-                maxRotation: 0,
-                minRotation: 0
-            }],
-            yAxes: [{
-                title: {
-                    display: true,
-                    text: 'Value'
-                }
-            }]
-        }
-    }
+	type: "bar",
+	data: initialData,
+	options: {
+		responsive: true,
+		title: {
+			display: true,
+			text: "HISTORICAL",
+		},
+		subtitle: {
+			display: true,
+			text: "Historic air quality graph for Singapore",
+		},
+		legend: {
+			display: false,
+		},
+		tooltips: {
+			mode: "index",
+			intersect: false,
+			callbacks: {
+				label: function (tooltipItem, data) {
+					const label = data.labels[tooltipItem.index];
+					return label + ": " + data.datasets[0].data[tooltipItem.index];
+				},
+			},
+		},
+		scales: {
+			xAxes: [
+				{
+					barPercentage: 0.6,
+					categoryPercentage: 0.7,
+					ticks: {
+						autoSkip: true,
+					},
+					maxRotation: 0,
+					minRotation: 0,
+				},
+			],
+			yAxes: [
+				{
+					title: {
+						display: true,
+						text: "Value",
+					},
+				},
+			],
+		},
+	},
 });
 
-// Function to update chart data based on the selected button
-const updateChart = (data) => {
-    chart.data = data;
-    chart.update();
-};
+queryButton.addEventListener("click", (event) => {
+	const clickedButton = event.target;
+	//console.log(clickedButton.id);
 
-// Event listener for button clicks
-buttons.forEach(button => {
-    button.addEventListener('click', () => {
-        // Implement logic to switch data based on clicked button
-        const buttonId = button.id.toLowerCase();
-        let newData;
-
-        // Example: Switch data based on button clicked
-        switch (buttonId) {
-            case 'aqibutton':
-                newData = {
-                    labels: ['', 'Jan 22 11:00 PM', '', '', 'Jan 23 2:00 AM', '', '', 'Jan 23 5:00 AM', '', '', 'Jan 23 8:00 AM', '',],
-                    datasets: [{
-                        label: 'AQI',
-                        data: [50, 60, 60, 80, 30, 60, 54, 60, 43, 30, 60, 60],
-                        backgroundColor: 'green',
-                        borderColor: 'green',
-                    }]
-                };
-
-                break;
-            case 'tempbutton':
-                newData = {
-                    labels: ['Jan 22 11:00 PM', 'Jan 23 12:00 AM', 'Jan 23 1:00 AM', 'Jan 23 2:00 AM'],
-                    datasets: [{
-                        label: 'Temperature',
-                        data: [25, 30, 40, 35],
-                        backgroundColor: 'green',
-                        borderColor: 'green',
-                    }]
-                };
-                break;
-            case 'humbutton':
-                newData = {
-                    labels: ['Jan 22 11:00 PM', 'Jan 23 12:00 AM', 'Jan 23 1:00 AM', 'Jan 23 2:00 AM'],
-                    datasets: [{
-                        label: 'Humidity',
-                        data: [25, 30, 40, 35],
-                        backgroundColor: 'green',
-                        borderColor: 'green',
-                    }]
-                };
-                break;
-            case 'pm25button':
-                newData = {
-                    labels: ['Jan 22 11:00 PM', 'Jan 23 12:00 AM', 'Jan 23 1:00 AM', 'Jan 23 2:00 AM'],
-                    datasets: [{
-                        label: 'PM2.5',
-                        data: [25, 30, 40, 35],
-                        backgroundColor: 'green',
-                        borderColor: 'green',
-                    }]
-                };
-                break;
-            case 'pm10button':
-                newData = {
-                    labels: ['Jan 22 11:00 PM', 'Jan 23 12:00 AM', 'Jan 23 1:00 AM', 'Jan 23 2:00 AM'],
-                    datasets: [{
-                        label: 'PM10',
-                        data: [25, 30, 40, 35],
-                        backgroundColor: 'green',
-                        borderColor: 'green',
-                    }]
-                };
-                break;
-            case 'o3button':
-                newData = {
-                    labels: ['Jan 22 11:00 PM', 'Jan 23 12:00 AM', 'Jan 23 1:00 AM', 'Jan 23 2:00 AM'],
-                    datasets: [{
-                        label: 'O3',
-                        data: [25, 30, 40, 35],
-                        backgroundColor: 'green',
-                        borderColor: 'green',
-                    }]
-                };
-                break;
-            case 'no2button':
-                newData = {
-                    labels: ['Jan 22 11:00 PM', 'Jan 23 12:00 AM', 'Jan 23 1:00 AM', 'Jan 23 2:00 AM'],
-                    datasets: [{
-                        label: 'NO2',
-                        data: [25, 30, 40, 35],
-                        backgroundColor: 'green',
-                        borderColor: 'green',
-                    }]
-                };
-                break;
-            case 'so2button':
-                newData = {
-                    labels: ['Jan 22 11:00 PM', 'Jan 23 12:00 AM', 'Jan 23 1:00 AM', 'Jan 23 2:00 AM'],
-                    datasets: [{
-                        label: 'SO2',
-                        data: [25, 30, 40, 35],
-                        backgroundColor: 'green',
-                        borderColor: 'green',
-                    }]
-                };
-                break;
-            case 'cobutton':
-                newData = {
-                    labels: ['Jan 22 11:00 PM', 'Jan 23 12:00 AM', 'Jan 23 1:00 AM', 'Jan 23 2:00 AM'],
-                    datasets: [{
-                        label: 'CO',
-                        data: [25, 30, 40, 35],
-                        backgroundColor: 'green',
-                        borderColor: 'green',
-                    }]
-                };
-                break;
-
-            default:
-                newData = initialData; // Default to initial data (AQI)
-                break;
-        }
-
-        updateChart(newData);
-    });
+	//make it switch bar chart based on query button
 });
+

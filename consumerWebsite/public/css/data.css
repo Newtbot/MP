@@ -15,14 +15,16 @@
 
 .button-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around; /* Change this value to adjust the spacing */
     margin: 20px 0;
 }
+
 
 #download-container {
     display: flex;
     align-items: center;
     margin-top: 20px; /* Adjust the margin-top for spacing */
+
 }
 
 button {
