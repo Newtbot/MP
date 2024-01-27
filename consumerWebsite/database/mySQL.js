@@ -6,8 +6,8 @@ const fs = require('fs');
 
 const sequelize = new Sequelize(
  "eco_saver",
- process.env.DB_USER,
- process.env.DB_PASS,
+ "DB_USER='mpuser",
+ "DB_PASS='majorprojectpassword1234!",
  {
     host: "mpsqldatabasean.mysql.database.azure.com",
     dialect: 'mysql',
