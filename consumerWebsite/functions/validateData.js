@@ -1,5 +1,9 @@
 var validator = require("validator");
 
+/*
+All the validation functions are used by database model.
+*/
+
 const dateRegex = /^[A-Za-z]{3}, \d{2} [A-Za-z]{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/;
 
 function isValidDateString(value) {

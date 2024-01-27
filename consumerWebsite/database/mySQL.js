@@ -15,7 +15,7 @@ const sequelize = new Sequelize(
     attributeBehavior: 'escape',
     dialectOptions: {
       ssl: {
-         ca: fs.readFileSync(path.resolve(__dirname, '../cert/DigiCertGlobalRootCA.crt.pem')),
+         ca: fs.readFileSync(path.resolve(__dirname, '../cert/DigiCertGlobalRootCA.crt_3.pem')),
       },
 
     },

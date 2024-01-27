@@ -30,7 +30,7 @@ async function getTokenByToken(token) {
 	return token;
 }
 
-async function addToken(userId, permission, expiry) {
+async function addToken(userId, permission, isKey ,expiry) {
 	let uuid = await generateUUID();
 	let hashtoken = await hash(uuid);
 	//console.log("user id", userId);
@@ -41,6 +41,7 @@ async function addToken(userId, permission, expiry) {
 		userid: userId,
 		token: hashtoken,
 		permission: permission,
+		isKey: isKey,
 		expiration: expiry,
 	});
 
@@ -48,4 +49,16 @@ async function addToken(userId, permission, expiry) {
 	return token.id + "-" + uuid;
 }
 
-module.exports = { addToken, getTokenByToken };
+async function checkToken(id) {
+	let tokenRes = await tokenModel.findOne(
+		{
+			where: {
+				userid: id,
+			}
+		}
+
+	);	
+	return tokenRes;
+}
+
+module.exports = { addToken, getTokenByToken , checkToken};

@@ -3,7 +3,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 const { sequelize } = require("../mySQL");
 const { userModel } = require("./userModel");
 
-sequelize.sync();
+//sequelize.sync();
 const tokenModel = sequelize.define(
 	"token",
 	{
@@ -47,6 +47,14 @@ const tokenModel = sequelize.define(
 				len: [1, 255],
 				isIn: [["canRead", "canWrite",]],
 			},
+		},
+		isKey: {
+			type: DataTypes.STRING,
+			allowNull: true,
+			length: 45,
+			validate:{
+				isIn: [["isKey" , "isNotKey"]],
+			}	
 		},
 		expiration: {
 			type: DataTypes.DATE,

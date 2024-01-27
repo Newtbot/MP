@@ -2,7 +2,6 @@ const express = require("express");
 const { rateLimit } = require("express-rate-limit");
 const path = require("path");
 const app = express();
-const port = 3000;
 const ejs = require("ejs");
 
 module.exports = app;

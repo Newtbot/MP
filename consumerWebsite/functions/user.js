@@ -84,7 +84,7 @@ async function loginUser(user) {
 	//let tokenToLive = moment().add(30, 'minutes').format();
 	let currentDate = new Date();
 	let tokenToLive = new Date(currentDate.getTime() + 30 * 60000);
-	let token = await addToken(userRes.id , "canRead" , tokenToLive);
+	let token = await addToken(userRes.id , "canRead" , "isNotKey" , tokenToLive);
 	return { token: token, userid: userRes.id, username: userRes.username };
 }
 

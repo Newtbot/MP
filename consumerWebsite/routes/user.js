@@ -7,7 +7,7 @@ const router = express.Router();
 //getbyid
 router.get("/me", async function (req, res, next) {
 	try {
-		let user = await getUserByID(req.user);
+		let user = await getUserByID(req.user); //req.user assigned in middleware!
 		//console.log(user);
 		res.json({
 			user: user,
