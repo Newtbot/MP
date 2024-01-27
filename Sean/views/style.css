@@ -636,3 +636,40 @@ footer {
   .custom-location-form h3 {
     color: #333; /* Customize the heading color */
   }
+  section {
+    margin-top: 20px;
+    display: flex; /* Use flexbox to arrange items in a row */
+    justify-content: space-between; /* Distribute items evenly along the main axis */
+  }
+
+  .health-container {
+    width: 200px; /* Set a fixed width for square shape */
+    height: 200px; /* Set a fixed height for square shape */
+    background-color: #f0f0f0; /* Background color */
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
+    transition: transform 0.3s ease-in-out; /* Add a subtle transition effect */
+  }
+
+  .health-container:hover {
+    transform: scale(1.05); /* Scale up on hover */
+  }
+
+  .health-container h4 {
+    text-align: center;
+    color: #333; /* Heading color */
+  }
+
+  .health-container ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  .health-container li {
+    margin: 5px 0;
+    color: #555; /* Text color */
+  }
