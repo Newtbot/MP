@@ -100,3 +100,16 @@ body {
     background-color: #213f6d; 
     color: #fff;
 }
+
+.custom-btn {
+    display: inline-block;
+    padding: 10px 20px; /* Adjust padding as needed */
+    background-color: #3498db; /* Change background color */
+    color: #ffffff; /* Change text color */
+    text-decoration: none;
+    border-radius: 5px; /* Add rounded corners if desired */
+}
+
+.custom-btn:hover {
+    background-color: #2980b9; /* Change background color on hover */
+}

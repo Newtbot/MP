@@ -1,21 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
     function updateAdditionalInfo(region) {
         const infoContainer = document.getElementById("additional-info");
-// Replace the following with actual data retrieval based on the region
-const aqi = "15";
-const temperature = "25°C";
-const humidity = "60%";
-const pm25 = "10";
-const pm10 = "20";
-const so2 = "5";
-const o3 = "35";
-const co = "0.5";
-const no2 = "15";
+        // Replace the following with actual data retrieval based on the region
+        const aqi = "15";
+        const temperature = "25°C";
+        const humidity = "60%";
+        const pm25 = "10";
+        const pm10 = "20";
+        const so2 = "5";
+        const o3 = "35";
+        const co = "0.5";
+        const no2 = "15";
 
-infoContainer.innerHTML = `
+        infoContainer.innerHTML = `
     <div class="additional-info-box">
         <h3>Additional Information - ${region}</h3>
-        <button id="downloadCsvButton">Download CSV</button>
+        <button id="viewData">View Data</button>
         <div class="info-item">
             <span class="info-label">Air Quality Index:</span>
             <span class="info-value">${aqi}</span>
@@ -54,7 +54,13 @@ infoContainer.innerHTML = `
         </div>
     </div>
 `;
+        var viewDataButton = document.getElementById("viewData");
 
+        // Add a click event listener to the button
+        viewDataButton.addEventListener("click", function () {
+            // Redirect to the "viewdata.ejs" page
+            window.location.href = "/viewdata";
+        });
 
         // Remove the 'active' class from all info-box elements
         const infoBoxes = document.querySelectorAll('.info-box');
@@ -65,12 +71,14 @@ infoContainer.innerHTML = `
         clickedBox.classList.add('active');
     }
 
+
+
     const defaultRegion = "North";
     const defaultBox = document.getElementById(defaultRegion.toLowerCase());
     defaultBox.classList.add('active');
     const defaultAqi = "--"; // Replace with actual data retrieval
     updateAdditionalInfo(defaultRegion, defaultAqi);
-    
+
     // Event listeners for each region's info-box
     document.getElementById("north").addEventListener("click", function () {
         const northAqi = "--"; // Replace with actual data retrieval
@@ -116,4 +124,5 @@ document.getElementById("west").addEventListener("click", function () {
 document.getElementById("central").addEventListener("click", function () {
     updateAdditionalInfo("Central");
 });
+
 
