@@ -6,8 +6,8 @@ const fs = require('fs');
 
 const sequelize = new Sequelize(
  "eco_saver",
- "DB_USER='mpuser",
- "DB_PASS='majorprojectpassword1234!",
+ process.env.DB_USER,
+ process.env.DB_PASS,
  {
     host: "mpsqldatabasean.mysql.database.azure.com",
     dialect: 'mysql',
@@ -15,7 +15,7 @@ const sequelize = new Sequelize(
     attributeBehavior: 'escape',
     dialectOptions: {
       ssl: {
-         ca: fs.readFileSync(path.resolve(__dirname, '../cert/DigiCertGlobalRootCA.crt_3.pem')),
+         ca: fs.readFileSync(path.resolve(__dirname, '../cert/DigiCertGlobalRootCA.crt.pem')),
       },
 
     },
