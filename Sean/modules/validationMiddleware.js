@@ -20,7 +20,7 @@ const locationdeleteValidation = [
 const sensorValidation = [
 	body('sensorname').trim().isLength({ min: 1 }).withMessage('Sensor Name must not be empty').escape(),
 	body('added_by').trim().isLength({ min: 1 }).withMessage('Added by must not be empty').escape(),
-	body('macAddress').custom(value => {
+	body('macAddress').escape().custom(value => {
 	  const macAddressRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
 	  if (!macAddressRegex.test(value)) {
 		throw new Error('Invalid MAC address format');
@@ -35,7 +35,7 @@ const sensorupdateValidation = [
 	body('id').trim().escape(),
 	body('sensorname').trim().isLength({ min: 1 }).withMessage('Sensor Name must not be empty').escape(),
 	body('added_by').trim().isLength({ min: 1 }).withMessage('Added by must not be empty').escape(),
-	body('macAddress').custom(value => {
+	body('macAddress').escape().custom(value => {
 	  const macAddressRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
 	  if (!macAddressRegex.test(value)) {
 		throw new Error('Invalid MAC address format');
