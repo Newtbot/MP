@@ -40,3 +40,7 @@ const sendOTPByEmail = async (email, otp) => {
     generateOTP,
     sendOTPByEmail
   };
+
+
+
+  
