@@ -1,12 +1,13 @@
 const nodemailer = require("nodemailer");
 const otpGenerator = require('otp-generator');
-const path = require('path')
+const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
 
 const generateOTP = () => {
-	const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false });
+	const otp = otpGenerator.generate(8, { upperCase: true, specialChars: true });
 	const expirationTime = Date.now() + 5 * 60 * 1000; // 5 minutes expiration
 	return { otp, expirationTime };
+
   };
 const sendOTPByEmail = async (email, otp) => {
 	try {

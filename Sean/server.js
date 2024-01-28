@@ -77,6 +77,7 @@ app.post('/login', loginValidation, async (req, res) => {
         req.session.otp = otp;
         req.session.otpExpiration = expirationTime;
         req.session.save();
+		console.log(otp);
 
         try {
           await sendOTPByEmail(user.email, otp);
@@ -160,7 +161,7 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 		req.session.authenticated = true;
 		req.session.username = req.body.username;
 		req.session.sessionToken = sessionToken;
-		csrfTokenSession = crypto.randomBytes(32).toString('hex');
+		req.session.csrfToken = crypto.randomBytes(32).toString('hex');
   
 		res.cookie('sessionToken', sessionToken, { secure: true, httpOnly: true, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // Expires in 1 day
   
@@ -205,16 +206,27 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 	  res.status(500).send("Internal Server Error");
 	}
   });
+
+  const getDatabaseStatus = async () => {
+	try {
+	  await sequelize.authenticate();
+	  return { connected: true };
+	} catch (error) {
+	  console.error('Database connection error:', error);
+	  return { connected: false, error: error.message };
+	}
+  };
+  
   const getSystemHealth = async () => {
 	const cpuInfo = await pidusage(process.pid);
+	const databaseStatus = await getDatabaseStatus();
 	return {
 	  serverStatus: { uptime: process.uptime() },
-	  databaseStatus: { connected: true }, // Replace with actual logic
+	  databaseStatus,
 	  resourceUtilization: {
 		cpuUsage: cpuInfo.cpu,
 		memoryUsage: process.memoryUsage(),
 	  },
-	  networkHealth: { latency: 10 }, // Replace with actual logic
 	};
   };
   app.get("/home", isAuthenticated, async (req, res) => {
@@ -231,7 +243,7 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 	
 			const currentUsername = req.session.username;
 			// Render the inusers page with JSON data
-			res.render("inusers", {allUsers, csrfToken: csrfTokenSession, currentUsername });
+			res.render("inusers", {allUsers, csrfToken: req.session.csrfToken, currentUsername });
 		} catch (error) {
 			console.error("Error fetching all users:", error);
 			res.status(500).send("Internal Server Error");
@@ -286,8 +298,8 @@ app.post
             }
             // Validate the anti-CSRF token
             const submittedCSRFToken = req.body.csrf_token;
-
-            if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+			
+            if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
                 return res.status(403).json({ error: 'CSRF token mismatch' });
             }
 
@@ -519,7 +531,7 @@ app.post("/reset-password", async (req, res) => {
     const creatorUsername = req.session.username;
     const submittedCSRFToken = req.body.csrf_token;
 
-    if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+    if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
         return res.status(403).json({ error: 'CSRF token mismatch' });
     }
 	const sessionTokencookie = req.cookies['sessionToken'];
@@ -632,7 +644,7 @@ app.delete('/api/deleteUser/:username', async (req, res) => {
         const { csrfToken } = req.body;
         console.log(csrfToken);
         // Compare CSRF token with the one stored in the session
-        if (csrfToken !== csrfTokenSession) {
+        if (csrfToken !== req.session.csrfToken) {
             return res.status(403).json({ success: false, error: 'CSRF token mismatch' });
 		}
 
@@ -691,7 +703,7 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 	  const locationsData = response.data;
   
 	  // Render the "locations" page with the fetched JSON data
-	  res.render("locations", { locationsData, csrfToken: csrfTokenSession});
+	  res.render("locations", { locationsData, csrfToken: req.session.csrfToken});
 	} catch (error) {
 	  console.error("Error fetching locations:", error);
 	  res.status(500).send("Internal Server Error");
@@ -710,7 +722,7 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
 	  }
 	  const submittedCSRFToken = req.body.csrf_token;
-	  if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+	  if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
 		  return res.status(403).json({ error: 'CSRF token mismatch' });
 	  }
 	  const { name, added_by, description } = req.body;
@@ -737,7 +749,7 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
 	  }
 	  const submittedCSRFToken = req.body.csrf_token;
-	  if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+	  if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
 		  return res.status(403).json({ error: 'CSRF token mismatch' });
 	  }
 	  const { id, name, added_by, description } = req.body;
@@ -765,7 +777,7 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
 	  }
 	  const submittedCSRFToken = req.body.csrf_token;
-	  if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+	  if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
 		  return res.status(403).json({ error: 'CSRF token mismatch' });
 	  }
 	  const {id} = req.body;
@@ -787,7 +799,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 		const locationsData = response.data;
 		const response2 = await axios.get(process.env.API_ALLSENSOR);
 		const sensorData = response2.data;
-		res.render("sensors",{locationsData, sensorData, csrfToken: csrfTokenSession});
+		res.render("sensors",{locationsData, sensorData, csrfToken: req.session.csrfToken});
 	} catch (error) {
 		console.error("Error:", error);
 		res.status(500).send("Internal Server Error");
@@ -806,7 +818,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
 	  }
 	  const submittedCSRFToken = req.body.csrf_token;
-	  if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+	  if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
 		  return res.status(403).json({ error: 'CSRF token mismatch' });
 	  }
 	  const { sensorname, added_by, macAddress, description, location} = req.body;
@@ -833,7 +845,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
 	  }
 	  const submittedCSRFToken = req.body.csrf_token;
-	  if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+	  if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
 		  return res.status(403).json({ error: 'CSRF token mismatch' });
 	  }
 	  const { id, sensorname, added_by, macAddress, description, location} = req.body;
@@ -860,7 +872,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
 	  }
 	  const submittedCSRFToken = req.body.csrf_token;
-	  if (!csrfTokenSession || submittedCSRFToken !== csrfTokenSession) {
+	  if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
 		  return res.status(403).json({ error: 'CSRF token mismatch' });
 	  }
 	  const {id} = req.body;
@@ -874,6 +886,21 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  res.status(500).json({ message: 'Internal Server Error' });
 	}
   });
+
+  app.get("/apilog", isAuthenticated, async (req, res) => {
+	try {
+	  // Fetch data using Axios
+	  const response = await axios.get(process.env.API_LOGS);
+	  const logData = response.data;
+  
+	  // Render the "locations" page with the fetched JSON data
+	  res.render("locations", {logData});
+	} catch (error) {
+	  console.error("Error fetching locations:", error);
+	  res.status(500).send("Internal Server Error");
+	}
+  });
+
 
 app.use(express.static("views"));
 

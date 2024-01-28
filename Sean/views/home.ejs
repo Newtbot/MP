@@ -22,6 +22,7 @@
     <a href="#">Users</a>
     <a href="/sensors">Sensors</a>
     <a href="/locations">Locations</a>
+    <a href="/apilog">Api Logs</a>
     <a href="/logout">Logout</a>
   </nav>
 
@@ -57,12 +58,6 @@
       </ul>
     </div>
 
-    <div class="health-container">
-      <h4>Network Latency</h4>
-      <ul>
-        <li><strong>Latency:</strong> <%= systemHealth && systemHealth.networkHealth ? systemHealth.networkHealth.latency : 'N/A' %> ms</li>
-      </ul>
-    </div>
   </section>
   <footer>
     Any Issue faced, Please contact the administrator at 11111111 or ecosaverAdmin@gmail.com
