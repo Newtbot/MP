@@ -3,6 +3,7 @@ const {
 	addSensor,
 	updateSensor,
     deleteSensor,
+	getSensorByName,
     getSensorById
 } = require("../functions/sensor.js");
 
@@ -51,6 +52,16 @@ router.delete("/delete", async (req, res, next) => {
         console.error(error);
         next(error);
     }
+});
+
+router.get("/name/:name", async (req, res, next) => {
+	try {
+		const sensor = await getSensorByName(req.params.name);
+		res.status(200).json(sensor);
+	} catch (error) {
+		console.error(error);
+		next(error);
+	}
 });
 router.get("/:id", async (req, res, next) => {
     try {

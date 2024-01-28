@@ -5,6 +5,26 @@
     <script type="text/javascript">
         // Require login to see this page.
         app.auth.forceLogin()
+
+        //get Location data
+        app.api.get('location', function (error, data) {
+            for (let row in data){
+                //format time to local time than push
+                data[row].createdAt = new Date(data[row].createdAt).toLocaleString();
+                data[row].updatedAt = new Date(data[row].updatedAt).toLocaleString();
+                $.scope.LocationTable.push(data[row]);
+            }
+        })
+
+        //get sensor data
+        app.api.get('sensor', function (error, data) {
+            for (let row in data){
+                //format time to local time than push
+                data[row].createdAt = new Date(data[row].createdAt).toLocaleString();
+                data[row].updatedAt = new Date(data[row].updatedAt).toLocaleString();
+                $.scope.SensorTable.push(data[row]);
+            }
+        })
     </script>
     <br>
     <br>
@@ -12,17 +32,15 @@
     <body>
 
         <div class="air-quality-container">
-            <div class="querybutton-container" id="querybutton-container">
-                <!-- <button id="yearButton">Year</button>
-                <button id="monthButton">Month</button>
-                <button id="weekButton">Week</button> -->
-                <button id="dayButton">Day</button>
+            <!-- header -->
+            <div class="header-container">
+                <h1>Daily Air Quality Data Chart</h1>
             </div>
             <br>
             <div class="chart-container">
-                <canvas id="dataChart"></canvas>
+                <canvas id="DailyDataChart"></canvas>
             </div>
-            <!-- <div class="button-container"> 
+            <div class="button-container">
                 <button id="psiButton">PSI</button>
                 <button id="tempButton">Temperature</button>
                 <button id="humButton">Humidity</button>
@@ -31,16 +49,70 @@
                 <button id="so2Button">SO2</button>
                 <button id="coButton">CO</button>
             </div>
-            -->
+            <br>
+            <div class="header-container">
+                <h1>Location Table</h1>
+            </div>
+            <table id="LocationTable" class="table table-striped LocationTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Location Name</th>
+                        <th>Added_By</th>
+                        <th>Description</th>
+                        <th>CreatedAt</th>
+                        <th>UpdatedAt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!--  Table Content Goes Here -->
+                    <tr jq-repeat="LocationTable">
+                        <td>{{id}}</td>
+                        <td>{{name}}</td>
+                        <td>{{added_by}}</td>
+                        <td>{{description}}</td>
+                        <td>{{createdAt}}</td>
+                        <td>{{updatedAt}}</td>
+
+                </tbody>
+            </table>
+            <div class="header-container">
+                <h1>Sensor Table</h1>
+            </div>
+            <table id="sensorTable" class="table table-striped sensorTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Sensor Name</th>
+                        <th>Added_By</th>
+                        <th>Mac Address</th>
+                        <th>Description</th>
+                        <th>Location ID</th>
+                        <th>CreatedAt</th>
+                        <th>UpdatedAt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!--  Table Content Goes Here -->
+                    <tr jq-repeat="SensorTable">
+                        <td>{{id}}</td>
+                        <td>{{name}}</td>
+                        <td>{{added_by}}</td>
+                        <td>{{mac_address}}</td>
+                        <td>{{description}}</td>
+                        <td>{{locationid}}</td>
+                        <td>{{createdAt}}</td>
+                        <td>{{updatedAt}}</td>
+                </tbody>
+            </table>
             <br>
             <div class="download-container">
-                <p>Download data here:</p>
+                <p>Download sensor data here:</p>
                 <button id="downloadCSVButton" onclick="downloadCSV()">Download CSV</button>
                 <br><br>
                 <button id="downloadCSVButton" onclick="downloadExcel()">Download Excel Sheet</button>
             </div>
         </div>
-
     </body>
     <br>
     <br>

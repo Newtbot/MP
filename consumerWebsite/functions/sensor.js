@@ -1,4 +1,5 @@
 const { sensorModel } = require("../database/model/sensorModel");
+const {Op} = require("sequelize");
 
 async function getSensor() {
 	const sensor = await sensorModel.findAll();
@@ -55,6 +56,33 @@ async function deleteSensor(id) {
 		},
 	});
 }
+/*
+async function getLocationByName(name) {
+	const location = await locationModel.findAll({
+		where: {
+			[Op.or]: [
+				{name: {[Op.like]: "%" + name + "%"}},
+				{added_by: {[Op.like]: "%" + name + "%"}},
+				{description: {[Op.like]: "%" + name + "%"}},
+			],
+		},
+	});
+	return location;
+}
+*/
+async function getSensorByName(name) {
+	const sensor = await sensorModel.findAll({
+		where: {
+			[Op.or]: [
+				{name: {[Op.like]: "%" + name + "%"}},
+				{added_by: {[Op.like]: "%" + name + "%"}},
+				{mac_address: {[Op.like]: "%" + name + "%"}},
+				{description: {[Op.like]: "%" + name + "%"}},
+			],
+		},
+	});
+	return sensor;
+}
 
 async function getSensorById(id) {
 	const sensor = await sensorModel.findAll({
@@ -70,5 +98,6 @@ module.exports = {
 	addSensor,
 	updateSensor,
 	deleteSensor,
+	getSensorByName,
 	getSensorById,
 };

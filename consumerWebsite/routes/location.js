@@ -2,6 +2,7 @@ const {
 	addLocation,
 	getLocation,
 	getLocationById,
+	getLocationByName,
 	updateLocation,
 	deleteLocation,
 } = require("../functions/location");
@@ -52,6 +53,19 @@ router.delete("/delete", async (req, res, next) => {
 		const { id } = req.body;
 		await deleteLocation(id);
 		res.status(200).json({ message: "Location " + id + " deleted" });
+	} catch (error) {
+		console.error(error);
+		next(error);
+	}
+});
+
+//get location by name
+router.get("/name/:name", async (req, res, next) => {
+	try {
+		//get params
+		const { name } = req.params;
+		const location = await getLocationByName(name);
+		res.status(200).json(location);
 	} catch (error) {
 		console.error(error);
 		next(error);
