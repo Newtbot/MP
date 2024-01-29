@@ -84,13 +84,13 @@ curl localhost/api/v0/sensor-data/new -H "Content-Type: application/json" -X POS
 //put
 curl localhost/api/v0/sensor-data/update -H "Content-Type: application/json" -X PUT -d '{"id": "1", "id_sensor": "1" , "id_location": "3" , "sensordata": {
 "psi": "500",
-"humidity": "11%",
-"o3": "326ppm",
-"no2": "445ppm",
-"so2": "511ppm",
-"co": "16ppm",
-"temperature": "25C",
-"windspeed": "2km/h",
+"humidity": "11",
+"o3": "326",
+"no2": "445",
+"so2": "511",
+"co": "16",
+"temperature": "25",
+"windspeed": "2",
 }}'
 
 //delete
@@ -160,10 +160,15 @@ Hour = 1 or wtv
 curl 'http://localhost/api/v0/sensor-data/data?year=2023&month=1&week=1&day=1&sensorid=1&locationid=1'
 
 
-
-
 //get specific data
-http://localhost/api/v0/sensor-data/filter?windspeed=highest&limit=1
+http://localhost/api/v0/sensor-data/data?psi=highest
+
+//avg 
+http://localhost/api/v0/sensor-data/data?avg=temperature
+
+//sum
+http://localhost/api/v0/sensor-data/data?sum=temperature
+
 
 //pagination
 http://localhost/api/v0/sensor-data/data?week=1&sensorid=1&locationid=1&page=2&pagesize=10

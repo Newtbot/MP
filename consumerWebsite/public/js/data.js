@@ -1,5 +1,6 @@
 //getting button from DOM id
 const buttons = document.querySelectorAll(".button-container button");
+const weeklybuttons = document.querySelectorAll(".weeklybutton-container button");
 const queryButton = document.getElementById("querybutton-container");
 
 $(document).ready(async function () {
@@ -21,7 +22,7 @@ $(document).ready(async function () {
 		labels: [], // Array to store timestamps
 		datasets: [
 			{
-				label: "Average MeasurementData",
+				label: "Average Measurement Data",
 				data: [], // Array to store measurements objects
 				backgroundColor: "green",
 				borderColor: "green",
@@ -87,7 +88,6 @@ $(document).ready(async function () {
 			chart.update();
 		});
 	}
-
 	// Event listeners for buttons
 	document.getElementById("psiButton").addEventListener("click", function () {
 		updateChart("psi");
@@ -116,4 +116,6 @@ $(document).ready(async function () {
 	document.getElementById("coButton").addEventListener("click", function () {
 		updateChart("co");
 	});
+
+
 });

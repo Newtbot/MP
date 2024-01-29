@@ -18,17 +18,17 @@ async function getSensorData() {
 	const sensorData = await sensorDataModel.findAll();
 	return sensorData;
 }
-async function addSensorData(id_sensor, id_location, sensordata) {
+async function addSensorData(sensorid , locationid , measurement) {
 	const sensorData = await sensorDataModel.create({
-		sensorid: id_sensor,
-		locationid: id_location ,
-		measurement: sensordata.measurement,
+		sensorid: sensorid,
+		locationid: locationid,
+		measurement: measurement
 	});
 	//console.log("sensorData", sensorData);
 	//console.log("sensorData", sensordata.measurement);
-
+	//console.log("sensorData", sensorData.measurement);
 	
-	io().emit('sensorData:new', sensordata)
+	io().emit('sensorData:new', sensorData.measurement);
 	return sensorData;
 }
 
@@ -674,6 +674,7 @@ async function getDatabyRange(queryString) {
 		queryString.limit = queryString.pagesize;
 
 		whereDate = {};
+		ormQuery = {};
 		for (let query in queryString) {
 			if (buildFunc[query]) {
 				await buildFunc[query](queryString);
@@ -700,6 +701,8 @@ async function getDatabyRange(queryString) {
 		}
 	} else {
 		whereDate = {};
+		ormQuery = {};
+		
 		for (let query in queryString) {
 			if (buildFunc[query]) {
 				await buildFunc[query](queryString);

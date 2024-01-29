@@ -23,8 +23,9 @@ router.get("/", async (req, res, next) => {
 
 router.post("/new", async (req, res, next) => {
 	try {
-		const { id_sensor, id_location, sensordata } = req.body;
-		let data = await addSensorData(id_sensor, id_location, sensordata);
+		//locationid
+		const { sensorid , locationid , measurement } = req.body;
+		let data = await addSensorData(sensorid , locationid , measurement);
 		res.json({ message: "SensorData " + data.id + " added", ...data });
 	} catch (error) {
 		console.error(error);
@@ -34,8 +35,8 @@ router.post("/new", async (req, res, next) => {
 
 router.put("/update", async (req, res, next) => {
 	try {
-		const { id, id_sensor, id_location, sensordata } = req.body;
-		await updateSensorData(id, id_sensor, id_location, sensordata);
+		const { id , sensorid , locationid , measurement } = req.body;
+		await updateSensorData(id, sensorid , locationid , measurement);
 		res.status(200).json({ message: "SensorData " + id + " updated" });
 	} catch (error) {
 		console.error(error);
@@ -55,7 +56,6 @@ router.delete("/delete", async (req, res, next) => {
 });
 router.get("/data", async (req, res, next) => {
     try {
-		console.log(req.query);
         const data = await getData(req.query);
         res.status(200).json(data);
 

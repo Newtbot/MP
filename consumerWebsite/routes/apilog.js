@@ -12,6 +12,7 @@ router.get("/", async (req, res, next) => {
     res.json(Res);
 });
 
+/*
 //get by route name?
 router.get("/route/:name", async (req, res, next) => {
 });
@@ -27,6 +28,8 @@ router.get("/method/:method", async (req, res, next) => {
 //by ip
 router.get("/ip/:ip", async (req, res, next) => {
 });
+*/
+
 
 
 

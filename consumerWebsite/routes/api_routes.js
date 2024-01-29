@@ -19,7 +19,7 @@ router.use('/sensor', [auth, APIlogger], require('./sensor.js'));
 router.use('/sensor-data', [auth, APIlogger], require('./sensorData.js'));
 
 //apilog route
-router.use('/apilog', [APIlogger], require('./apilog.js'));
+router.use('/apilog', [auth, APIlogger], require('./apilog.js'));
 
 //latest sensor data to display on dashboard
 router.use('/latest-sensor-data', [APIlogger], require('./latestsensorData.js'));

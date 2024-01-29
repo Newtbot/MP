@@ -8,6 +8,7 @@ async function getTokenByToken(token) {
 	const splitAuthToken = token.split("-");
 	const rowid = splitAuthToken[0];
 	const suppliedToken = splitAuthToken.slice(1).join("-");
+	if (!suppliedToken) return false;
 
 	token = await tokenModel.findByPk(rowid, { include: userModel });
 
