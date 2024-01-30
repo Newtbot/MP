@@ -2,7 +2,7 @@ const { tokenModel } = require("../database/model/tokenModel.js");
 const { userModel } = require("../database/model/userModel");
 const { hash, compareHash } = require("./bcrypt.js");
 const { generateUUID } = require("./generateUUID.js");
-const { isValid } = require("./isValid");
+const { isValid , resetIsValid  } = require("./isValid");
 
 async function getTokenByToken(token) {
 	const splitAuthToken = token.split("-");
@@ -53,7 +53,7 @@ async function addToken(userId, permission, isKey ,expiry) {
 async function addPasswordResetToken(data , token){
 	let hashtoken = await hash(token);
 	let currentDate = new Date();
-	let tokenToLive = new Date(currentDate.getTime() + 15 * 60000);
+	let tokenToLive = new Date(currentDate.getTime() + 5 * 60000);
 
 	let tokenRes = await tokenModel.create({
 		userid: data.id,
@@ -62,7 +62,7 @@ async function addPasswordResetToken(data , token){
 		isKey: "isNotKey",
 		expiration: tokenToLive,
 	});
-	return true;
+	return tokenRes.id
 }
 
 async function checkToken(id) {
@@ -77,6 +77,31 @@ async function checkToken(id) {
 	return tokenRes;
 }
 
+async function checkTokenByrowID(token) {
+	if (!token) return false;
+	//split
+	const splitAuthToken = token.split("-");
+	const rowid = splitAuthToken[0];
+	const suppliedToken = splitAuthToken.slice(1).join("-");
+
+	let tokenRes = await tokenModel.findByPk(rowid);
+	//console.log(tokenRes);
+
+	if (!tokenRes) return false;
+
+	if (!compareHash(suppliedToken, tokenRes.token)) return false;
 
 
-module.exports = { addToken, getTokenByToken , checkToken , addPasswordResetToken};
+	//pass tokemRes.expiration to isValid
+	if (!isValid(tokenRes.expiration)) {
+		//add boolean to token table
+		tokenRes.destroy();
+		return false;
+	}
+
+	return tokenRes;
+
+}
+
+
+module.exports = { addToken, getTokenByToken , checkToken , addPasswordResetToken , checkTokenByrowID};

@@ -163,6 +163,23 @@ async function checkEmailDetails(email) {
 
 }
 
+async function resetPass(userid , data ){
+	let hashed = await hash(data.password);
+	let updateUser = await userModel.update(
+		{
+			password: hashed,
+		},
+		{
+			where: {
+				id: userid,
+			},
+		}
+	);
+	if (!updateUser) return false;
+	return true;
+
+}
+
 
 module.exports = {
 	getUserByID,
@@ -171,5 +188,7 @@ module.exports = {
 	loginUser,
 	updateProfile,
 	checkEmail,
-	checkEmailDetails
+	checkEmailDetails,
+	resetPass,
+
 };

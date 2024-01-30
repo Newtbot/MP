@@ -3,13 +3,17 @@ const {
 	loginUser,
 	checkEmail,
 	checkEmailDetails,
+	resetPass,
 } = require("../functions/user");
 const { sendContactEmail } = require("../functions/nodeMail");
 const { generateUUID } = require("../functions/generateUUID");
 const { addPasswordResetToken } = require("../functions/api");
 const { sendResetPasswordEmail } = require("../functions/nodeMail");
+const { checkTokenByrowID } = require("../functions/api");
+
 
 const express = require("express");
+const { render } = require("ejs");
 const router = express.Router();
 
 // /user/register
@@ -91,12 +95,15 @@ router.post("/checkemail", async (req, res, next) => {
 			let data = await checkEmailDetails(req.body.email);
 			//console.log(data);
 			//token generation and insert into token table
-			const token = await generateUUID();
+			let token = await generateUUID();
 
 			let tokenRes = await addPasswordResetToken(data, token);
 
 			//email user with temp token link
 			if (!tokenRes) return false;
+
+			//apend table id to token
+			token = tokenRes + "-" + token;
 
 			//email logic to send reset password link
 			sendResetPasswordEmail(req.body.email, token);
@@ -111,15 +118,33 @@ router.post("/checkemail", async (req, res, next) => {
 	}
 });
 
-router.get("/resetpassword/:token", async (req, res, next) => {	
-	//pass token to reset password page 
-
-});
 
 //reset password
-router.post("/resetpassword", async (req, res, next) => {
+router.post("/resetpassword/:token", async (req, res, next) => {
+	console.log(req.body);
+	console.log(req.params.token);
+
+	//if token is valid
+	let tokenRes = await checkTokenByrowID(req.params.token);
+
+	if (!tokenRes) {
+		let error = new Error("Token not found");
+		error.status = 400;
+		return next(error);
+	}
+	//token is valid and reset password
+	else{
+		let Res = await resetPass(tokenRes.userid, req.body);
+		if (!Res) return false;
+		else{
+			res.json({
+				message: "Password reset successfully",
+			});
+			tokenRes.destroy();
+		}
+	}
+
 });
 
 module.exports = router;
-
 

@@ -1,4 +1,5 @@
 "use strict";
+const { checkTokenByrowID } = require("../functions/api");
 
 var router = require("express").Router();
 
@@ -33,7 +34,7 @@ router.get("/forgotpassword", function (req, res, next) {
 	res.render("forgotpassword");
 });
 
-//resetted password page
+//resetting password page
 router.get("/resetpassword", function (req, res, next) {
 	res.render("resetpassword");
 });
@@ -62,5 +63,32 @@ router.get("/api", function (req, res, next) {
 router.get("/sensor-data", function (req, res, next) {
 	res.render("sensor-data");
 });
+
+//reset password page
+router.get("/resetpassword/:token", async (req, res, next) => {	
+	try{
+	//pass token to reset password page 
+	//console.log(req.params.token);
+
+	//check if token is valid
+	let tokenRes = await checkTokenByrowID(req.params.token);
+
+	if (!tokenRes) {
+		let error = new Error("Token not found");
+		error.status = 400;
+		return next(error);
+	}
+	else {
+		let token = req.params.token;
+		console.log(token);
+		res.render("resetpassword", { token: token });
+	  }
+
+	}catch(error){
+		console.error(error);
+		next(error);
+	}
+});
+
 
 module.exports = router;
