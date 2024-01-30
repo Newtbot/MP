@@ -77,6 +77,67 @@ async function sendTokenEmail(email, token) {
     }
 }
 
+async function sendResetPasswordEmail(email, message) {
+    console.log(email, message);
+
+	try {
+		let resetMessage = await transporter.sendMail({
+            to: process.env.euser,
+            subject: "Reset Password",
+            html: `
+                <h1>Reset Password</h1>
+                <p><strong>From:</strong> Eco Saver</p>
+                <p><strong>User Email:</strong> ${email}</p>
+                <p><strong>Message:</strong> ${message}</p>
+                <p>Kindly click on the link given to reset your password!</p>
+                <p>Regards,</p>
+                <p>EcoSaver Team</p>
+                <p><a href="https://ecosaver.teeseng.uk/">EcoSaver Website</a></p>
+                <p>Please do not reply to this email.</p>
+            `,
+		});
+        transporter.sendMail({ resetMessage }, function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log("Email sent: " + info.response);
+            }
+        });
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+async function sendResetTokenEmail(email, token) {
+
+    try {
+        let tokenMessage = await transporter.sendMail({
+            to: email,
+            from: process.env.euser,
+            subject: "API Token",
+            html: `
+                <h1>API Token</h1>
+                <p><strong>Token:</strong> ${token}</p>
+                <p>Please do not lose this token and do not share your token with anyone!</p>
+                <p>Thank you for using EcoSaver.</p>
+                <p>Regards,</p>
+                <p>EcoSaver Team</p>
+                <p><a href="https://ecosaver.teeseng.uk/">EcoSaver Website</a></p>
+                <p>Please do not reply to this email.</p>
+
+            `,
+        });
+        transporter.sendMail({ resetMessage }, function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log("Email sent: " + info.response);
+            }
+        });
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 
-module.exports = { sendContactEmail , sendTokenEmail };
+module.exports = { sendContactEmail , sendTokenEmail, sendResetPasswordEmail, sendResetTokenEmail };

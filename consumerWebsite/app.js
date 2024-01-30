@@ -1,10 +1,7 @@
 const express = require("express");
 const { rateLimit } = require("express-rate-limit");
 const path = require("path");
-const router = require('./routes/user');
-const errorHandler = require('./utils/errorHandler');
 const app = express();
-const ejs = require("ejs");
 
 module.exports = app;
 
@@ -95,15 +92,4 @@ app.use(function (err, req, res, next) {
             keyErrors,
         });
     }
-});
-
-//reset password logic
-app.use("/api/user", router)
-
-app.use(errorHandler);
-
-const PORT = 3000;
-
-app.listen(PORT, () => {
-    console.log('server running on port ' + PORT);
 });

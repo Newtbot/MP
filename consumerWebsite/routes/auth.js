@@ -72,4 +72,28 @@ router.post("/contact", async (req, res, next) => {
 	}
 });
 
+//reset
+router.post("/checkemail", async (req, res, next) => {
+	try{
+		//console.log(req.body);
+		let Res = await checkEmail(req.body.email);
+		if (!Res) {
+			let error = new Error("Email not found");
+			error.status = 400;
+			return next(error);
+		}
+		else{
+			//console.log(Res);
+			send(req.body.email, req.body.name, req.body.message);
+			return res.json({
+				message: "Reset Password Link has successfully sent to your email!",
+			});
+			
+		}
+	}catch (error){
+		console.error(error);
+		next(error);
+	}
+});
+
 module.exports = router;
