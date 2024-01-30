@@ -243,6 +243,10 @@ app.auth = (function (app) {
 		location.replace(`/profile`);
 	}
 
+	function checkEmailRedirect(){
+		location.replace(`/checkemail`);
+	}
+
 	return {
 		getToken: getToken,
 		setToken: setToken,
@@ -252,6 +256,7 @@ app.auth = (function (app) {
 		logInRedirect,
 		homeRedirect,
 		profileRedirect,
+		checkEmailRedirect,
 	};
 })(app);
 
@@ -279,6 +284,8 @@ function formAJAX(btn, del) {
 	var $form = $(btn).closest("[action]"); // gets the 'form' parent
 	var formData = $form.find("[name]").serializeObject(); // builds query formDataing
 	var method = $form.attr("method") || "post";
+	console.log("Form data", formData);
+	console.log("Form method", method);
 
 	app.util.actionMessage("Loading...", $form, "info");
 

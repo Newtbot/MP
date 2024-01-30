@@ -38,6 +38,11 @@ router.get("/resetpassword", function (req, res, next) {
 	res.render("resetpassword");
 });
 
+//check email page
+router.get("/checkemail", function (req, res, next) {
+	res.render("checkemail");
+});
+
 //contact page
 router.get("/contact", function (req, res, next) {
 	res.render("contact");

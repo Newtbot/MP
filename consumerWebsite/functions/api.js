@@ -50,6 +50,21 @@ async function addToken(userId, permission, isKey ,expiry) {
 	return token.id + "-" + uuid;
 }
 
+async function addPasswordResetToken(data , token){
+	let hashtoken = await hash(uuid);
+	let currentDate = new Date();
+	let tokenToLive = new Date(currentDate.getTime() + 15 * 60000);
+
+	let tokenRes = await tokenModel.create({
+		userid: data.id,
+		token: hashtoken,
+		permission: "canRead",
+		isKey: "isNotKey",
+		expiration: tokenToLive,
+	});
+	return true;
+}
+
 async function checkToken(id) {
 	let tokenRes = await tokenModel.findOne(
 		{
@@ -62,4 +77,6 @@ async function checkToken(id) {
 	return tokenRes;
 }
 
-module.exports = { addToken, getTokenByToken , checkToken};
+
+
+module.exports = { addToken, getTokenByToken , checkToken , addPasswordResetToken};

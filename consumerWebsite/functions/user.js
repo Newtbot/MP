@@ -152,6 +152,17 @@ async function checkEmail(email) {
 
 }
 
+async function checkEmailDetails(email) {
+	let emailRes = await userModel.findOne({
+		where: {
+			email: email,
+		},
+	});	
+	if (!emailRes) return false;
+	return emailRes;
+
+}
+
 
 module.exports = {
 	getUserByID,
@@ -159,5 +170,6 @@ module.exports = {
 	addUser,
 	loginUser,
 	updateProfile,
-	checkEmail
+	checkEmail,
+	checkEmailDetails
 };

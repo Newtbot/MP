@@ -1,5 +1,7 @@
-const { addUser, loginUser, checkEmail } = require("../functions/user");
+const { addUser, loginUser, checkEmail , checkEmailDetails } = require("../functions/user");
 const { sendContactEmail } = require("../functions/nodeMail");
+const { generateUUID } = require("../functions/generateUUID");
+const { } = require("../functions/api");
 
 const express = require("express");
 const router = express.Router();
@@ -75,7 +77,7 @@ router.post("/contact", async (req, res, next) => {
 //reset
 router.post("/checkemail", async (req, res, next) => {
 	try{
-		//console.log(req.body);
+		
 		let Res = await checkEmail(req.body.email);
 		if (!Res) {
 			let error = new Error("Email not found");
@@ -83,17 +85,38 @@ router.post("/checkemail", async (req, res, next) => {
 			return next(error);
 		}
 		else{
-			//console.log(Res);
-			send(req.body.email, req.body.name, req.body.message);
+			//user info lookup
+			let data = await checkEmailDetails(req.body.email);
+			//console.log(data);
+			//token generation and insert into token table 
+			const token = await generateUUID();
+
+			let tokenRes = await addPasswordResetToken(data , token);
+
+			//email user with temp token link
+			if (!tokenRes) return false;
+
+			//email logic to send reset password link
+			
 			return res.json({
 				message: "Reset Password Link has successfully sent to your email!",
 			});
 			
 		}
+	
 	}catch (error){
 		console.error(error);
 		next(error);
 	}
+
 });
 
 module.exports = router;
+
+
+ /*
+ router.get('/login/resetpassword/:token', async function(req, res, next){
+        res.render('reset_password', {});
+});
+
+ */
