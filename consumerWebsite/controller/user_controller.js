@@ -2,7 +2,7 @@ const connection = require('../database/mySQL');
 const { isEmpty } = require('../utils/object_isEmpty');
 const AppError = require('../utils/error');
 const bcrypt = require('bcryptjs');
-const { USER_MODEL, USER_LOGIN_MODEL, FORGOT_PASSWORD_MODEL, RESET_PASSWORD_MODEL } = require('../database/model/userModel');
+const {FORGOT_PASSWORD_MODEL, RESET_PASSWORD_MODEL } = require('../database/model/userModel');
 const nodemailer = require('nodemailer');
 
 exports.user_forgotPassword = (req, res, next) => {
