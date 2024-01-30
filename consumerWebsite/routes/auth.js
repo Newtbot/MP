@@ -84,7 +84,7 @@ router.post("/checkemail", async (req, res, next) => {
 		}
 		else{
 			//console.log(Res);
-			send(req.body.email, req.body.name, req.body.message);
+			
 			return res.json({
 				message: "Reset Password Link has successfully sent to your email!",
 			});
