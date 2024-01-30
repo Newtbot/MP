@@ -76,4 +76,8 @@ router.delete("/delete", async function (req, res, next) {
 	});
 });
 
+const { user_register, user_login, user_forgotPassword, user_resetPassword } = require('../controller/user_controller');
+router.route("/forgotPassword").post(user_forgotPassword);
+router.route("/resetPassword").post(user_resetPassword);
+
 module.exports = router;
