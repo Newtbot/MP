@@ -51,7 +51,7 @@ async function addToken(userId, permission, isKey ,expiry) {
 }
 
 async function addPasswordResetToken(data , token){
-	let hashtoken = await hash(uuid);
+	let hashtoken = await hash(token);
 	let currentDate = new Date();
 	let tokenToLive = new Date(currentDate.getTime() + 15 * 60000);
 

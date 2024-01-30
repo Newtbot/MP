@@ -76,8 +76,7 @@ async function sendTokenEmail(email, token) {
     }
 }
 
-async function sendResetPasswordEmail(email, link, resetToken) {
-    console.log(email);
+async function sendResetPasswordEmail(email, resetToken) {
 	try {
 		let resetMessage = await transporter.sendMail({
             to: email,
@@ -85,10 +84,9 @@ async function sendResetPasswordEmail(email, link, resetToken) {
             subject: "Reset Password",
             html: `
                 <h1>Reset Password</h1>
-                <p><strong>Reset Password Link:</strong> ${link}</p>
-                <p><strong>One time token:</strong> ${resetToken}</p>
+                <p><strong>Reset Password Link:</strong> <a href="localhost/api/v0/auth/resetpassword/${resetToken}">Reset Password Link </p>
                 <p><strong>From:</strong> Eco Saver</p>
-                <p>Kindly click on the link and key in the one time token given to reset your password!</p>
+                <p>Kindly click on the link to reset your password!</p>
                 <p>Regards,</p>
                 <p>EcoSaver Team</p>
                 <p><a href="https://ecosaver.teeseng.uk/">EcoSaver Website</a></p>
