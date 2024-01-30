@@ -2,11 +2,10 @@ const express = require("express");
 const { rateLimit } = require("express-rate-limit");
 const path = require("path");
 const app = express();
-const ejs = require("ejs");
 
 module.exports = app;
 
-process.nextTick(() => require("./mqttApp"));
+//process.nextTick(() => require("./mqttApp"));
 
 app.use(express.json());
 app.set("json spaces", 2);
@@ -68,6 +67,7 @@ app.use(function (err, req, res, next) {
                 keyErrors[item.path] = item.message;
             }
         }
+        res.status = 422;
     }
 
     if (![404, 401, 422].includes(err.status || res.status)) {
@@ -76,6 +76,7 @@ app.use(function (err, req, res, next) {
         console.error("=========================================");
     }
     res.status(err.status || 500);
+	//  res.status(err.status || 500);
 
     if (req.get('Content-Type') && req.get('Content-Type').includes("json")) {
         res.json({
