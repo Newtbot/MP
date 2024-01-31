@@ -19,10 +19,11 @@ async function getSensorData() {
 	return sensorData;
 }
 async function addSensorData(sensorid , locationid , measurement) {
+	console	.log("measurement", measurement.measurement);
 	const sensorData = await sensorDataModel.create({
 		sensorid: sensorid,
 		locationid: locationid,
-		measurement: measurement
+		measurement: measurement.measurement,
 	});
 	//console.log("sensorData", sensorData);
 	//console.log("sensorData", sensordata.measurement);

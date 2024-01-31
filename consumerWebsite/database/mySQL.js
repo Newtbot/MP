@@ -9,13 +9,16 @@ const sequelize = new Sequelize(
  process.env.DB_USER,
  process.env.DB_PASS,
  {
-    host: "mpdatabase.mysql.database.azure.com",
+   host: "mpdatabase.mysql.database.azure.com",
+   // host: "mpsqldatabasean.mysql.database.azure.com",
     dialect: 'mysql',
     //  attributeBehavior?: 'escape' | 'throw' | 'unsafe-legacy';
     attributeBehavior: 'escape',
     dialectOptions: {
       ssl: {
          ca: fs.readFileSync(path.resolve(__dirname, '../cert/DigiCertGlobalRootCA.crt.pem')),
+         // ca: fs.readFileSync(path.resolve(__dirname, '../cert/DigiCertGlobalRootCA.crt_3.pem')),
+
       },
 
     },
