@@ -1,48 +1,225 @@
 <%- include('top') %>
 <link href="css/learnmore.css" rel="stylesheet" />
+<script type="text/javascript">
+    // Initialize locations object
+    function extractNumbers(str) {
+        if (typeof str === 'number') return str;
+        return str.match(/\d+/)[0];
+    }
+
+    const values = {
+        psi: [],
+        humidity: [],
+        temperature: [],
+        windspeed: [],
+        co: [],
+        o3: [],
+        no2: [],
+        so2: [],
+    };
+
+    async function updateLocations() {
+        // Wrap the asynchronous location update in a promise
+        return new Promise(resolve => {
+            app.api.get('location', function (error, data) {
+                for (let location of data) {
+                    locations[parseInt(location.id, 10)] = location;
+                }
+                console.log("Updated Locations Object:", locations);
+                resolve();
+            });
+        });
+    }
+
+    function parseRowToTemplace(row) {
+        const locationName = locations[row.locationid] ? locations[row.locationid].name : 'Unknown Location';
+        values.psi.unshift(extractNumbers(row.measurement.psi))
+        values.humidity.unshift(extractNumbers(row.measurement.humidity))
+        values.temperature.unshift(extractNumbers(row.measurement.temperature))
+        values.windspeed.unshift(extractNumbers(row.measurement.windspeed))
+        values.co.unshift(extractNumbers(row.measurement.co))
+        values.o3.unshift(extractNumbers(row.measurement.o3))
+        values.no2.unshift(extractNumbers(row.measurement.no2))
+        values.so2.unshift(extractNumbers(row.measurement.so2))
+
+        return {
+            latest: {
+                locationName,
+                psi: extractNumbers(row.measurement.psi),
+                humidity: extractNumbers(row.measurement.humidity),
+                temperature: extractNumbers(row.measurement.temperature),
+                windspeed: extractNumbers(row.measurement.windspeed),
+                co: extractNumbers(row.measurement.co),
+                o3: extractNumbers(row.measurement.o3),
+                no2: extractNumbers(row.measurement.no2),
+                so2: extractNumbers(row.measurement.so2),
+            }
+        };
+    }
+    
+    function getSymbolOrUnit(key) {
+        switch (key) {
+            case 'psi':
+                return ' PSI';
+            case 'humidity':
+                return ' %';
+            case 'temperature':
+                return ' °C';
+            case 'windspeed':
+                return ' m/s';
+            case 'co':
+                return ' ppm';
+            case 'o3':
+                return ' ppb';
+            case 'no2':
+                return ' ppb';
+            case 'so2':
+                return ' ppb';
+            default:
+                return '';
+        }
+    }
+
+    function updateTable(locations) {
+    console.log("Received locations:", locations);
+
+    var tbody = document.getElementById("sensorDataTableBody");
+
+    // Clear existing rows in the table
+    tbody.innerHTML = "";
+
+    // Loop through each location
+    for (var i = 0; i < locations.length; i++) {
+        var location = locations[i];
+        console.log("Location:", location);
+
+        // Create a new table row
+        var row = document.createElement("tr");
+
+        // Check if the location has the 'locationName' property
+        if (location.latest.locationName) {
+            // Loop through the properties of the location
+            for (var dataKey in location.latest) {
+                var cell = document.createElement("td");
+                var cellText = document.createTextNode(location.latest[dataKey] + getSymbolOrUnit(dataKey));
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+            }
+
+            // Append the new row to the table
+            tbody.appendChild(row);
+        } else {
+            // Log if 'locationName' property is not found
+            console.log("Location name not found for location:", location);
+        }
+    }
+
+    console.log("Table updated. Rows:", tbody.children.length);
+}
+
+
+
+
+
+// Declare locations in the outer scope
+const locations = {};
+async function loadData() {
+    // Populate the locations object
+    await updateLocations();
+
+    // Fetch and process sensor data
+    app.api.get('latest-sensor-data/data', function (error, data) {
+        const uniqueLocationIds = [...new Set(data.map(row => parseInt(row.locationid, 10)))];
+
+        // Create an array to store location data
+        const locationsArray = [];
+
+        // Loop through each unique location ID
+        for (let locationIdAsNumber of uniqueLocationIds) {
+            // Check if the locationid exists in the locations object
+            const locationData = locations[locationIdAsNumber];
+            if (locationData) {
+                console.log("Location Data from Locations Object:", locationData);
+                const locationName = locationData.name;
+                console.log("Resolved Location Name:", locationName);
+
+                // Update the table for each row
+                const rowData = data.find(row => parseInt(row.locationid, 10) === locationIdAsNumber);
+                console.log("Row Data for Location ID:", locationIdAsNumber, rowData);
+
+                if (rowData) {
+                    $.scope.LatestSensorData.update(parseRowToTemplace(rowData));
+                    locationsArray.push(parseRowToTemplace(rowData));
+                } else {
+                    console.log("No sensor data found for Location ID:", locationIdAsNumber);
+                }
+            } else {
+                console.log("Location ID not found in Locations Object");
+            }
+        }
+
+        // Update the table with the array of locations
+        updateTable(locationsArray);
+    });
+
+    app.socket.on("sensorData:new", function (data) {
+        const locationIdAsNumber = parseInt(data.locationid, 10);
+        console.log("Location ID in Sensor Data:", locationIdAsNumber);
+
+        // Check if the locationid exists in the locations object
+        const locationData = locations[locationIdAsNumber];
+        if (locationData) {
+            console.log("Location Data from Locations Object:", locationData);
+            const locationName = locationData.name;
+            console.log("Resolved Location Name:", locationName);
+
+            // Update the table for the new data
+            $.scope.LatestSensorData.update(parseRowToTemplace(data));
+            updateTable(parseRowToTemplace(data));
+        } else {
+            console.log("Location ID not found in Locations Object");
+        }
+    });
+}
+
+
+
+// Load data when the document is ready
+$(document).ready(loadData);
+
+
+
+
+
+</script>
+
 
 <br>
 <br>
 
-<div id="map-container">
-    <img src="images/map.png" alt="Singapore Map" id="map">
+<div class="container">
+    <div class="services-bar" jq-repeat="LatestSensorData">
+        <h1 class="my-4">Location Sensor Readings</h1>
+        <table>
+            <thead>
+            <tr>
+                <th>Location</th>
+                <th>Air quality Index</th>
+                <th>Humidity</th>
+                <th>Temperature</th>
+                <th>Wind Speed</th>
+                <th>CO</th>
+                <th>O3</th>
+                <th>NO2</th>
+                <th>SO2</th>
+            </tr>
+            </thead>
+            <tbody id="sensorDataTableBody"></tbody>
+        </table>
 
-    <!-- Information boxes for each region -->
-    <div class="info-box" id="north">
-        <h3>North</h3>
-        <p>Air Quality Index: 15 <span id="north-aqi"></span></p>
     </div>
-
-    <div class="info-box" id="south">
-        <h3>South</h3>
-        <p>Air Quality Index: 16 <span id="south-aqi"></span></p>
-    </div>
-
-    <div class="info-box" id="east">
-        <h3>East</h3>
-        <p>Air Quality Index: 16 <span id="east-aqi"></span></p>
-    </div>
-
-    <div class="info-box" id="west">
-        <h3>West</h3>
-        <p>Air Quality Index: 18 <span id="west-aqi"></span></p>
-    </div>
-
-    <div class="info-box" id="central">
-        <h3>Central</h3>
-        <p>Air Quality Index: 17 <span id="central-aqi"></span></p>
-    </div>
-
 </div>
-<div id="additional-info"></div>
 
 <br>
 <br>
-
-
-
-<script src="js/learnmore.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
 <%- include('bot') %>
