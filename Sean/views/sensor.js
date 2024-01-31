@@ -42,7 +42,7 @@ $(document).ready(function () {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${sensor.id}</td>
-        <td>${sensor.sensorname}</td>
+        <td>${sensor.name}</td>
         <td>${sensor.added_by}</td>
         <td>${sensor.description}</td>
         <td>${location ? location.name : 'Unknown Location'}</td>
@@ -53,7 +53,7 @@ $(document).ready(function () {
     });
   }
   // Assuming locationsArray is defined elsewhere in your code
-  populateTableAndArray(sensorData);
+  populateTableAndArray(sensorArray);
   console.log(sensorArray);
 
   function populateLocationDropdown() {
