@@ -74,10 +74,10 @@ app.post('/login', loginValidation, async (req, res) => {
 
         const { otp, expirationTime } = generateOTP();
 
-        req.session.otp = otp;
-        req.session.otpExpiration = expirationTime;
-        req.session.save();
-		console.log(otp);
+		await user.update({
+			otp,
+			otp_expiration_time: expirationTime,
+		  });
 
         try {
           await sendOTPByEmail(user.email, otp);
@@ -116,6 +116,10 @@ app.post('/login', loginValidation, async (req, res) => {
   }
 });
 
+async function clearSession(username) {
+	await User.update({ sessionid: null }, { where: { username } });
+	res.redirect('/index');
+  }
 
 // OTP verification route
 app.post("/verify-otp", otpValidation ,async (req, res) => {
@@ -138,10 +142,17 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 		return res.status(500).send("Internal Server Error");
 	  }
   
-	  if (enteredOTP === req.session.otp) {
+	  const storedOTP = user.otp;
+      const expirationTime = user.otp_expiration_time;
+
+	  if (enteredOTP === storedOTP && new Date() < new Date(expirationTime)) {
 		if (req.body.username) {
 		  await userLogs.create({ username: req.body.username, activity: "OTP entered correctly" });
 		}
+		await user.update({
+			otp: null,
+			otp_expiration_time: null,
+		  });
   
 		const sessionToken = crypto.randomBytes(32).toString('hex');
 		const username = req.body.username; // Replace with the actual username
@@ -150,6 +161,10 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 		.then(([rowsUpdated]) => {
 		  if (rowsUpdated > 0) {
 			console.log(`SessionId updated for user: ${username}`);
+			setTimeout(async () => {
+				await clearSession(username);
+				console.log(`Session for user ${username} cleared after expiration.`);
+			  }, 9 * 60 * 60 * 1000);
 		  } else {
 			console.error('User not found.');
 		  }
@@ -157,13 +172,19 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 		.catch(error => {
 		  console.error('Error updating sessionId:', error);
 		});
-		
+		const jobTitle = user ? user.jobTitle : null;
+
+    
+		console.log(jobTitle);
+		req.session.jobTitle = jobTitle;
+		console.log(req.session.jobTitle);
 		req.session.authenticated = true;
 		req.session.username = req.body.username;
 		req.session.sessionToken = sessionToken;
 		req.session.csrfToken = crypto.randomBytes(32).toString('hex');
   
-		res.cookie('sessionToken', sessionToken, { secure: true, httpOnly: true, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) }); // Expires in 1 day
+		res.cookie('sessionToken', sessionToken, { secure: true, httpOnly: true, expires: new Date(Date.now() + 9 * 60 * 60 * 1000) }); // Expires in 9 hours
+
   
 		res.redirect("/home");
 	  } else {
@@ -182,6 +203,9 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
   app.get("/logout", async (req, res) => {
 	try {
 	  const username = req.session.username ;
+	    // Log the logout activity using Sequelize
+	await User.update({ sessionid: null }, { where: { username } })
+	await userLogs.create({ username, activity: "User logging out." });
 	  // Log the user out by clearing the session
 	  req.session.destroy(async (err) => {
 		if (err) {
@@ -191,10 +215,6 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 		  await userLogs.create({ username, activity: "User logged out unsuccessfully. Session not destroyed." });
 		} else {
 		  console.log("Session destroyed.");
-    // Log the logout activity using Sequelize
-	await User.update({ sessionid: null }, { where: { username } })
-	      await userLogs.create({ username, activity: "User logged out. Session destroyed." });
-		  // Clear the session token cookie
 		  res.clearCookie('sessionToken');
 		}
   
@@ -699,36 +719,49 @@ app.get('/api/getLogs', async (req, res) => {
 app.get("/locations", isAuthenticated, async (req, res) => {
 	try {
 	  // Fetch data using Axios
-	  const response = await axios.get(process.env.API_ALLLOCATION);
+	  const url = process.env.API_ALLLOCATION;
+      const headers = {
+		'auth-token': process.env.API_KEY,
+	  };
+	  const response = await axios.get(url, { headers });
 	  const locationsData = response.data;
   
 	  // Render the "locations" page with the fetched JSON data
-	  res.render("locations", { locationsData, csrfToken: req.session.csrfToken});
+	  res.render("locations", { locationsData, csrfToken: req.session.csrfToken, user:req.session.jobTitle});
 	} catch (error) {
 	  console.error("Error fetching locations:", error);
 	  res.status(500).send("Internal Server Error");
 	}
   });
 
-  app.post('/location/new', locationValidation, async (req, res) => {
+  app.post('/location/new', locationValidation, async (req , res) => {
 	try {
 	  const errors = validationResult(req);
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
+  
 	  const sessionTokencookie = req.cookies['sessionToken'];
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
-		  return res.status(403).json({ error: 'Invalid sessionToken' });
+		return res.status(403).json({ error: 'Invalid sessionToken' });
 	  }
+  
 	  const submittedCSRFToken = req.body.csrf_token;
 	  if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
-		  return res.status(403).json({ error: 'CSRF token mismatch' });
+		return res.status(403).json({ error: 'CSRF token mismatch' });
 	  }
-	  const { name, added_by, description } = req.body;
-	  const preparedData = {name, added_by, description};
-	  // Make a POST request with the sanitized data using Axios
-	  const axiosResponse = await axios.post(process.env.API_NEWLOCATION, preparedData);
+	  
+	  
+	  const {name, added_by, description}  = req.body;
+	  const preparedData = { name, added_by, description };
+	  const url = process.env.API_NEWLOCATION;
+	  const headers = {
+		'auth-token': process.env.API_KEY,
+		'Content-Type': 'application/json',
+	  };
+  
+	  const axiosResponse = await axios.post(url, preparedData, { headers });
 	  // Send the Axios response back to the client
 	  res.status(axiosResponse.status).json(axiosResponse.data);
 	} catch (error) {
@@ -736,33 +769,45 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 	  res.status(500).json({ message: 'Internal Server Error' });
 	}
   });
+  
 
   app.post('/location/update', locationValidationUpdate, async (req, res) => {
-	try {
-	  const errors = validationResult(req);
-	  if (!errors.isEmpty()) {
-		return res.status(400).json({ errors: errors.array() });
-	  }
-	  const sessionTokencookie = req.cookies['sessionToken'];
-	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
-	  if (!user) {
-		  return res.status(403).json({ error: 'Invalid sessionToken' });
-	  }
-	  const submittedCSRFToken = req.body.csrf_token;
-	  if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
-		  return res.status(403).json({ error: 'CSRF token mismatch' });
-	  }
-	  const { id, name, added_by, description } = req.body;
-	  const preparedData = {id, name, added_by, description};
-	  // Make a POST request with the sanitized data using Axios
-	  const axiosResponse = await axios.post(process.env.API_UPDATELOCATION, preparedData);
-	  // Send the Axios response back to the client
-	  res.status(axiosResponse.status).json(axiosResponse.data);
-	} catch (error) {
-	  console.error('Error handling new location submission:', error);
-	  res.status(500).json({ message: 'Internal Server Error' });
-	}
-  });
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        const sessionTokencookie = req.cookies['sessionToken'];
+        const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
+        
+        if (!user) {
+            return res.status(403).json({ error: 'Invalid sessionToken' });
+        }
+
+        const submittedCSRFToken = req.body.csrf_token;
+        if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
+            return res.status(403).json({ error: 'CSRF token mismatch' });
+        }
+
+        const { id, name, added_by, description } = req.body;
+        const preparedData = { id, name, added_by, description };
+
+        const url = process.env.API_UPDATELOCATION;
+        const headers = {
+            'Content-Type': 'application/json',
+			'auth-token': process.env.API_KEY,
+        };
+
+        const axiosResponse = await axios.put(url, preparedData, { headers });
+        // Send the Axios response back to the client
+        res.status(axiosResponse.status).json(axiosResponse.data);
+    } catch (error) {
+        console.error('Error handling location update:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 
  
   app.post('location/delete',locationdeleteValidation, async (req, res) => {
@@ -782,9 +827,13 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 	  }
 	  const {id} = req.body;
 	  const preparedData = {id};
-	  // Make a POST request with the sanitized data using Axios
-	  const axiosResponse = await axios.post(process.env.API_DELLOCATION, preparedData);
-	  // Send the Axios response back to the client
+	  const url = process.env.API_DELLOCATION;
+      const headers = {
+		'auth-token': process.env.API_KEY,
+        'Content-Type': 'application/json',
+	  };
+
+	  const axiosResponse = await axios.delete(url, preparedData, { headers});
 	  res.status(axiosResponse.status).json(axiosResponse.data);
 	} catch (error) {
 	  console.error('Error handling new sensor submission:', error);
@@ -794,12 +843,17 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 
 app.get("/sensors", isAuthenticated, async (req, res) => {
 	try {
+		const url1 = process.env.API_ALLLOCATION;
+		const url2 = process.env.API_ALLSENSOR;
+        const headers = {
+		'auth-token': process.env.API_KEY,
+	  };
 		// Render the inusers page with JSON data
-		const response = await axios.get(process.env.API_ALLLOCATION);
+		const response = await axios.get(url1, { headers});
 		const locationsData = response.data;
-		const response2 = await axios.get(process.env.API_ALLSENSOR);
-		const sensorData = response2.data;
-		res.render("sensors",{locationsData, sensorData, csrfToken: req.session.csrfToken});
+		const response2 = await axios.get(url2, { headers});
+		const sensorArray = response2.data;
+		res.render("sensors",{locationsData, sensorArray, csrfToken: req.session.csrfToken});
 	} catch (error) {
 		console.error("Error:", error);
 		res.status(500).send("Internal Server Error");
@@ -823,9 +877,14 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  }
 	  const { sensorname, added_by, macAddress, description, location} = req.body;
 	  const preparedData = {sensorname, added_by, macAddress, description, location};
-	  // Make a POST request with the sanitized data using Axios
-	  const axiosResponse = await axios.post(process.env.API_NEWSENSOR, preparedData);
-	  // Send the Axios response back to the client
+	  
+	  const url = process.env.API_NEWSENSOR;
+      const headers = {
+		'auth-token': process.env.API_KEY,
+        'Content-Type': 'application/json',
+	  };
+
+	  const axiosResponse = await axios.post(url, preparedData, { headers});
 	  res.status(axiosResponse.status).json(axiosResponse.data);
 	} catch (error) {
 	  console.error('Error handling new sensor submission:', error);
@@ -850,9 +909,14 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  }
 	  const { id, sensorname, added_by, macAddress, description, location} = req.body;
 	  const preparedData = {id, sensorname, added_by, macAddress, description, location};
-	  // Make a POST request with the sanitized data using Axios
-	  const axiosResponse = await axios.post(process.env.API_NEWSENSOR, preparedData);
-	  // Send the Axios response back to the client
+	  
+	  const url = process.env.API_UPDATESENSOR;
+      const headers = {
+		'auth-token': process.env.API_KEY,
+        'Content-Type': 'application/json',
+	  };
+
+	  const axiosResponse = await axios.post(url, preparedData, { headers});
 	  res.status(axiosResponse.status).json(axiosResponse.data);
 	} catch (error) {
 	  console.error('Error handling new sensor submission:', error);
@@ -877,9 +941,13 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  }
 	  const {id} = req.body;
 	  const preparedData = {id};
-	  // Make a POST request with the sanitized data using Axios
-	  const axiosResponse = await axios.post(process.env.API_DELSENSOR, preparedData);
-	  // Send the Axios response back to the client
+	  const url = process.env.API_DELSENSOR;
+      const headers = {
+		'auth-token': process.env.API_KEY,
+        'Content-Type': 'application/json',
+	  };
+
+	  const axiosResponse = await axios.post(url, preparedData, { headers});
 	  res.status(axiosResponse.status).json(axiosResponse.data);
 	} catch (error) {
 	  console.error('Error handling new sensor submission:', error);
@@ -889,12 +957,17 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 
   app.get("/apilog", isAuthenticated, async (req, res) => {
 	try {
+		const url = process.env.API_LOGS;
+		const headers = {
+		  'auth-token': process.env.API_KEY,
+		  'Content-Type': 'application/json',
+		};
 	  // Fetch data using Axios
-	  const response = await axios.get(process.env.API_LOGS);
+	  const response = await axios.get(url, { headers});
 	  const logData = response.data;
   
 	  // Render the "locations" page with the fetched JSON data
-	  res.render("locations", {logData});
+	  res.render("apilog", {logData});
 	} catch (error) {
 	  console.error("Error fetching locations:", error);
 	  res.status(500).send("Internal Server Error");

@@ -20,7 +20,7 @@ $(document).ready(function () {
       $('#deleteLocationLink').on('click', function () {
         $('#locationContainer').hide();
         $('#createLocationForm').hide();
-        $('#updateLocationForm').show();
+        $('#updateLocationForm').hide();
         $('#deleteLocationForm').show();
       }); 
   });
@@ -39,7 +39,7 @@ $(document).ready(function () {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${location.id}</td>
-        <td>${location.location}</td>
+        <td>${location.name}</td>
         <td>${location.description}</td>
       `;
       tableBody.appendChild(row);
@@ -50,46 +50,45 @@ $(document).ready(function () {
   }
   populateTableAndArray(locationsData);
   populateLocationDropdown();
-$('#locationForm').on('submit', function (e) {
+  $('#locationForm').on('submit', function (e) {
     e.preventDefault();
 
-    const location= $('#location').val();
-    const user = req.session.jobTitle
-    const description= $('#description').val();
-    const csrf_token = $('#userForm input[name="csrf_token"]').val();
-   
+    const location = $('#location').val();
+    const description = $('#description').val();
+    const csrf_token = $('#locationForm input[name="csrf_token"]').val();
+    console.log (csrf_token);
+
     fetch('/location/new', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-          name: location,
-          added_by: user,
-          description: description,
-          csrf_token: csrf_token
-      }),
-  })
-  .then(response => {
-    if (response.ok) {
-        // Status 201 indicates successful creation
-        return response.json();
-    } else {
-        return response.json().then(data => {
-            throw new Error(data.message || `HTTP error! Status: ${response.status}`);
-        });
-    }
-})
-.then(data => {
-    console.log(`Location added successfully. Message: ${data.message}`);
-    alert('Location added successfully!');
-    resetFormFields();
-})
-.catch(error => {
-    console.error('Location not added successfully', error);
-    // Handle error as needed
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: location,
+            added_by: user,
+            description: description,
+            csrf_token: csrf_token,
+        }),
+    })
+    .then(response => {
+        if (response.ok) {
+            // Status 201 indicates successful creation
+            return response.json();
+        } else {
+            return response.json().then(data => {
+                throw new Error(data.message || `HTTP error! Status: ${response.status}`);
+            });
+        }
+    })
+    .then(data => {
+        console.log(`Location added successfully. Message: ${data.message}`);
+        alert('Location added successfully!');
+    })
+    .catch(error => {
+        console.error('Location not added successfully', error);
+        // Handle error as needed
+    });
 });
-  });
 
   function populateLocationDropdown() {
     // Clear existing options
@@ -100,14 +99,15 @@ $('#locationForm').on('submit', function (e) {
         $('#locationDropdown').append(`<option value="${location.id}">${location.name}</option>`);
     });
 }
+populateLocationDropdown();
 
   $('#updateForm').on('submit', function (e) {
     e.preventDefault();
     const selectedLocationId = $('#locationDropdown').val();
-    const location= $('#location').val();
-    const user = req.session.jobTitle
-    const description=$('#description').val();
-    const csrf_token = $('#userForm input[name="csrf_token"]').val();
+    const location= $('#locationname').val();
+    const description= $('#description2').val();
+    console.log(description);
+    const csrf_token = $('#updateForm input[name="csrf_token"]').val();
 
     fetch('/location/update', {
       method: 'POST',
@@ -133,9 +133,9 @@ $('#locationForm').on('submit', function (e) {
     }
 })
 .then(data => {
-    console.log(`Location uppdated successfully. Message: ${data.message}`);
+   
     alert('Location updated successfully!');
-    resetFormFields();
+    
 })
 .catch(error => {
     console.error('Location not updated successfully', error);
@@ -143,10 +143,20 @@ $('#locationForm').on('submit', function (e) {
 });
   });
 
+  function populateLocationDropdown2() {
+    // Clear existing options
+    $('#locationDropdown2').empty();
+
+    // Populate the dropdown with options from locationArray
+    locationArray.forEach(location => {
+        $('#locationDropdown2').append(`<option value="${location.id}">${location.name}</option>`);
+    });
+}
+populateLocationDropdown2();
   $('#deleteForm').on('submit', function (e) {
     e.preventDefault();
-    const selectedLocationId = $('#locationDropdown').val();
-    const csrf_token = $('#userForm input[name="csrf_token"]').val();
+    const selectedLocationId = $('#locationDropdown2').val();
+    const csrf_token = $('#deleteForm input[name="csrf_token"]').val();
 
     fetch('/location/delete', {
       method: 'DELETE',

@@ -40,6 +40,12 @@ module.exports = (sequelize) => {
     sessionid: {
       type: DataTypes.STRING,
     },
+    otp: {
+      type: DataTypes.STRING,
+    },
+    otp_expiration_time: {
+      type: DataTypes.DATE,
+    },
   }, {
     hooks: {
       beforeCreate: async (user) => {
