@@ -222,7 +222,7 @@ app.auth = (function (app) {
 		app.auth.isLoggedIn(function (error, isLoggedIn) {
 			if (error || !isLoggedIn) {
 				app.auth.logOut(function () {
-					location.replace(`/login`);
+					window.location.href = "/login";
 				});
 			}
 		});
@@ -231,20 +231,24 @@ app.auth = (function (app) {
 	function logInRedirect() {
 		window.location.href =
 			//window.location.href = location.href.replace(location.origin+'/login', '') || '/'
-			location.href.replace(location.replace(`/login`)) || "/";
+			//location.href.replace(location.replace(`/login`)) || "/";
+			window.location.href = "/login"
 	}
 
 	function homeRedirect() {
 		//window.location.href = location.href.replace(location.replace(`/`)) || "/";
-		location.replace(`/`);
+		// location.replace(`/`);
+		window.location.href = "/"
 	}
 
 	function profileRedirect() {
-		location.replace(`/profile`);
+		// location.replace(`/profile`);
+		window.location.href = "/profile"
 	}
 
 	function checkEmailRedirect(){
-		location.replace(`/checkemail`);
+		// location.replace(`/checkemail`);
+		window.location.href = "/checkemail"
 	}
 
 	return {

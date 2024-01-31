@@ -87,9 +87,8 @@ router.post("/checkemail", async (req, res, next) => {
 	try {
 		let Res = await checkEmail(req.body.email);
 		if (!Res) {
-			let error = new Error("Email not found");
-			error.status = 400;
-			return next(error);
+			console.log("email not found");
+			//should be silent.
 		} else {
 			//user info lookup
 			let data = await checkEmailDetails(req.body.email);
