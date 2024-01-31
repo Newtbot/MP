@@ -84,7 +84,7 @@ async function sendResetPasswordEmail(email, resetToken) {
             subject: "Reset Password",
             html: `
                 <h1>Reset Password</h1>
-                <p><strong>Reset Password Link:</strong> <a href="localhost/resetpassword/${resetToken}">Reset Password Link </p>
+                <p><strong>Reset Password Link:</strong> <a href="https://ecosaver.teeseng.uk/resetpassword/${resetToken}">Reset Password Link </p>
                 <p><strong>From:</strong> Eco Saver</p>
                 <p>Kindly click on the link to reset your password!</p>
                 <p>Regards,</p>
