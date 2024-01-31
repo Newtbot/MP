@@ -20,7 +20,7 @@
     <a href="#" id="allLocationLink">All Locations</a>
     <a href="#" id="addLocationLink">Add Locations</a>
     <a href="#" id="updateLocationLink">Update Locations</a>
-    <a href="#">Delete Locations</a>
+    <a href="#" id="deleteLocationLink">Delete Locations</a>
     <a href="/home" id="homeLink">Home</a>
   </nav>
   <main>
@@ -70,20 +70,20 @@
             <span class="details">Location to Update</span>
             <select name="location" id="locationDropdown" required>
             </select>
-        </div>
+         </div>
           <div class="input-box">
             <span class="details">Location Name</span>
-            <input type="text" name="location"  id="location" placeholder="Enter Location name" required>
+            <input type="text" name="locationname"  id="locationname" placeholder="Enter Location name" required>
           </div>
           <div class="input-box">
             <span class="details">Description</span>
-            <input type="text" name="description" id="description" placeholder="Enter the description here" required>
+            <input type="text" name="description2" id="description2" placeholder="Enter the description here" required>
           </div>
-        </div>
         <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
         <div class="button">
           <input type="submit" value="submit">
         </div>
+      </div>
       </form>
     </div>
   </div>
@@ -95,14 +95,14 @@
         <div class="Location-details">
           <div class="input-box">
             <span class="details">Location to Delete</span>
-            <select name="location" id="locationDropdown" required>
+            <select name="location" id="locationDropdown2" required>
             </select>
-        </div>
         </div>
         <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
         <div class="button">
           <input type="submit" value="submit">
         </div>
+      </div>
       </form>
     </div>
   </div>
@@ -111,7 +111,9 @@
 </footer>
 <script>
    const locationsData = <%- JSON.stringify(locationsData) %>;
-</script>
+   const user = <%- JSON.stringify(user) %>;
+   console.log(user);
+   </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="location.js"></script>
