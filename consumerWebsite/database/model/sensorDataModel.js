@@ -5,7 +5,7 @@ const { locationModel } = require("./locationModel");
 const { sensorModel } = require("./sensorModel");
 const { isJson } = require('../../functions/validateData');
 
-//sequelize.sync();
+sequelize.sync();
 const sensorDataModel = sequelize.define(
 	"sensorData",
 	{
