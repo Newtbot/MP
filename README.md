@@ -14,8 +14,9 @@ i repeat DO NOT USE CREDS IN CODE! Please use .env files (https://www.npmjs.com/
 2) Sean
 * Admin Website Microservice
 
-Micro Service
-1) admin.blah admin website
-2) consumer.blah comsumer
-3) proxy.blah reverproxy
-4) mqtt.blah mqtt service 
+Service:
+1) admin.teeseng.uk admin website
+2) ecosaver.teeseng.uk comsumer website
+3) proxy.teeseng.uk reverse proxy
+4) mqtt.teeseng.uk mqtt broker
+5) iot-sensor
