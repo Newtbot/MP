@@ -81,7 +81,7 @@ const sensorModel = sequelize.define(
 		},
 		locationid: {
 			type: DataTypes.INTEGER,
-			allowNull: true,
+			allowNull: false,
 			length: 100,
 			//one to many relationship
 			references: {
