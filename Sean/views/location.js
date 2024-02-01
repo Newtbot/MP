@@ -106,7 +106,6 @@ populateLocationDropdown();
     const selectedLocationId = $('#locationDropdown').val();
     const location= $('#locationname').val();
     const description= $('#description2').val();
-    console.log(description);
     const csrf_token = $('#updateForm input[name="csrf_token"]').val();
 
     fetch('/location/update', {
@@ -153,13 +152,14 @@ populateLocationDropdown();
     });
 }
 populateLocationDropdown2();
+
   $('#deleteForm').on('submit', function (e) {
     e.preventDefault();
     const selectedLocationId = $('#locationDropdown2').val();
     const csrf_token = $('#deleteForm input[name="csrf_token"]').val();
 
     fetch('/location/delete', {
-      method: 'DELETE',
+      method: 'delete',
       headers: {
           'Content-Type': 'application/json'
       },
@@ -181,7 +181,6 @@ populateLocationDropdown2();
 .then(data => {
     console.log(`Location deleted successfully. Message: ${data.message}`);
     alert('Location deleted successfully!');
-    resetFormFields();
 })
 .catch(error => {
     console.error('Location not deleted successfully', error);

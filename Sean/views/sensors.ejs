@@ -84,7 +84,7 @@
     </div>
   </div>
   <div id="updateSensorForm" class="sensor-update-container" style="display: none;">
-    <h3>Add Location</h3>
+    <h3>Update Sensor</h3>
     <div class="content">
       <form action="/sensor/update" id="updateForm" method="put">
         <div class="Location-details">
@@ -108,11 +108,10 @@
         </div>
         <div class="input-box">
           <span class="details">Location</span>
-          <select name="location" id="locationDropdown" required>
+          <select name="location" id="locationDropdown2" required>
           </select>
       </div>
-  </div>
-  <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+     </div>
         <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
         <div class="button">
           <input type="submit" value="submit">
@@ -128,7 +127,7 @@
         <div class="Location-details">
           <div class="input-box">
             <span class="details">Sensor to Delete</span>
-            <select name="sensor" id="sensorDropdown" required>
+            <select name="sensor" id="sensorDropdown2" required>
             </select>
         </div>
         </div>
@@ -145,7 +144,8 @@
 </body>
 <script>
 const locationsArray = <%- JSON.stringify(locationsData) %>;
-const sensorArray = <%- JSON.stringify(sensorArray) %>;
+const sensorData = <%- JSON.stringify(sensorArray) %>;
+const user = <%- JSON.stringify(user) %>;
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

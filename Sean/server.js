@@ -810,7 +810,7 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 
 
  
-  app.post('location/delete',locationdeleteValidation, async (req, res) => {
+  app.delete('/location/delete', locationdeleteValidation, async (req, res) => {
 	try {
 	  const errors = validationResult(req);
 	  if (!errors.isEmpty()) {
@@ -825,15 +825,20 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 	  if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
 		  return res.status(403).json({ error: 'CSRF token mismatch' });
 	  }
+
 	  const {id} = req.body;
 	  const preparedData = {id};
+	  
 	  const url = process.env.API_DELLOCATION;
       const headers = {
-		'auth-token': process.env.API_KEY,
         'Content-Type': 'application/json',
+		'auth-token': process.env.API_KEY,
 	  };
 
-	  const axiosResponse = await axios.delete(url, preparedData, { headers});
+	  const axiosResponse = await axios.delete(url, {
+		headers,
+		data: preparedData,
+	  });
 	  res.status(axiosResponse.status).json(axiosResponse.data);
 	} catch (error) {
 	  console.error('Error handling new sensor submission:', error);
@@ -853,14 +858,14 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 		const locationsData = response.data;
 		const response2 = await axios.get(url2, { headers});
 		const sensorArray = response2.data;
-		res.render("sensors",{locationsData, sensorArray, csrfToken: req.session.csrfToken});
+		res.render("sensors",{locationsData, sensorArray, csrfToken: req.session.csrfToken, user:req.session.jobTitle});
 	} catch (error) {
 		console.error("Error:", error);
 		res.status(500).send("Internal Server Error");
 	}
 });
 
-  app.post('sensor/new',sensorValidation, async (req, res) => {
+  app.post('/sensor/new',sensorValidation, async (req, res) => {
 	try {
 	  const errors = validationResult(req);
 	  if (!errors.isEmpty()) {
@@ -875,16 +880,17 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
 		  return res.status(403).json({ error: 'CSRF token mismatch' });
 	  }
-	  const { sensorname, added_by, macAddress, description, location} = req.body;
-	  const preparedData = {sensorname, added_by, macAddress, description, location};
-	  
+	  const { sensorname, added_by, mac_address, description, location} = req.body;
+	  const preparedData = {sensorname, added_by, mac_address, description, location};
+
+	  console.log(preparedData);
 	  const url = process.env.API_NEWSENSOR;
       const headers = {
 		'auth-token': process.env.API_KEY,
         'Content-Type': 'application/json',
 	  };
 
-	  const axiosResponse = await axios.post(url, preparedData, { headers});
+	  const axiosResponse = await axios.post(url, preparedData, { headers });
 	  res.status(axiosResponse.status).json(axiosResponse.data);
 	} catch (error) {
 	  console.error('Error handling new sensor submission:', error);
@@ -892,7 +898,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	}
   });
 
-  app.post('sensor/update',sensorupdateValidation, async (req, res) => {
+  app.post('/sensor/update',sensorupdateValidation, async (req, res) => {
 	try {
 	  const errors = validationResult(req);
 	  if (!errors.isEmpty()) {
@@ -916,7 +922,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
         'Content-Type': 'application/json',
 	  };
 
-	  const axiosResponse = await axios.post(url, preparedData, { headers});
+	  const axiosResponse = await axios.post(url, preparedData, { headers });
 	  res.status(axiosResponse.status).json(axiosResponse.data);
 	} catch (error) {
 	  console.error('Error handling new sensor submission:', error);
@@ -924,7 +930,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	}
   });
 
-  app.post('sensor/delete',sensordeleteValidation, async (req, res) => {
+  app.delete('/sensor/delete',sensordeleteValidation, async (req, res) => {
 	try {
 	  const errors = validationResult(req);
 	  if (!errors.isEmpty()) {
@@ -947,7 +953,11 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
         'Content-Type': 'application/json',
 	  };
 
-	  const axiosResponse = await axios.post(url, preparedData, { headers});
+	  const axiosResponse = await axios.delete(url, {
+		headers,
+		data: preparedData,
+	  });
+
 	  res.status(axiosResponse.status).json(axiosResponse.data);
 	} catch (error) {
 	  console.error('Error handling new sensor submission:', error);
