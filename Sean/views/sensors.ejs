@@ -44,10 +44,10 @@
     </table>
 </div>
 
-<div id="createSensorForm" class="sensor-creation-container" style="display: none;">
+<div id="createSensorForm" class="sensor-creation-container custom-location-form" style="display: none;">
     <h3>Add Sensor</h3>
     <div class="content">
-        <form action="/api/v0/sensor/new" id="sensorForm" method="post">
+        <form action="/sensor/new" id="sensorForm" method="post">
             <div class="Sensor-details">
                 <div class="input-box">
                     <span class="details">Sensor Name</span>
@@ -83,10 +83,11 @@
       </ul>
     </div>
   </div>
-  <div id="updateSensorForm" class="sensor-update-container" style="display: none;">
+
+  <div id="updateSensorForm" class="sensor-update-container custom-location-form" style="display: none;">
     <h3>Update Sensor</h3>
     <div class="content">
-      <form action="/sensor/update" id="updateForm" method="put">
+      <form action="/sensor/update" id="updateForm" method="post">
         <div class="Location-details">
           <div class="input-box">
             <span class="details">Sensor to Update</span>
@@ -99,28 +100,27 @@
           </div>
           <div class="input-box">
             <span class="details">Mac Address</span>
-            <input type="text" name="macAddress" id="macAddress" placeholder="Enter the Mac Address" required>
-        </div>
+            <input type="text" name="macAddress1" id="macAddress1" placeholder="Enter the Mac Address" required>
+         </div>
           <div class="input-box">
             <span class="details">Description</span>
-            <input type="text" name="description" id="description" placeholder="Enter the description here" required>
+            <input type="text" name="description1" id="description1" placeholder="Enter the description here" required>
           </div>
-        </div>
         <div class="input-box">
           <span class="details">Location</span>
           <select name="location" id="locationDropdown2" required>
           </select>
       </div>
-     </div>
         <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
         <div class="button">
           <input type="submit" value="submit">
         </div>
+      </div>
       </form>
     </div>
   </div>
 
-  <div id="deleteSensorForm" class="sensor-delete-container" style="display: none;">
+  <div id="deleteSensorForm" class="sensor-delete-container custom-location-form" style="display: none;">
     <h3>Delete Location</h3>
     <div class="content">
       <form action="/sensor/delete" id="deleteForm" method="delete">

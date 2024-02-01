@@ -23,7 +23,7 @@ const sensorValidation = [
 	body('mac_address').custom(value => {
 	  const macAddressRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
 	  if (!macAddressRegex.test(value)) {
-		throw new Error('Invalid MAC address formatgh');
+		throw new Error('Invalid MAC address format');
 	  }
 	  console.log('MAC Address:', value); // Log MAC address
 	  return true;
@@ -37,7 +37,7 @@ const sensorupdateValidation = [
 	body('id').trim().escape(),
 	body('sensorname').trim().isLength({ min: 1 }).withMessage('Sensor Name must not be empty').escape(),
 	body('added_by').trim().isLength({ min: 1 }).withMessage('Added by must not be empty').escape(),
-	body('macAddress').escape().custom(value => {
+	body('mac_address').custom(value => {
 	  const macAddressRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
 	  if (!macAddressRegex.test(value)) {
 		throw new Error('Invalid MAC address format');

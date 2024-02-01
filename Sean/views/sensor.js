@@ -164,15 +164,16 @@ $('#sensorForm').on('submit', function (e) {
     });
 }
 populateLocationDropdown2()
-  $('#updatesensorForm').on('submit', function (e) {
+  $('#updateForm').on('submit', function (e) {
     e.preventDefault();
        const id = $('#sensorDropdown').val();
        const sensorname = $('#sensorname').val();
-       const macAddress = $('#macAddress').val();
-       const description = $('#description').val();
+       const mac_address = $('#macAddress1').val();
+       const description = $('#description1').val();
        const location = $('#locationDropdown2').val();
-       const csrf_token = $('#updatesensorForm input[name="csrf_token"]').val();
+       const csrf_token = $('#updateForm input[name="csrf_token"]').val();
    
+       console.log(csrf_token);
     fetch('/sensor/update', {
       method: 'POST',
       headers: {
@@ -182,7 +183,7 @@ populateLocationDropdown2()
           id: id,
           sensorname: sensorname,
           added_by: user,
-          mac_address: macAddress,
+          mac_address: mac_address,
           description: description,
           location: location,
           csrf_token: csrf_token
@@ -199,9 +200,7 @@ populateLocationDropdown2()
     }
 })
 .then(data => {
-    console.log(`Sensor updated successfully. Message: ${data.message}`);
-    alert('Sensor updated successfully!');
-    resetFormFields();
+    alert('Sensor updated successfully! ');
 })
 .catch(error => {
     console.error('Sensor not updated successfully', error);
@@ -256,12 +255,11 @@ populateLocationDropdown2()
     }
 })
 .then(data => {
-    console.log(`Sensor deleted successfully. Message: ${data.message}`);
     alert('Sensor deleted successfully!');
-    resetFormFields();
 })
 .catch(error => {
     console.error('Sensor not deleted successfully', error);
+    alert('Sensor not deleted successfully!');
     // Handle error as needed
 });
   });

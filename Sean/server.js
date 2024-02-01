@@ -901,6 +901,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
   app.post('/sensor/update',sensorupdateValidation, async (req, res) => {
 	try {
 	  const errors = validationResult(req);
+	  console.log(errors);
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
@@ -913,16 +914,17 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  if (!req.session.csrfToken || submittedCSRFToken !== req.session.csrfToken) {
 		  return res.status(403).json({ error: 'CSRF token mismatch' });
 	  }
-	  const { id, sensorname, added_by, macAddress, description, location} = req.body;
-	  const preparedData = {id, sensorname, added_by, macAddress, description, location};
-	  
+	  const { id, sensorname, added_by, mac_address, description, location} = req.body;
+	  const preparedData = {id, sensorname, added_by, mac_address, description, location};
+	  console.log(preparedData);
+
 	  const url = process.env.API_UPDATESENSOR;
       const headers = {
 		'auth-token': process.env.API_KEY,
         'Content-Type': 'application/json',
 	  };
 
-	  const axiosResponse = await axios.post(url, preparedData, { headers });
+	  const axiosResponse = await axios.put(url, preparedData, { headers });
 	  res.status(axiosResponse.status).json(axiosResponse.data);
 	} catch (error) {
 	  console.error('Error handling new sensor submission:', error);
