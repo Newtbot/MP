@@ -18,7 +18,7 @@ async function addSensor(
 		added_by: added_by,
 		mac_address: mac_address,
 		description: description,
-		location: location,
+		locationid: location,
 	});
 }
 
@@ -36,7 +36,7 @@ async function updateSensor(
 			added_by: added_by,
 			mac_address: mac_address,
 			description: description,
-			location: location,
+			locationid: location,
 		},
 		{
 			where: {
