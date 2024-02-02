@@ -25,7 +25,7 @@
                 for (let location of data) {
                     locations[parseInt(location.id, 10)] = location;
                 }
-                console.log("Updated Locations Object:", locations);
+                //console.log("Updated Locations Object:", locations);
                 resolve();
             });
         });
@@ -81,7 +81,7 @@
     }
 
     function updateTable(locations) {
-    console.log("Received locations:", locations);
+    //console.log("Received locations:", locations);
 
     var tbody = document.getElementById("sensorDataTableBody");
 
@@ -91,7 +91,7 @@
     // Loop through each location
     for (var i = 0; i < locations.length; i++) {
         var location = locations[i];
-        console.log("Location:", location);
+        //console.log("Location:", location);
 
         // Create a new table row
         var row = document.createElement("tr");
@@ -110,11 +110,11 @@
             tbody.appendChild(row);
         } else {
             // Log if 'locationName' property is not found
-            console.log("Location name not found for location:", location);
+            //console.log("Location name not found for location:", location);
         }
     }
 
-    console.log("Table updated. Rows:", tbody.children.length);
+    //console.log("Table updated. Rows:", tbody.children.length);
 }
 
 
@@ -139,22 +139,22 @@ async function loadData() {
             // Check if the locationid exists in the locations object
             const locationData = locations[locationIdAsNumber];
             if (locationData) {
-                console.log("Location Data from Locations Object:", locationData);
+                //console.log("Location Data from Locations Object:", locationData);
                 const locationName = locationData.name;
-                console.log("Resolved Location Name:", locationName);
+                //console.log("Resolved Location Name:", locationName);
 
                 // Update the table for each row
                 const rowData = data.find(row => parseInt(row.locationid, 10) === locationIdAsNumber);
-                console.log("Row Data for Location ID:", locationIdAsNumber, rowData);
+                //console.log("Row Data for Location ID:", locationIdAsNumber, rowData);
 
                 if (rowData) {
                     $.scope.LatestSensorData.update(parseRowToTemplace(rowData));
                     locationsArray.push(parseRowToTemplace(rowData));
                 } else {
-                    console.log("No sensor data found for Location ID:", locationIdAsNumber);
+                    //console.log("No sensor data found for Location ID:", locationIdAsNumber);
                 }
             } else {
-                console.log("Location ID not found in Locations Object");
+                //console.log("Location ID not found in Locations Object");
             }
         }
 
@@ -164,20 +164,20 @@ async function loadData() {
 
     app.socket.on("sensorData:new", function (data) {
         const locationIdAsNumber = parseInt(data.locationid, 10);
-        console.log("Location ID in Sensor Data:", locationIdAsNumber);
+        //console.log("Location ID in Sensor Data:", locationIdAsNumber);
 
         // Check if the locationid exists in the locations object
         const locationData = locations[locationIdAsNumber];
         if (locationData) {
-            console.log("Location Data from Locations Object:", locationData);
+            //console.log("Location Data from Locations Object:", locationData);
             const locationName = locationData.name;
-            console.log("Resolved Location Name:", locationName);
+            //console.log("Resolved Location Name:", locationName);
 
             // Update the table for the new data
             $.scope.LatestSensorData.update(parseRowToTemplace(data));
             updateTable(parseRowToTemplace(data));
         } else {
-            console.log("Location ID not found in Locations Object");
+            //console.log("Location ID not found in Locations Object");
         }
     });
 }
