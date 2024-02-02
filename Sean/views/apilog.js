@@ -1,54 +1,93 @@
-function downloadAsExcel() {
-    // Get the current date
-    var currentDate = new Date();
-    var formattedDate = currentDate.toISOString().slice(0, 10); // Format as YYYY-MM-DD
 
-    // Create a new workbook
-    var wb = XLSX.utils.book_new();
-    // Convert logData to a worksheet
-    var ws = XLSX.utils.json_to_sheet(logData);
-    // Add the worksheet to the workbook
-    XLSX.utils.book_append_sheet(wb, ws, 'Log Data');
-    // Create a blob with the Excel file content
-    var blob = XLSX.write(wb, { bookType: 'xlsx', type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    
-    // Trigger the download with the filename including the current date
-    saveAs(blob, 'log_data_' + formattedDate + '.xlsx');
+
+  // Function to display logs in the table
+  function displayLogs(logs) {
+    const tableBody = $('#logTableBody');
+
+    // Clear previous logs
+    tableBody.empty();
+
+    // Add each log as a row in the table
+    logs.forEach(log => {
+      const row = `<tr>
+        <td>${log.id}</td>
+        <td>${log.time}</td>
+        <td>${log.method}</td>
+        <td>${log.host}</td>
+        <td>${log.createdAt}</td>
+      </tr>`;
+      tableBody.append(row);
+    });
   }
-  document.addEventListener('DOMContentLoaded', function() {
-    // Initialize flatpickr on the date input
-    flatpickr("#datepicker", {
-      dateFormat: "Y-m-d",
-      onChange: function(selectedDates, dateStr, instance) {
-        // Call a function to filter logs based on the selected date
-        filterLogsByDate(dateStr);
-      }
+
+  // Function to apply date filter
+  function applyDateFilter() {
+    const selectedDate = $("#datePicker").val();
+
+    const formattedSelectedDate = new Date(selectedDate).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
     });
 
-    function filterLogsByDate(selectedDate) {
-      // Use logData to filter logs based on the selected date
-      var filteredLogs = logData.filter(function(entry) {
-        return entry.createdAt.startsWith(selectedDate);
+    const filteredLogs = logData.filter(log => {
+      const formattedLogDate = new Date(log.createdAt).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
       });
+      return formattedLogDate === formattedSelectedDate;
+    });
 
-      // Render the filtered logs in the table
-      renderLogsTable(filteredLogs);
-    }
+    displayLogs(filteredLogs);
+  }
 
-    function renderLogsTable(logs) {
-      var tableBody = document.getElementById('logsTableBody');
-      tableBody.innerHTML = '';
+  // Function to download logs in CSV format
+  function downloadLogs() {
+    const selectedDate = $("#datePicker").val();
 
-      logs.forEach(function(entry) {
-        var row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${entry.id}</td>
-          <td>${entry.time}</td>
-          <td>${entry.method}</td>
-          <td>${entry.host}</td>
-          <td>${entry.createdAt}</td>
-        `;
-        tableBody.appendChild(row);
+    const formattedSelectedDate = new Date(selectedDate).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+
+    const filteredLogs = logData.filter(log => {
+      const formattedLogDate = new Date(log.createdAt).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
       });
+      return formattedLogDate === formattedSelectedDate;
+    });
+
+    if (filteredLogs.length > 0) {
+      const csvContent = 'data:text/csv;charset=utf-8,';
+      const header = 'ID,Time,Method,Host,Date\n';
+      const rows = filteredLogs.map(log => `${log.id},${log.time},${log.method},${log.host},"${log.createdAt}"`).join('\n');
+      const data = header + rows;
+      const encodedData = encodeURI(csvContent + data);
+
+      // Create a hidden anchor element to trigger the download
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedData);
+      link.setAttribute('download', `filtered_logs_${formattedSelectedDate}.csv`);
+      document.body.appendChild(link);
+
+      // Trigger the download
+      link.click();
+
+      // Remove the link from the DOM
+      document.body.removeChild(link);
+    } else {
+      console.error('No logs available for download.');
     }
+  }
+
+  // Initialize Flatpickr for the date picker
+  flatpickr("#datePicker", {
+    dateFormat: "Y-m-d",
   });
+
+  // Display initial logs
+  displayLogs(logData);

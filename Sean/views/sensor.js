@@ -5,6 +5,8 @@ $(document).ready(function () {
       $('#additional-text4').hide();
       $('#updateSensorForm').hide();
       $('#deleteSensorForm').hide();
+      $('#additional-text5').hide();
+      $('#additional-text6').hide();
     });
     $('#addSensorLink').on('click', function () {
         $('#sensorContainer').hide();
@@ -12,6 +14,8 @@ $(document).ready(function () {
         $('#additional-text4').show();
         $('#updateSensorForm').hide();
         $('#deleteSensorForm').hide();
+        $('#additional-text5').hide();
+        $('#additional-text6').hide();
       });
       $('#updateSensorLink').on('click', function () {
         $('#sensorContainer').hide();
@@ -19,6 +23,8 @@ $(document).ready(function () {
         $('#additional-text4').hide();
         $('#updateSensorForm').show();
         $('#deleteSensorForm').hide();
+        $('#additional-text5').show();
+        $('#additional-text6').hide();
       });
       $('#deleteSensorLink').on('click', function () {
         $('#sensorContainer').hide();
@@ -26,6 +32,8 @@ $(document).ready(function () {
         $('#additional-text4').hide();
         $('#updateSensorForm').hide();
         $('#deleteSensorForm').show();
+        $('#additional-text5').hide();
+        $('#additional-text6').show();
       });  
 
     
@@ -59,8 +67,6 @@ $(document).ready(function () {
   }
   // Assuming locationsArray is defined elsewhere in your code
   populateTableAndArray(sensorData, locationsArray);
-  console.log(sensorArray);
-  console.log(locationsArray);
 
   function populateLocationDropdown() {
     const locationDropdown = document.getElementById('locationDropdown');
@@ -137,12 +143,10 @@ $('#sensorForm').on('submit', function (e) {
     }
 })
 .then(data => {
-    console.log(`Sensor added successfully. Message: ${data.message}`);
     alert('Sensor added successfully!');
 })
 .catch(error => {
-    console.error('Location not added successfully', error);
-    // Handle error as needed
+    alert('Sensor not added successfully! Please ensure inputs are correctly entered');
 });
   });
 
@@ -203,7 +207,7 @@ populateLocationDropdown2()
     alert('Sensor updated successfully! ');
 })
 .catch(error => {
-    console.error('Sensor not updated successfully', error);
+  alert('Sensor not updated successfully! Please ensure inputs are correctly entered');
     // Handle error as needed
 });
   });
@@ -258,8 +262,20 @@ populateLocationDropdown2()
     alert('Sensor deleted successfully!');
 })
 .catch(error => {
-    console.error('Sensor not deleted successfully', error);
     alert('Sensor not deleted successfully!');
-    // Handle error as needed
 });
   });
+
+  function handleUserRoleAccess() {
+    // Disable user creation, deletion, and password reset for non-admin users
+    if (user !== 'admin') {
+      document.getElementById('addSensorLink').style.display = 'none';
+      document.getElementById('updateSensorLink').style.display = 'none';
+      document.getElementById('deleteSensorLink').style.display = 'none';
+      
+    }
+  
+  }
+  
+  // Call the function to handle user role access when the page loads
+  handleUserRoleAccess();

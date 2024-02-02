@@ -22,32 +22,29 @@
     <main>
     <h2>Welcome to the API Logs Users Page</h2>
    </main>
-    <div id="downloadButtonContainer">
-      <button id="downloadButton" onclick="downloadAsExcel()">Download as Excel</button>
-    </div>
-
-    <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Time</th>
-            <th>Method</th>
-            <th>Host</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% logData.forEach(entry => { %>
-            <tr>
-              <td><%= entry.id %></td>
-              <td><%= entry.time %></td>
-              <td><%= entry.method %></td>
-              <td><%= entry.host %></td>
-              <td><%= entry.createdAt %></td>
-            </tr>
-          <% }); %>
-        </tbody>
-      </table>
+     <!-- Datepicker input field -->
+  <label for="datePicker">Filter by Date:</label>
+  <input type="text" id="datePicker">
+  <button onclick="applyDateFilter()">Apply Filter</button>
+  
+  <!-- Download button -->
+  <button onclick="downloadLogs()">Download Log</button>
+   <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Time</th>
+        <th>Method</th>
+        <th>Host</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody id="logTableBody">
+      <!-- Log data will be inserted here dynamically -->
+    </tbody>
+  </table>
+  
+ 
     <script >
         const logData = <%- JSON.stringify(logData) %>;
       </script>

@@ -251,10 +251,20 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
   };
   app.get("/home", isAuthenticated, async (req, res) => {
 	const systemHealth = await getSystemHealth();
+	const sessionTokencookie = req.cookies['sessionToken'];
+
+			if (!sessionTokencookie) {
+				// Redirect the user to the /home page
+				return res.redirect('/index');}
 	  res.render("home", { username: req.session.username, systemHealth});
 	});
 
 	app.get("/inusers", isAuthenticated, async (req, res) => {
+		const sessionTokencookie = req.cookies['sessionToken'];
+
+			if (!sessionTokencookie) {
+				// Redirect the user to the /home page
+				return res.redirect('/index');}
 		try {
 			// Fetch all user data from the database using Sequelize
 			const allUsers = await User.findAll({
@@ -309,6 +319,11 @@ app.post
                 return res.status(400).json({ errors: errors.array() });
             }
 			const sessionTokencookie = req.cookies['sessionToken'];
+
+			if (!sessionTokencookie) {
+				// Redirect the user to the /home page
+				return res.redirect('/index');
+			  }
 
             // Verify sessionToken with the one stored in the database
             const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
@@ -555,8 +570,15 @@ app.post("/reset-password", async (req, res) => {
         return res.status(403).json({ error: 'CSRF token mismatch' });
     }
 	const sessionTokencookie = req.cookies['sessionToken'];
+     
+	if (!sessionTokencookie) {
+		// Redirect the user to the /home page
+		return res.redirect('/index');
+	  }
+
+	  
             // Verify sessionToken with the one stored in the database
-            const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
+    const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
             if (!user) {
                 return res.status(403).json({ error: 'Invalid sessionToken' });
             }
@@ -602,38 +624,14 @@ app.post("/reset-password", async (req, res) => {
     }
 });
 
-
-app.get('/searchUser', async (req, res) => {
-    const { username } = req.query;
-    // Sanitize the input
-    const sanitizedUsername = validator.escape(username);
-    try {
-        // Find the user in the database
-        const user = await User.findOne({ where: { username: sanitizedUsername } });
-		console.log(user);
-        if (!user) {
-            // No user found with the given username
-            res.status(404).json({ success: false, error: 'User not found' });
-        } else {res.json(user)}
-    } catch (error) {
-        console.error('Sequelize query error:', error);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
-    }
-});
-
-app.get('/api/users', async (req, res) => {
-    try {
-        // Find all users in the database
-        const users = await User.findAll();
-        // Return the users in the response
-        res.json(users);
-    } catch (error) {
-        console.error('Sequelize query error:', error);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
-    }
-});
   
 app.get('/api/searchUser', async (req, res) => {
+	const sessionTokencookie = req.cookies['sessionToken'];
+     
+	if (!sessionTokencookie) {
+		// Redirect the user to the /home page
+		return res.redirect('/index');
+	  }
     const { username } = req.query;
     try {
         // Find the user in the database by username
@@ -654,12 +652,21 @@ app.get('/api/searchUser', async (req, res) => {
 });
   
 app.delete('/api/deleteUser/:username', async (req, res) => {
+	
+     
+	
+
     const { username } = req.params;
     const creatorUsername = req.session.username;
 
 	try {
         // Retrieve sessionToken from cookies
         const sessionTokencoookie = req.cookies['sessionToken'];
+
+		if (!sessionTokencookie) {
+			// Redirect the user to the /home page
+			return res.redirect('/index');
+		  }
         // Retrieve CSRF token from the request body
         const { csrfToken } = req.body;
         console.log(csrfToken);
@@ -694,6 +701,13 @@ app.delete('/api/deleteUser/:username', async (req, res) => {
 });
 
 app.get('/api/getLogs', async (req, res) => {
+	const sessionTokencookie = req.cookies['sessionToken'];
+     
+	if (!sessionTokencookie) {
+		// Redirect the user to the /home page
+		return res.redirect('/index');
+	  }
+
     try {
         // Query the database to fetch logs using Sequelize model
         const logs = await userLogs.findAll({
@@ -717,6 +731,13 @@ app.get('/api/getLogs', async (req, res) => {
 });
 
 app.get("/locations", isAuthenticated, async (req, res) => {
+	const sessionTokencookie = req.cookies['sessionToken'];
+     
+	if (!sessionTokencookie) {
+		// Redirect the user to the /home page
+		return res.redirect('/index');
+	  }
+
 	try {
 	  // Fetch data using Axios
 	  const url = process.env.API_ALLLOCATION;
@@ -735,6 +756,7 @@ app.get("/locations", isAuthenticated, async (req, res) => {
   });
 
   app.post('/location/new', locationValidation, async (req , res) => {
+
 	try {
 	  const errors = validationResult(req);
 	  if (!errors.isEmpty()) {
@@ -742,6 +764,13 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 	  }
   
 	  const sessionTokencookie = req.cookies['sessionToken'];
+     
+	if (!sessionTokencookie) {
+		// Redirect the user to the /home page
+		return res.redirect('/index');
+	  }
+
+
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -778,7 +807,14 @@ app.get("/locations", isAuthenticated, async (req, res) => {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const sessionTokencookie = req.cookies['sessionToken'];
+        
+		const sessionTokencookie = req.cookies['sessionToken'];
+     
+	if (!sessionTokencookie) {
+		// Redirect the user to the /home page
+		return res.redirect('/index');
+	  }
+
         const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
         
         if (!user) {
@@ -816,7 +852,15 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
+	  
 	  const sessionTokencookie = req.cookies['sessionToken'];
+     
+	  if (!sessionTokencookie) {
+		  // Redirect the user to the /home page
+		  return res.redirect('/index');
+		}
+  
+
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -847,6 +891,12 @@ app.get("/locations", isAuthenticated, async (req, res) => {
   });
 
 app.get("/sensors", isAuthenticated, async (req, res) => {
+	const sessionTokencookie = req.cookies['sessionToken'];
+     
+	  if (!sessionTokencookie) {
+		  // Redirect the user to the /home page
+		  return res.redirect('/index');
+		}
 	try {
 		const url1 = process.env.API_ALLLOCATION;
 		const url2 = process.env.API_ALLSENSOR;
@@ -871,7 +921,14 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
+	  
 	  const sessionTokencookie = req.cookies['sessionToken'];
+     
+	  if (!sessionTokencookie) {
+		  // Redirect the user to the /home page
+		  return res.redirect('/index');
+		}
+
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -905,7 +962,14 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
+	  
 	  const sessionTokencookie = req.cookies['sessionToken'];
+     
+	  if (!sessionTokencookie) {
+		  // Redirect the user to the /home page
+		  return res.redirect('/index');
+		}
+
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -938,7 +1002,14 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
+	  
 	  const sessionTokencookie = req.cookies['sessionToken'];
+     
+	  if (!sessionTokencookie) {
+		  // Redirect the user to the /home page
+		  return res.redirect('/index');
+		}
+	  
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -968,6 +1039,12 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
   });
 
   app.get("/apilog", isAuthenticated, async (req, res) => {
+	const sessionTokencookie = req.cookies['sessionToken'];
+     
+	  if (!sessionTokencookie) {
+		  // Redirect the user to the /home page
+		  return res.redirect('/index');
+		}
 	try {
 		const url = process.env.API_LOGS;
 		const headers = {
