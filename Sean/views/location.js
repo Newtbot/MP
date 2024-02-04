@@ -4,24 +4,36 @@ $(document).ready(function () {
       $('#createLocationForm').hide();
       $('#updateLocationForm').hide();
       $('#deleteLocationForm').hide();
+      $('#additional-text7').hide();
+      $('#additional-text8').hide();
+      $('#additional-text9').hide();
     });
     $('#addLocationLink').on('click', function () {
         $('#locationContainer').hide();
         $('#createLocationForm').show();
         $('#updateLocationForm').hide();
         $('#deleteLocationForm').hide();
+        $('#additional-text7').show();
+        $('#additional-text8').hide();
+      $('#additional-text9').hide();
       });
       $('#updateLocationLink').on('click', function () {
         $('#locationContainer').hide();
         $('#createLocationForm').hide();
         $('#updateLocationForm').show();
         $('#deleteLocationForm').hide();
+        $('#additional-text7').hide();
+        $('#additional-text8').show();
+      $('#additional-text9').hide();
       });
       $('#deleteLocationLink').on('click', function () {
         $('#locationContainer').hide();
         $('#createLocationForm').hide();
         $('#updateLocationForm').hide();
         $('#deleteLocationForm').show();
+        $('#additional-text7').hide();
+        $('#additional-text8').hide();
+      $('#additional-text9').show();
       }); 
   });
 
@@ -81,12 +93,10 @@ $(document).ready(function () {
         }
     })
     .then(data => {
-        console.log(`Location added successfully. Message: ${data.message}`);
         alert('Location added successfully!');
     })
     .catch(error => {
-        console.error('Location not added successfully', error);
-        // Handle error as needed
+        alert('Location not added successfully! Please ensure all inputs are correct');
     });
 });
 
@@ -106,7 +116,6 @@ populateLocationDropdown();
     const selectedLocationId = $('#locationDropdown').val();
     const location= $('#locationname').val();
     const description= $('#description2').val();
-    console.log(description);
     const csrf_token = $('#updateForm input[name="csrf_token"]').val();
 
     fetch('/location/update', {
@@ -138,8 +147,7 @@ populateLocationDropdown();
     
 })
 .catch(error => {
-    console.error('Location not updated successfully', error);
-    // Handle error as needed
+    alert('Location not updated successfully! Please ensure all inputs are correct');
 });
   });
 
@@ -153,13 +161,14 @@ populateLocationDropdown();
     });
 }
 populateLocationDropdown2();
+
   $('#deleteForm').on('submit', function (e) {
     e.preventDefault();
     const selectedLocationId = $('#locationDropdown2').val();
     const csrf_token = $('#deleteForm input[name="csrf_token"]').val();
 
     fetch('/location/delete', {
-      method: 'DELETE',
+      method: 'delete',
       headers: {
           'Content-Type': 'application/json'
       },
@@ -179,12 +188,26 @@ populateLocationDropdown2();
     }
 })
 .then(data => {
-    console.log(`Location deleted successfully. Message: ${data.message}`);
     alert('Location deleted successfully!');
-    resetFormFields();
 })
 .catch(error => {
-    console.error('Location not deleted successfully', error);
-    // Handle error as needed
+    
+    alert('Location not deleted successfully!');
 });
   });
+
+  // Function to enable/disable actions based on user role
+function handleUserRoleAccess() {
+    // Disable user creation, deletion, and password reset for non-admin users
+    if (user !== 'admin') {
+      document.getElementById('addLocationLink').style.display = 'none';
+      document.getElementById('updateLocationLink').style.display = 'none';
+      document.getElementById('deleteLocationLink').style.display = 'none';
+      
+    }
+  
+  }
+  
+  // Call the function to handle user role access when the page loads
+  handleUserRoleAccess();
+  

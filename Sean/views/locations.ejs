@@ -60,8 +60,17 @@
       </form>
     </div>
   </div>
+  <div id="additional-text7" style="display: none;">
+    <div class="condition">
+      <span>Conditions for adding a location:</span>
+      <ul>
+        <li class="error">Please Remember to fill all inputs.</li>
+        <li class="error">Please ensure all inputs are correct before adding</li>
+      </ul>
+    </div>
+  </div>
 
-  <div id="updateLocationForm" class="location-update-container" style="display: none;">
+  <div id="updateLocationForm" class="location-update-container custom-location-form" style="display: none;">
     <h3>Update Location</h3>
     <div class="content">
       <form action="/location/update" id="updateForm" method="put">
@@ -88,7 +97,18 @@
     </div>
   </div>
 
-  <div id="deleteLocationForm" class="location-delete-container" style="display: none;">
+  <div id="additional-text8" style="display: none;">
+    <div class="condition">
+      <span>Conditions for updating a location:</span>
+      <ul>
+        <li class="error">Please Ensure the correct location to update is correctly selected.</li>
+        <li class="error">Please Remember to fill all inputs.</li>
+        <li class="error">Please ensure all inputs are correct before adding</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="deleteLocationForm" class="location-delete-container custom-location-form" style="display: none;">
     <h3>Delete Location</h3>
     <div class="content">
       <form action="/location/delete" id="deleteForm" method="delete">
@@ -106,14 +126,22 @@
       </form>
     </div>
   </div>
+
+  <div id="additional-text9" style="display: none;">
+    <div class="condition">
+      <span>Conditions for deleting a location:</span>
+      <ul>
+        <li class="error">Please Ensure the correct location to delete is correctly selected.</li>
+      </ul>
+    </div>
+  </div>
   <footer>
     Any Issue faced, Please contact the administrator at 11111111 or ecosaverAdmin@gmail.com
 </footer>
 <script>
    const locationsData = <%- JSON.stringify(locationsData) %>;
    const user = <%- JSON.stringify(user) %>;
-   console.log(user);
-   </script>
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="location.js"></script>
