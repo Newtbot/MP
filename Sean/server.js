@@ -278,10 +278,6 @@ app.post
             }
 			const sessionTokencookie = req.cookies['sessionToken'];
 
-<<<<<<< Updated upstream
-=======
-			
->>>>>>> Stashed changes
             // Verify sessionToken with the one stored in the database
             const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 
@@ -527,10 +523,7 @@ app.post("/reset-password", async (req, res) => {
         return res.status(403).json({ error: 'CSRF token mismatch' });
     }
 	const sessionTokencookie = req.cookies['sessionToken'];
-<<<<<<< Updated upstream
-=======
    
->>>>>>> Stashed changes
             // Verify sessionToken with the one stored in the database
             const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
             if (!user) {
@@ -610,11 +603,8 @@ app.get('/api/users', async (req, res) => {
 });
   
 app.get('/api/searchUser', async (req, res) => {
-<<<<<<< Updated upstream
-=======
 	
 
->>>>>>> Stashed changes
     const { username } = req.query;
     try {
         // Find the user in the database by username
@@ -635,23 +625,17 @@ app.get('/api/searchUser', async (req, res) => {
 });
   
 app.delete('/api/deleteUser/:username', async (req, res) => {
-<<<<<<< Updated upstream
-=======
 	
     
 
->>>>>>> Stashed changes
     const { username } = req.params;
     const creatorUsername = req.session.username;
 
 	try {
         // Retrieve sessionToken from cookies
         const sessionTokencoookie = req.cookies['sessionToken'];
-<<<<<<< Updated upstream
-=======
 
 		
->>>>>>> Stashed changes
         // Retrieve CSRF token from the request body
         const { csrfToken } = req.body;
         console.log(csrfToken);
@@ -686,10 +670,7 @@ app.delete('/api/deleteUser/:username', async (req, res) => {
 });
 
 app.get('/api/getLogs', async (req, res) => {
-<<<<<<< Updated upstream
-=======
 	
->>>>>>> Stashed changes
     try {
         // Query the database to fetch logs using Sequelize model
         const logs = await userLogs.findAll({
@@ -713,10 +694,7 @@ app.get('/api/getLogs', async (req, res) => {
 });
 
 app.get("/locations", isAuthenticated, async (req, res) => {
-<<<<<<< Updated upstream
-=======
 	
->>>>>>> Stashed changes
 	try {
 	  // Fetch data using Axios
 	  const response = await axios.get(process.env.API_ALLLOCATION);
@@ -736,14 +714,10 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
-<<<<<<< Updated upstream
-	  const sessionTokencookie = req.cookies['sessionToken'];
-=======
   
 	
 
 
->>>>>>> Stashed changes
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -765,8 +739,6 @@ app.get("/locations", isAuthenticated, async (req, res) => {
   });
 
   app.post('/location/update', locationValidationUpdate, async (req, res) => {
-<<<<<<< Updated upstream
-=======
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -806,19 +778,14 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 
  
   app.delete('/location/delete', locationdeleteValidation, async (req, res) => {
->>>>>>> Stashed changes
 	try {
 	  const errors = validationResult(req);
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
-<<<<<<< Updated upstream
-	  const sessionTokencookie = req.cookies['sessionToken'];
-=======
 	  
   
 
->>>>>>> Stashed changes
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -868,10 +835,7 @@ app.get("/locations", isAuthenticated, async (req, res) => {
   });
 
 app.get("/sensors", isAuthenticated, async (req, res) => {
-<<<<<<< Updated upstream
-=======
 	
->>>>>>> Stashed changes
 	try {
 		// Render the inusers page with JSON data
 		const response = await axios.get(process.env.API_ALLLOCATION);
@@ -891,12 +855,8 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
-<<<<<<< Updated upstream
-	  const sessionTokencookie = req.cookies['sessionToken'];
-=======
 	  
 
->>>>>>> Stashed changes
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -923,12 +883,8 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
-<<<<<<< Updated upstream
-	  const sessionTokencookie = req.cookies['sessionToken'];
-=======
 	  
 
->>>>>>> Stashed changes
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -955,13 +911,9 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
-<<<<<<< Updated upstream
-	  const sessionTokencookie = req.cookies['sessionToken'];
-=======
 	  
 	
 	  
->>>>>>> Stashed changes
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -982,8 +934,6 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	}
   });
 
-<<<<<<< Updated upstream
-=======
   app.get("/apilog", isAuthenticated, async (req, res) => {
 	
 	try {
@@ -1005,7 +955,6 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
   });
 
 
->>>>>>> Stashed changes
 app.use(express.static("views"));
 
 app.listen(PORT, () => {
