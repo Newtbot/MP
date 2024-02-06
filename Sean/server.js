@@ -441,7 +441,7 @@ app.post("/forgot-password", async (req, res) => {
 	  }
 	  // Generate reset token and update the user
 	  const reset_token = crypto.randomBytes(20).toString("hex");
-	  const reset_token_expiry = new Date(Date.now() + 3600000); // Token expires in 1 hour
+	  const reset_token_expiry = new Date(Date.now() + 600000); // 600000 milliseconds = 10 minutes
 	  // Update the user with the reset token and expiry
 	  await User.update({reset_token,reset_token_expiry,},
 		{where: {id: user.id},}
@@ -567,10 +567,7 @@ app.post("/reset-password", async (req, res) => {
     }
 	const sessionTokencookie = req.cookies['sessionToken'];
      
-	
-
-	  
-            // Verify sessionToken with the one stored in the database
+    // Verify sessionToken with the one stored in the database
     const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
             if (!user) {
                 return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -641,23 +638,22 @@ app.get('/api/searchUser', async (req, res) => {
   
 app.delete('/api/deleteUser/:username', async (req, res) => {
 	
-
-
     const { username } = req.params;
     const creatorUsername = req.session.username;
-
+	
 	try {
         
         // Retrieve CSRF token from the request body
         const { csrfToken } = req.body;
-        console.log(csrfToken);
+        
         // Compare CSRF token with the one stored in the session
         if (csrfToken !== req.session.csrfToken) {
             return res.status(403).json({ success: false, error: 'CSRF token mismatch' });
 		}
-
+		const sessionTokencookie = req.cookies['sessionToken'];
+		
         // Verify sessionToken with the one stored in the database
-        const user = await User.findOne({ where: { sessionid: sessionTokencoookie  } });
+        const user = await User.findOne({ where: { sessionid: sessionTokencookie} });
 
         if (!user) {
             return res.status(403).json({ success: false, error: 'Invalid sessionToken or user not found' });
@@ -683,7 +679,6 @@ app.delete('/api/deleteUser/:username', async (req, res) => {
 
 app.get('/api/getLogs', async (req, res) => {
 	
-
     try {
         // Query the database to fetch logs using Sequelize model
         const logs = await userLogs.findAll({
@@ -707,7 +702,6 @@ app.get('/api/getLogs', async (req, res) => {
 });
 
 app.get("/locations", isAuthenticated, async (req, res) => {
-	
 
 	try {
 	  // Fetch data using Axios
