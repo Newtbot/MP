@@ -640,6 +640,7 @@ app.delete('/api/deleteUser/:username', async (req, res) => {
 	
     const { username } = req.params;
     const creatorUsername = req.session.username;
+	
 	try {
         
         // Retrieve CSRF token from the request body
@@ -649,9 +650,10 @@ app.delete('/api/deleteUser/:username', async (req, res) => {
         if (csrfToken !== req.session.csrfToken) {
             return res.status(403).json({ success: false, error: 'CSRF token mismatch' });
 		}
-
+		const sessionTokencookie = req.cookies['sessionToken'];
+		
         // Verify sessionToken with the one stored in the database
-        const user = await User.findOne({ where: { sessionid: sessionTokencoookie  } });
+        const user = await User.findOne({ where: { sessionid: sessionTokencookie} });
 
         if (!user) {
             return res.status(403).json({ success: false, error: 'Invalid sessionToken or user not found' });
