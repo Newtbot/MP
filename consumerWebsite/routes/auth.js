@@ -11,7 +11,6 @@ const { addPasswordResetToken } = require("../functions/api");
 const { sendResetPasswordEmail } = require("../functions/nodeMail");
 const { checkTokenByrowID } = require("../functions/api");
 
-
 const express = require("express");
 const { render } = require("ejs");
 const router = express.Router();
@@ -63,19 +62,10 @@ router.post("/login", async (req, res, next) => {
 //auth/contact
 router.post("/contact", async (req, res, next) => {
 	try {
-		//console.log(req.body);
-		let Res = await checkEmail(req.body.email);
-		if (!Res) {
-			let error = new Error("Email not found");
-			error.status = 400;
-			return next(error);
-		} else {
-			//console.log(Res);
-			sendContactEmail(req.body.email, req.body.name, req.body.message);
-			return res.json({
-				message: "Email sent successfully",
-			});
-		}
+		sendContactEmail(req.body.email, req.body.name, req.body.message);
+		return res.json({
+			message: "Email sent successfully",
+		});
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -117,7 +107,6 @@ router.post("/checkemail", async (req, res, next) => {
 	}
 });
 
-
 //reset password
 router.post("/resetpassword/:token", async (req, res, next) => {
 	console.log(req.body);
@@ -132,18 +121,16 @@ router.post("/resetpassword/:token", async (req, res, next) => {
 		return next(error);
 	}
 	//token is valid and reset password
-	else{
+	else {
 		let Res = await resetPass(tokenRes.userid, req.body);
 		if (!Res) return false;
-		else{
+		else {
 			res.json({
 				message: "Password reset successfully",
 			});
 			tokenRes.destroy();
 		}
 	}
-
 });
 
 module.exports = router;
-

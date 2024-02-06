@@ -3,83 +3,87 @@
         // Require login to see this page.
         //app.auth.redirectIfLoggedIn();
     </script>
+    <section class="wrapper">
+        <div class="form signup iot-card">
+            <!--<div class="form signup card" -->
+            <header>Signup</header>
+            <div class="card-header shadow actionMessage" style="display:none"></div>
+            <!-- localhost/api/v0/user/register -->
+            <!-- evalAjax Fires when status 200 is returned  -->
+            <!-- https://stackoverflow.com/questions/40782598/set-custom-error-message-when-using-pattern-attribute-in-html5-not-working-in-ie -->
+            <form action="auth/register" onsubmit="formAJAX(this)" evalAJAX="app.auth.logInRedirect();">
+                <input type="text" name="firstname" placeholder="First Name" required pattern="^[a-zA-Z\s]+$"
+                    title="Only first name with letter, numbers are allowed!" />
+                <input type="text" name="last name" placeholder="Last Name" required pattern="^[a-zA-Z\s]+$"
+                    title="Only lastname with letter, numbers are allowed!" />
+                <input type="text" name="username" placeholder="Username" required pattern="^\w+$"
+                    title="Only username with numbers and letters!" />
+                <input type="email" name="email" placeholder="Email" required
+                    pattern="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" title="Only emails are allowed!" />
+                <input type="text" name="address" placeholder="Address" required pattern="^(\d{1,3}.)?.+\s(\d{6})$"
+                    title="The address must follow this format: Nanyang Polytechnic 180 Ang Mo Kio Avenue 8 Singapore 569830" />
+                <input type="text" name="phone" placeholder="Phone Number" required
+                    pattern="^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,8}$"
+                    title="Only phone numbers are allowed. For example: 12345678 or +6512345678" />
+                <input type="password" id="password" name="password" placeholder="Password" required />
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password"
+                    required />
+                <input type="submit" value="Signup" />
+            </form>
+        </div>
 
-        <section class="wrapper">
-            <div class="form signup iot-card">
-                <!--<div class="form signup card" -->
-                <header>Signup</header>
-                <div class="card-header shadow actionMessage" style="display:none"></div>
-                <!-- localhost/api/v0/user/register -->
-                <!-- evalAjax Fires when status 200 is returned  -->
-                <form action="auth/register" onsubmit="formAJAX(this)" evalAJAX="app.auth.logInRedirect();">
-                    <input type="text" name="firstname" placeholder="First Name" required pattern="^[a-zA-Z\s]+$" />
-                    <input type="text" name="lastname" placeholder="Last Name" required pattern="^[a-zA-Z\s]+$" />
-                    <input type="text" name="username" placeholder="Username" required pattern="^\w+$" />
-                    <input type="email" name="email" placeholder="Email" required
-                        pattern="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" />
-                    <input type="text" name="address" placeholder="Address" required
-                        pattern="^(\d{1,3}.)?.+\s(\d{6})$" />
-                    <input type="text" name="phone" placeholder="Phone Number" required
-                        pattern="^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,8}$" />
-                    <input type="password" id="password" name="password" placeholder="Password" required />
-                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password"
-                        required />
-                    <input type="submit" value="Signup" />
-                </form>
-            </div>
-
-            <div class="form login iot-card">
-                <header>Login</header>
-                <div class="card-header shadow actionMessage" style="display:none"></div>
-                <!-- evalAjax Fires when status 200 is returned  -->
-                <form action="auth/login" onsubmit="formAJAX(this)" evalAJAX="app.auth.homeRedirect();
+        <div class="form login iot-card">
+            <header>Login</header>
+            <div class="card-header shadow actionMessage" style="display:none"></div>
+            <!-- evalAjax Fires when status 200 is returned  -->
+            <form action="auth/login" onsubmit="formAJAX(this)" evalAJAX="app.auth.homeRedirect();
                 app.auth.setToken(data.token);">
-                    <input type="text" name="username" placeholder="Email address | Username" required
-                        pattern="^(\w+@\w+\.\w+)$|^\w+$"/>
-                    <input type="password" name="password" placeholder="Password" required />
-                    <a href="/forgotpassword">Forgot password?</a>
-                    <input type="submit" value="Login" />
-                </form>
-            </div>
+                <input type="text" name="username" placeholder="Email address | Username" required
+                    pattern="^(\w+@\w+\.\w+)$|^\w+$" />
+                <input type="password" name="password" placeholder="Password" required />
+                <a href="/forgotpassword">Forgot password?</a>
+                <input type="submit" value="Login" />
+            </form>
+        </div>
 
-            <script>
-                //both password fields must match
-                var password = document.getElementById("password");
-                var confirm_password = document.getElementById("confirmPassword");
+        <script>
+            //both password fields must match
+            var password = document.getElementById("password");
+            var confirm_password = document.getElementById("confirmPassword");
 
-                function validatePassword() {
-                    var passwordValue = password.value;
+            function validatePassword() {
+                var passwordValue = password.value;
 
-                    // Strong password regex pattern
-                    var strongPasswordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+                // Strong password regex pattern
+                var strongPasswordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
 
-                    if (passwordValue != confirm_password.value) {
-                        confirm_password.setCustomValidity("Passwords Don't Match");
-                    } else if (!strongPasswordPattern.test(passwordValue)) {
-                        confirm_password.setCustomValidity("Password must be at least 8 characters long and include at least one letter, one number, and one special character.");
-                    } else {
-                        confirm_password.setCustomValidity('');
-                    }
+                if (passwordValue != confirm_password.value) {
+                    confirm_password.setCustomValidity("Passwords Don't Match");
+                } else if (!strongPasswordPattern.test(passwordValue)) {
+                    confirm_password.setCustomValidity("Password must be at least 8 characters long and include at least one letter, one number, and one special character.");
+                } else {
+                    confirm_password.setCustomValidity('');
                 }
+            }
 
-                password.onchange = validatePassword;
-                confirm_password.onkeyup = validatePassword;
+            password.onchange = validatePassword;
+            confirm_password.onkeyup = validatePassword;
 
 
-                
-                const wrapper = document.querySelector(".wrapper"),
-                    signupHeader = document.querySelector(".signup header"),
-                    loginHeader = document.querySelector(".login header");
 
-                loginHeader.addEventListener("click", () => {
-                    wrapper.classList.add("active");
-                });
-                signupHeader.addEventListener("click", () => {
-                    wrapper.classList.remove("active");
-                });
-            </script>
-        </section>
+            const wrapper = document.querySelector(".wrapper"),
+                signupHeader = document.querySelector(".signup header"),
+                loginHeader = document.querySelector(".login header");
+
+            loginHeader.addEventListener("click", () => {
+                wrapper.classList.add("active");
+            });
+            signupHeader.addEventListener("click", () => {
+                wrapper.classList.remove("active");
+            });
+        </script>
+    </section>
 
     </body>
 
-</html>
+    </html>
