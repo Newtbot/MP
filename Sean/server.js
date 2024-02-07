@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const validator = require('validator');
 const axios = require('axios');
 const pidusage = require('pidusage');
+const path = require('path');
 
 const { validationResult } = require('express-validator');
 const { locationValidation, locationValidationUpdate, locationdeleteValidation
@@ -29,6 +30,8 @@ require("dotenv").config();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
+
+app.set('views', path.join(__dirname, 'views'));
 app.set("view engine", "ejs");
 
 app.use(session({
