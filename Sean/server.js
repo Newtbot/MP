@@ -39,7 +39,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: false, // Make sure to set this to true in a production environment with HTTPS
+        secure: secure, // Make sure to set this to true in a production environment with HTTPS
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // Session duration in milliseconds (here set to 1 day)
     },
@@ -450,7 +450,7 @@ app.post("/forgot-password", async (req, res) => {
 		{where: {id: user.id},}
 	  );
 	  // Send email with reset link
-	  const resetLink = `http://localhost:3000/reset-password/${reset_token}`;
+	  const resetLink = `https://admin.teeseng.uk/reset-password/${reset_token}`;
 	  const mailOptions = {
 		to: user.email,
 		subject: "Password Reset",
