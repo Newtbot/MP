@@ -277,7 +277,7 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 	
 			const currentUsername = req.session.username;
 			// Render the inusers page with JSON data
-			res.render("inusers", {allUsers, csrfToken: req.session.csrfToken, currentUsername, userRole:req.session.jobTitle});
+			res.render("inusers", {allUsers, csrfToken: req.session.csrfToken, currentUsername, userRole: req.session.jobTitle});
 		} catch (error) {
 			console.error("Error fetching all users:", error);
 			res.status(500).send("Internal Server Error");
