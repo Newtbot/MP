@@ -40,7 +40,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: true, // Make sure to set this to true in a production environment with HTTPS
+        secure: false, // Make sure to set this to true in a production environment with HTTPS
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // Session duration in milliseconds (here set to 1 day)
     },
@@ -181,10 +181,10 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 		});
 		const jobTitle = user ? user.jobTitle : null;
 
-		console.log(jobTitle);
+		
 
 		req.session.jobTitle = jobTitle;
-		console.log(req.session.jobTitle);
+		
 		req.session.authenticated = true;
 		req.session.username = req.body.username;
 		req.session.sessionToken = sessionToken;
