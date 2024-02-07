@@ -47,8 +47,10 @@ app.use(session({
 }));
 function isAuthenticated(req, res, next) {
 	if (req.session && req.session.authenticated) {
+		console.log("testing1");
 		return next();
 	} else {
+		console.log("testing");
 		res.redirect("/index");
 	}
 }
