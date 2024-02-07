@@ -51,7 +51,7 @@ function isAuthenticated(req, res, next) {
 		res.redirect("/index");
 	}
 }
-router.get(["/", "/index"], function (req, res) {
+app.get(["/", "/index"], function (req, res) {
 	res.render("index");
 }); 
 
