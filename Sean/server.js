@@ -30,8 +30,15 @@ require("dotenv").config();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
+app.use(express.static('public', { 
+	setHeaders: (res, path, stat) => {
+	  if (path.endsWith('.css')) {
+		res.setHeader('Content-Type', 'text/css');
+	  }
+	},
+  }));
 app.set('views', path.join(__dirname, 'views'));
+
 app.set("view engine", "ejs");
 
 app.use(session({
