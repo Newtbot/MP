@@ -39,7 +39,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: secure, // Make sure to set this to true in a production environment with HTTPS
+        secure: true, // Make sure to set this to true in a production environment with HTTPS
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // Session duration in milliseconds (here set to 1 day)
     },
