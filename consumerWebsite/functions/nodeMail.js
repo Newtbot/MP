@@ -12,7 +12,6 @@ var message = {
 };
 //send mail with defined transport object
 transporter.sendMail(data[, callback])
-
 */
 
 async function sendContactEmail(email, name, message) {
