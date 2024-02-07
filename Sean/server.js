@@ -985,7 +985,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
   });
 
 
-app.use(express.static("views"));
+// app.use(express.static("views"));
 
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`);
