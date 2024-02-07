@@ -46,7 +46,7 @@ app.use(session({
     },
 }));
 function isAuthenticated(req, res, next) {
-	if (req.session && req.session.authenticated) {
+	if (req.session) {
 		console.log("testing1");
 		return next();
 	} else {
