@@ -279,6 +279,7 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 			const currentUsername = req.session.username;
 			// Render the inusers page with JSON data
 			const userRole = req.session.jobTitle;
+			console.log(req.session.jobTitle);
 			console.log(userRole);
 			res.render("inusers", {allUsers, csrfToken: req.session.csrfToken, currentUsername, userRole});
 		} catch (error) {
