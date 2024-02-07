@@ -497,9 +497,6 @@ fetchLogs();
 // Assuming EJS is properly configured to evaluate expressions
 
 
-// Assuming allUsers is an array containing user information
-const user = allUsers.find(user => user.username === currentUsername);
-const userRole = user?.jobTitle;
 console.log(userRole);
 
 // Function to enable/disable actions based on user role
