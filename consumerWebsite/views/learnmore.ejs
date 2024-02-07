@@ -1,5 +1,5 @@
 <%- include('top') %>
-<link href="css/learnmore.css" rel="stylesheet" />
+<link href="/css/learnmore.css" rel="stylesheet" />
 <script type="text/javascript">
     // Initialize locations object
     function extractNumbers(str) {
@@ -109,12 +109,8 @@
             // Append the new row to the table
             tbody.appendChild(row);
         } else {
-            // Log if 'locationName' property is not found
-            //console.log("Location name not found for location:", location);
         }
     }
-
-    //console.log("Table updated. Rows:", tbody.children.length);
 }
 
 

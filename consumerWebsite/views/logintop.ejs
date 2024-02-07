@@ -48,6 +48,7 @@
                 if (!error) {
                     $("#cl-logout-button").show("fast");
                     $("#cl-viewdata-button").show("fast");
+                    $("#cl-learnmore-button").show("fast");
                     $("#cl-api-button").show("fast");
                     $("#cl-profile-button").show("fast");
                     $("#cl-login-button").hide("fast");
@@ -86,10 +87,14 @@
                     </li>
                     <!-- profile button -->
                     <div class="form-inline mt-2 mt-md-0">
-						<a id="cl-viewdata-button" class="btn btn-outline-info btn-sm my-2 my-sm-0" href="/viewdata"
-						style="display: none">
-						<i class="fas fa-sign-out"></i>Data
-					</a>
+                        <a id="cl-learnmore-button" class="btn btn-outline-info btn-sm my-2 my-sm-0" href="/learnmore"
+                            style="display: none">
+                            <i class="fas fa-sign-out"></i>Reading
+                        </a>
+                        <a id="cl-viewdata-button" class="btn btn-outline-info btn-sm my-2 my-sm-0" href="/viewdata"
+                            style="display: none">
+                            <i class="fas fa-sign-out"></i>Data
+                        </a>
                         <a id="cl-api-button" class="btn btn-outline-info btn-sm my-2 my-sm-0" href="/api"
                             style="display: none">
                             <i class="fas fa-sign-out"></i> API
