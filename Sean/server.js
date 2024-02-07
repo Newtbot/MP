@@ -181,9 +181,10 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 		});
 		const jobTitle = user ? user.jobTitle : null;
 
-		// console.log(jobTitle);
+		console.log(jobTitle);
+		
 		req.session.jobTitle = jobTitle;
-		// console.log(req.session.jobTitle);
+		
 		req.session.authenticated = true;
 		req.session.username = req.body.username;
 		req.session.sessionToken = sessionToken;
