@@ -188,8 +188,6 @@ app.post("/verify-otp", otpValidation ,async (req, res) => {
 		req.session.csrfToken = crypto.randomBytes(32).toString('hex');
   
 		res.cookie('sessionToken', sessionToken, { secure: true, httpOnly: true, expires: new Date(Date.now() + 9 * 60 * 60 * 1000) }); // Expires in 9 hours
-
-  
 		res.redirect("/home");
 	  } else {
 		if (req.body.username) {
