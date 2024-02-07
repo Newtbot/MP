@@ -175,7 +175,9 @@
     
     <script >
       const allUsers = <%- JSON.stringify(allUsers) %>;
-      const currentUsername = '<%= currentUsername %>';
+      const currentUsername = <%- JSON.stringify(currentUsername) %>;
+      const userRole = <%- JSON.stringify(userRole) %>;
+      console.log(userRole);
     </script>
  
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
