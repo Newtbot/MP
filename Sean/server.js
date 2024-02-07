@@ -48,9 +48,10 @@ function isAuthenticated(req, res, next) {
 		res.redirect("/index");
 	}
 }
-app.get('/index', (req, res) => {
-	res.render('index'); 
-  });
+router.get(["/", "/index"], function (req, res) {
+	res.render("index");
+}); 
+
 
 app.get("/login", (req, res) => {
 	res.render("login", { error: null });
