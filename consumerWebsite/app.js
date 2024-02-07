@@ -28,6 +28,9 @@ app.onListen = [
 // Apply the rate limiting middleware to all requests.
 app.use(limiter);
 
+//proxy trust
+app.enable('trust proxy');
+
 //disable x-powered-by header for security reasons
 app.disable("x-powered-by");
 
