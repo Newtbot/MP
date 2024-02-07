@@ -74,15 +74,15 @@ button.btn-secondary:hover{
 	border-radius: 4.8px;
 }
 .btn-outline-danger{
-	width: 78px;
-	height: 40px;
+	width: 100px;
+	height: 42px;
 	padding-top: 8px;
 	font-size: 16px;
 
 }
 .btn-outline-info{
-	width: 78px ;
-	height: 40px ;
+	width: 100px ;
+	height: 42px ;
 	padding-top: 8px;
 	font-size: 16px;
 
