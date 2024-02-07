@@ -30,7 +30,7 @@ require("dotenv").config();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.static('view', { 
+app.use(express.static('views', { 
 	setHeaders: (res, path, stat) => {
 	  if (path.endsWith('.css')) {
 		res.setHeader('Content-Type', 'text/css');
