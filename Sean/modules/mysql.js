@@ -12,7 +12,7 @@ const { Sequelize } = require('sequelize');
 	process.env.DB_USER,
 	process.env.DB_PASS,
 	{
-	  host: "mpsqldatabasean.mysql.database.azure.com",
+	  host: proccess.env.host,
 	   dialect: 'mysql',
 	   //  attributeBehavior?: 'escape' | 'throw' | 'unsafe-legacy';
 	   attributeBehavior: 'escape',
