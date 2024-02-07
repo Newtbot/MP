@@ -493,12 +493,6 @@ function downloadLogs(logs, filename) {
 fetchLogs();
 
 
-
-// Assuming EJS is properly configured to evaluate expressions
-
-
-console.log(userRole);
-
 // Function to enable/disable actions based on user role
 function handleUserRoleAccess() {
   // Disable user creation, deletion, and password reset for non-admin users
