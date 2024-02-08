@@ -9,6 +9,8 @@ class IoTdataGenerator {
 		try {
 			const loc = await getLocation();
 			const sen = await getSensor();
+			console.log(loc);
+			console.log(sen);
 			return { loc, sen };
 		} catch (err) {
 			console.error(err);
