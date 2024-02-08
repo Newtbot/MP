@@ -735,7 +735,7 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
-
+	  const sessionTokencookie = req.cookies['sessionToken'];
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -772,7 +772,7 @@ app.get("/locations", isAuthenticated, async (req, res) => {
             return res.status(400).json({ errors: errors.array() });
         }
 
-    
+		const sessionTokencookie = req.cookies['sessionToken'];
         const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
         
         if (!user) {
@@ -810,7 +810,7 @@ app.get("/locations", isAuthenticated, async (req, res) => {
 	  if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
 	  }
-  
+	  const sessionTokencookie = req.cookies['sessionToken'];
 
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
@@ -868,7 +868,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 		return res.status(400).json({ errors: errors.array() });
 	  }
 	  
-	 
+	  const sessionTokencookie = req.cookies['sessionToken'];
 
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
@@ -905,7 +905,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  }
 	  
 	
-
+	  const sessionTokencookie = req.cookies['sessionToken'];
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
@@ -939,7 +939,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 		return res.status(400).json({ errors: errors.array() });
 	  }
 	  
-
+	  const sessionTokencookie = req.cookies['sessionToken'];
 	  
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
