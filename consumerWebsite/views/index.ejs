@@ -50,6 +50,7 @@
 
          //call socket.io to get live data
          app.socket.on("sensorData:new", function (data) {
+            // console.log("Index WS" , data);
             $.scope.LatestSensorData.update(parseRowToTemplace(data));
          });
       });

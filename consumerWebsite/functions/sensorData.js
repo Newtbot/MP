@@ -29,7 +29,7 @@ async function addSensorData(sensorid , locationid , measurement) {
 	//console.log("sensorData", sensordata.measurement);
 	//console.log("sensorData", sensorData.measurement);
 	
-	io().emit('sensorData:new', sensorData.measurement);
+	io().emit('sensorData:new', sensorData);
 	return sensorData;
 }
 
