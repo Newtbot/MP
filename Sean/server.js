@@ -905,7 +905,7 @@ app.get("/sensors", isAuthenticated, async (req, res) => {
 	  }
 	  
 	
-	  const sessionTokencookie = req.cookies['sessionToken'];const sessionTokencookie = req.cookies['sessionToken'];
+	  const sessionTokencookie = req.cookies['sessionToken'];
 	  const user = await User.findOne({ where: { sessionid: sessionTokencookie } });
 	  if (!user) {
 		  return res.status(403).json({ error: 'Invalid sessionToken' });
