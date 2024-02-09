@@ -25,7 +25,7 @@
                 for (let location of data) {
                     locations[parseInt(location.id, 10)] = location;
                 }
-                //console.log("Updated Locations Object:", locations);
+                console.log("Updated Locations Object:", locations);
                 resolve();
             });
         });
@@ -70,11 +70,11 @@
             case 'co':
                 return ' ppm';
             case 'o3':
-                return ' ppb';
+                return ' ppm';
             case 'no2':
-                return ' ppb';
+                return ' ppm';
             case 'so2':
-                return ' ppb';
+                return ' ppm';
             default:
                 return '';
         }
@@ -90,25 +90,30 @@
 
     // Loop through each location
     for (var i = 0; i < locations.length; i++) {
-        var location = locations[i];
-        //console.log("Location:", location);
-
-        // Create a new table row
-        var row = document.createElement("tr");
+        var locationData = locations[i].latest; // Access the 'latest' property
+        //console.log("Location Data from Locations Object:", locationData);
 
         // Check if the location has the 'locationName' property
-        if (location.latest.locationName) {
+        if (locationData.locationName) {
+            // Create a new table row
+            var row = document.createElement("tr");
+            //console.log("Row Object:", row);
+
             // Loop through the properties of the location
-            for (var dataKey in location.latest) {
+            for (var dataKey in locationData) {
                 var cell = document.createElement("td");
-                var cellText = document.createTextNode(location.latest[dataKey] + getSymbolOrUnit(dataKey));
+                var cellText = document.createTextNode(locationData[dataKey] + getSymbolOrUnit(dataKey));
                 cell.appendChild(cellText);
                 row.appendChild(cell);
+                //console.log("Cell Object:", cell);
+
             }
 
             // Append the new row to the table
             tbody.appendChild(row);
         } else {
+            //console.log("Location ID not found in Locations Object");
+            // Handle the case where locationName is not found, you can log an error or take other actions.
         }
     }
 }
@@ -117,7 +122,6 @@
 
 
 
-// Declare locations in the outer scope
 const locations = {};
 async function loadData() {
     // Populate the locations object
@@ -126,16 +130,22 @@ async function loadData() {
     // Fetch and process sensor data
     app.api.get('latest-sensor-data/data', function (error, data) {
         const uniqueLocationIds = [...new Set(data.map(row => parseInt(row.locationid, 10)))];
-
-        // Create an array to store location data
         const locationsArray = [];
-
+        //console.log("Sensor Data:", data);
+        if (error) {
+            console.error("Error fetching sensor data:", error);
+            return;
+    }
         // Loop through each unique location ID
         for (let locationIdAsNumber of uniqueLocationIds) {
-            // Check if the locationid exists in the locations object
             const locationData = locations[locationIdAsNumber];
+            //console.log("Location Data from Locations Object:", locationData);
+            const rowData = data.find(row => parseInt(row.locationid, 10) === 7);
+            //console.log("Row Data for Location ID:", 7, rowData);
+           // console.log("Unique Location IDs:", uniqueLocationIds);
+
+
             if (locationData) {
-                //console.log("Location Data from Locations Object:", locationData);
                 const locationName = locationData.name;
                 //console.log("Resolved Location Name:", locationName);
 
@@ -154,7 +164,7 @@ async function loadData() {
             }
         }
 
-        // Update the table with the array of locations
+        // Update the table after processing all locations
         updateTable(locationsArray);
     });
 
@@ -162,7 +172,6 @@ async function loadData() {
         const locationIdAsNumber = parseInt(data.locationid, 10);
         //console.log("Location ID in Sensor Data:", locationIdAsNumber);
 
-        // Check if the locationid exists in the locations object
         const locationData = locations[locationIdAsNumber];
         if (locationData) {
             //console.log("Location Data from Locations Object:", locationData);
@@ -179,12 +188,7 @@ async function loadData() {
 }
 
 
-
-// Load data when the document is ready
 $(document).ready(loadData);
-
-
-
 
 
 </script>
@@ -205,27 +209,53 @@ $(document).ready(loadData);
                 <th>Temperature</th>
                 <th>Wind Speed</th>
                 <th>CO</th>
-                <th>O3</th>
-                <th>NO2</th>
-                <th>SO2</th>
+                <th>O₃</th>
+                <th>NO₂</th>
+                <th>SO₂</th>
             </tr>
             </thead>
             <tbody id="sensorDataTableBody"></tbody>
         </table>
         <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
+    
+        <div class="legend">
+            <p>Legend:</p>
+            <ul>
+                <li><strong>Air Quality Index(AQI): </strong> PSI</li>
+                <li style="margin-left: 15px;"><strong> PSI: </strong> Pollutant Standards Index - It is a measure used to communicate how polluted the air currently is. </li>
+                <li style="margin-left: 15px;">Note: Higher PSI values indicate poorer air quality.</li>
 
+                <li><strong>Humidity: </strong> %</li>
+                <li style="margin-left: 15px;"><strong> %: </strong> Percentage - Represents the percentage of water vapor in the air.</li>
+                <li style="margin-left: 15px;">Note: Higher humidity values are neither better nor worse; they simply represent a higher percentage of water vapor in the air.</li>
+
+                <li><strong>Temperature: </strong> °C</li>
+                <li style="margin-left: 15px;"><strong> °C: </strong> Degrees Celsius - Indicates the temperature in degrees Celsius.</li>
+                <li style="margin-left: 15px;">Note: Interpretation depends on the context. In general, higher temperatures can be considered better or worse depending on personal preferences or specific requirements.</li>
+
+                <li><strong>Wind Speed: </strong> m/s</li>
+                <li style="margin-left: 15px;"><strong> m/s: </strong> Meters per Second  - Represents the speed of the wind in meters per second.</li>
+                <li style="margin-left: 15px;">Note: Interpretation depends on the context. In some cases, higher wind speeds may be considered better for air circulation, while in other cases, excessive wind speed may be undesirable.</li>
+
+                <li><strong>Carbon Monoxide (CO): </strong> ppm</li>
+                <li><strong>Ozone (O₃): </strong> ppm</li>
+                <li><strong>Nitrogen Dioxide (NO₂):</strong> ppm</li>
+                <li><strong>ulfur Dioxide (SO₂): </strong> ppm</li>
+                <li style="margin-left: 15px;"><strong> ppm: </strong> Parts per Million - Measures the concentration in parts per million.</li>
+                <li style="margin-left: 15px;">Note: The interpretation depends on the specific substance being measured. In the context of pollutants like CO, O₃, NO₂, and SO₂, higher concentrations are generally considered worse.</li>
+            </ul>
+        </div>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        
     </div>
 </div>
 
