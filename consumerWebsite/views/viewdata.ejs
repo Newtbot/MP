@@ -2,13 +2,15 @@
     <link href="css/data.css" rel="stylesheet" />
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script type="text/javascript">
         // Require login to see this page.
         app.auth.forceLogin()
 
         //get Location data
         app.api.get('location', function (error, data) {
-            for (let row in data){
+            for (let row in data) {
                 //format time to local time than push
                 data[row].createdAt = new Date(data[row].createdAt).toLocaleString();
                 data[row].updatedAt = new Date(data[row].updatedAt).toLocaleString();
@@ -18,7 +20,7 @@
 
         //get sensor data
         app.api.get('sensor', function (error, data) {
-            for (let row in data){
+            for (let row in data) {
                 //format time to local time than push
                 data[row].createdAt = new Date(data[row].createdAt).toLocaleString();
                 data[row].updatedAt = new Date(data[row].updatedAt).toLocaleString();
@@ -83,6 +85,42 @@
                 <button id="monthlyso2Button">SO2</button>
                 <button id="monthlycoButton">CO</button>
             </div>
+            <div class="legend-container">
+                <h1>Legend</h1>
+                <div class="legend">
+                    <!-- PSI -->
+                    <div class="legend-item">
+                        <div class="legend-text">PSI (Particulate Matter): Healthy (0 - 50 μg/m³), Moderate (51 - 100 μg/m³), Unhealthy (101 - 200 μg/m³)</div>
+                    </div>
+                    <!-- O3 -->
+                    <div class="legend-item">
+                        <div class="legend-text">O3 or Ozone: Healthy (0 - 20 ppm), Moderate (21 - 70 ppm), Unhealthy (71 - 200 ppm)</div>
+                    </div>
+                    <!-- NO2 -->
+                    <div class="legend-item">
+                        <div class="legend-text">NO2 or Nitrogen Dioxide: Healthy (0 - 40 ppm), Moderate (41 - 100 ppm), Unhealthy (101 - 200 ppm)</div>
+                    </div>
+                    <!-- SO2 -->
+                    <div class="legend-item">
+                        <div class="legend-text">SO2 or Sulfur Dioxide: Healthy (0 - 40 ppm), Moderate (41 - 100 ppm), Unhealthy (101 - 200 ppm)</div>
+                    </div>
+                    <!-- CO -->
+                    <div class="legend-item">
+                        <div class="legend-text">CO or Carbon Monoxide: Healthy (0 - 4.4 ppm), Moderate (4.5 - 9.4 ppm), Unhealthy (9.5 - 25 ppm)</div>
+                    </div>
+                    <!-- Humidity -->
+                    <div class="legend-item">
+                        <div class="legend-text">Humidity: Dry (0 - 50%), Humid (51 - 100%)</div>
+                    </div>
+                    <!-- Temperature -->
+                    <div class="legend-item">
+                        <div class="legend-text">Temperature: Cold (0 - 15°C), Cool (15 - 28°C), Hot (28 - 40°C)</div>
+                    </div>
+                </div>
+            </div>
+            
+
+
             <br>
             <div class="header-container">
                 <h1>Location Table</h1>
