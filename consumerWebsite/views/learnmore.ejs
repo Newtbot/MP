@@ -25,7 +25,7 @@
                 for (let location of data) {
                     locations[parseInt(location.id, 10)] = location;
                 }
-                console.log("Updated Locations Object:", locations);
+                //console.log("Updated Locations Object:", locations);
                 resolve();
             });
         });
@@ -92,6 +92,7 @@
     for (var i = 0; i < locations.length; i++) {
         var locationData = locations[i].latest; // Access the 'latest' property
         //console.log("Location Data from Locations Object:", locationData);
+        
 
         // Check if the location has the 'locationName' property
         if (locationData.locationName) {
@@ -129,9 +130,11 @@ async function loadData() {
 
     // Fetch and process sensor data
     app.api.get('latest-sensor-data/data', function (error, data) {
-        const uniqueLocationIds = [...new Set(data.map(row => parseInt(row.locationid, 10)))];
+        const uniqueLocationIds = [...new Set(data.map(row => parseInt(row.locationid, 20)))];
         const locationsArray = [];
+        //console.log("API Response for Location 7:", data.filter(row => parseInt(row.locationid, 10) === 9));
         //console.log("Sensor Data:", data);
+
         if (error) {
             console.error("Error fetching sensor data:", error);
             return;
@@ -140,9 +143,9 @@ async function loadData() {
         for (let locationIdAsNumber of uniqueLocationIds) {
             const locationData = locations[locationIdAsNumber];
             //console.log("Location Data from Locations Object:", locationData);
-            const rowData = data.find(row => parseInt(row.locationid, 10) === 7);
-            //console.log("Row Data for Location ID:", 7, rowData);
-           // console.log("Unique Location IDs:", uniqueLocationIds);
+            // console.log("Unique Location IDs:", uniqueLocationIds);
+            //console.log("Processing data for Location ID:", locationIdAsNumber);
+
 
 
             if (locationData) {
@@ -150,8 +153,9 @@ async function loadData() {
                 //console.log("Resolved Location Name:", locationName);
 
                 // Update the table for each row
-                const rowData = data.find(row => parseInt(row.locationid, 10) === locationIdAsNumber);
+                const rowData = data.find(row => parseInt(row.locationid, 20) === locationIdAsNumber);
                 //console.log("Row Data for Location ID:", locationIdAsNumber, rowData);
+                //console.log("Row Data for Location ID:", 7, rowData);
 
                 if (rowData) {
                     $.scope.LatestSensorData.update(parseRowToTemplace(rowData));
@@ -169,7 +173,7 @@ async function loadData() {
     });
 
     app.socket.on("sensorData:new", function (data) {
-        const locationIdAsNumber = parseInt(data.locationid, 10);
+        const locationIdAsNumber = parseInt(data.locationid, 20);
         //console.log("Location ID in Sensor Data:", locationIdAsNumber);
 
         const locationData = locations[locationIdAsNumber];
