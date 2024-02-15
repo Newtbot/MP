@@ -20,7 +20,8 @@ Service:
 The cert folder holds all certificate that would be used by the codebase like azure mysql database cert and lets encrypt generated certificate. 
 
 ## consumerWebsite folder
-* bin  
+* bin folder
+  * contains the www file which would run the express http server. 
 
 ## iot-sensor folder
 
