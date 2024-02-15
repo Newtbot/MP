@@ -9,9 +9,6 @@ Service:
 4) mqtt.teeseng.uk mqtt broker
 5) iot-sensor
 
-## cert folder
-The cert folder holds all certificate that would be used by the codebase like azure mysql database cert and lets encrypt generated certificate. 
-
 ## consumerWebsite folder
 * app.js which is the express application file that runs all express functions.
 * mqttApp.js which would handle all MQTT logic.
